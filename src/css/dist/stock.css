@@ -1,0 +1,86 @@
+* {
+  padding: 0;
+  margin: 0;
+  border-spacing: 0;
+  font-family: "Goudy Old Style";
+  user-select: none;
+  background-color: #F6F6F6;
+  font-size: 18px;
+}
+
+.stock {
+  position: relative;
+  overflow: auto;
+  height: 550px;
+}
+.stock > div {
+  display: flex;
+}
+.stock > div.stock-headers {
+  position: sticky;
+  top: 0;
+}
+.stock > div.first-stock-event > .stock-in input,
+.stock > div.first-stock-event .stock-out input {
+  cursor: not-allowed;
+  background: #E4E4E4;
+}
+.stock > div > div {
+  height: 40px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stock > div > .header {
+  border: #F6F6F6 solid 1px;
+}
+.stock > div > .content {
+  border: 1px #B0B0B0 solid;
+}
+.stock > div > .content > input {
+  border: none;
+  height: calc(100% - 20px);
+  width: calc(100% - 20px);
+  padding: 10px;
+}
+.stock > div > .content.invalid {
+  border: rgba(236, 55, 55, 0.918) 1px solid;
+}
+.stock > div .actions {
+  height: 40px;
+  width: 3%;
+}
+.stock > div .codes {
+  width: 16%;
+}
+.stock > div .names {
+  min-width: 35%;
+}
+.stock > div .quantities {
+  width: 7.5%;
+}
+.stock > div .quantities:not(.header) {
+  cursor: pointer;
+}
+.stock > div .quantities:not(.header):hover {
+  background-color: #E4E4E4;
+}
+.stock > div .buy-prices,
+.stock > div .sell-prices {
+  width: 10%;
+}
+.stock > div .buy-prices input,
+.stock > div .sell-prices input {
+  text-align: center;
+}
+.stock > div .first-stock,
+.stock > div .stock-in,
+.stock > div .stock-out {
+  width: 7.5%;
+}
+.stock > div .first-stock input,
+.stock > div .stock-in input,
+.stock > div .stock-out input {
+  text-align: center;
+}

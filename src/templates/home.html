@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>POS</title>
+    <link rel="stylesheet" href="../css/dist/home.css">
+    <link rel="stylesheet" href="../font-awesome/css/all.min.css">
+</head>
+
+<body>
+    <div id="home">
+        <div class="homeOverlayWrapper disabled"></div>
+
+        <div class="homeMainMenuWrapper">
+            <div class="dateHeaderWrapper">
+                <p class="dateHeaderWrapper__dateD">23</p>
+                <p class="dateHeaderWrapper__dateMY">November 2020</p>
+            </div>
+
+            <div class="menusWrapper">
+                <div class="menusWrapper__menu" title="Akses Admin">
+                    <i class="menusWrapper__menu__icon fas fa-user-lock"></i>
+                    <p class="menusWrapper__menu__text">Admin (F2)</p>
+                </div>
+                <div class="menusWrapper__menu open-stock" title="Buka Stok">
+                    <i class="menusWrapper__menu__icon fas fa-shopping-cart"></i>
+                    <p class="menusWrapper__menu__text">Stok (F3)</p>
+                </div>
+                <div class="menusWrapper__menu open-cashier" title="Buka Kasir">
+                    <i class="menusWrapper__menu__icon fas fa-cash-register"></i>
+                    <p class="menusWrapper__menu__text">Kasir (F4)</p>
+                </div>
+                <div class="menusWrapper__menu quit-app" title="Tutup Aplikasi">
+                    <i class="menusWrapper__menu__icon fas fa-sign-out-alt"></i>
+                    <p class="menusWrapper__menu__text">Keluar (F10)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../js/pages/home/main.js"></script>
+</body>
+
+</html>

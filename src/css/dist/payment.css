@@ -1,0 +1,60 @@
+.payment {
+  margin: auto;
+  height: 400px;
+  width: 400px;
+}
+.payment .payment-header {
+  text-align: center;
+  font-size: 28px;
+  padding-top: 20px;
+}
+.payment .payment-content {
+  padding: 25px 25px;
+  margin-top: 20px;
+  font-size: 24px;
+}
+.payment .payment-content > div:not(.payment-content__divider) {
+  margin: 15px 0;
+  display: flex;
+}
+.payment .payment-content > div:not(.payment-content__divider) > div {
+  width: calc(50% - 20px);
+}
+.payment .payment-content > div:not(.payment-content__divider) > input {
+  width: 50%;
+  background-color: transparent;
+  border: none;
+  font-size: 24px;
+  outline: none;
+  padding: 0 10px;
+}
+.payment .payment-content > div:not(.payment-content__divider) input:not(.payment-content__customer__content) {
+  cursor: default;
+}
+.payment .payment-content .payment-content__divider {
+  height: 1px;
+  background-color: #707070;
+  width: 100%;
+}
+.payment .payment-actions {
+  padding: 0 40px;
+  display: flex;
+  width: calc(100% - 80px);
+}
+.payment .payment-actions > div {
+  margin: auto;
+  width: 60px;
+  text-align: center;
+  padding: 25px;
+  background-color: #DCDCDC;
+  font-size: 20px;
+  border-radius: 10px;
+  transition: 0.1s all;
+  cursor: pointer;
+}
+.payment .payment-actions > div > i {
+  margin-right: 10px;
+}
+.payment .payment-actions > div:hover {
+  box-shadow: inset 7px 7px 15px rgba(167, 166, 166, 0.3), inset -7px -7px 7px #c7c7c726, 0px 0px 4px rgba(167, 166, 166, 0.3);
+}

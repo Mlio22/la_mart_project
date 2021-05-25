@@ -1,0 +1,70 @@
+.search-item {
+  width: 75vw;
+  text-align: center;
+}
+.search-item .search-item-header {
+  margin: auto;
+  padding: 25px 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #707070;
+}
+.search-item .search-item-header p {
+  margin-right: 20px;
+  font-size: 20px;
+}
+.search-item .search-item-header input.keywordInput {
+  border: none;
+  border-radius: 15px;
+  width: 50%;
+  padding: 15px;
+  font-size: 18px;
+  height: 25px;
+}
+.search-item .search-item-header input.keywordInput:active, .search-item .search-item-header input.keywordInput:focus {
+  border: none;
+}
+.search-item .search-item-results {
+  transition: 0.5s all;
+  overflow: auto;
+  max-height: 500px;
+}
+.search-item .search-item-results .search-item-result-header,
+.search-item .search-item-results .search-item-result-content {
+  background-color: white;
+  display: flex;
+}
+.search-item .search-item-results .search-item-result-header > p,
+.search-item .search-item-results .search-item-result-content > p {
+  padding: 12.5px;
+  margin: 0;
+  border: #F6F6F6 1px solid;
+  font-size: 18px;
+}
+.search-item .search-item-results .search-item-result-header > .item-barcode,
+.search-item .search-item-results .search-item-result-content > .item-barcode {
+  width: 20%;
+}
+.search-item .search-item-results .search-item-result-header > .item-name,
+.search-item .search-item-results .search-item-result-content > .item-name {
+  width: 45%;
+}
+.search-item .search-item-results .search-item-result-header > .item-type,
+.search-item .search-item-results .search-item-result-content > .item-type {
+  width: 15%;
+}
+.search-item .search-item-results .search-item-result-header > .item-price,
+.search-item .search-item-results .search-item-result-content > .item-price {
+  width: 20%;
+}
+.search-item .search-item-results .search-item-result-content > * {
+  text-align: left;
+}
+.search-item .search-item-results .search-item-result-content:hover {
+  cursor: pointer;
+  background-color: #eeeeee;
+}
+.search-item .search-item-results .search-item-result-content:hover > p {
+  border: #eeeeee 1px solid;
+}

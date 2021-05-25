@@ -1,0 +1,86 @@
+* {
+    padding: 0;
+    margin: 0;
+    border-spacing: 0;
+    font-family: 'Goudy Old Style';
+    user-select: none;
+    background-color: #F6F6F6;
+    font-size: 18px;
+}
+
+.stock {
+    position: relative;
+    overflow: auto;
+    height: 550px;
+    >div {
+        display: flex;
+        &.stock-headers {
+            position: sticky;
+            top: 0;
+        }
+        &.first-stock-event {
+            >.stock-in input,
+            .stock-out input {
+                cursor: not-allowed;
+                background: #E4E4E4;
+            }
+        }
+        >div {
+            height: 40px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        >.header {
+            border: #F6F6F6 solid 1px;
+        }
+        >.content {
+            border: 1px #B0B0B0 solid;
+            >input {
+                border: none;
+                height: calc(100% - 20px);
+                width: calc(100% - 20px);
+                padding: 10px;
+            }
+            &.invalid {
+                border: rgba(236, 55, 55, 0.918) 1px solid;
+            }
+        }
+        .actions {
+            height: 40px;
+            width: 3%;
+        }
+        .codes {
+            width: 16%;
+        }
+        .names {
+            min-width: 35%;
+        }
+        .quantities {
+            width: 7.5%;
+            &:not(.header) {
+                cursor: pointer;
+                &:hover {
+                    background-color: #E4E4E4;
+                }
+            }
+        }
+        .buy-prices,
+        .sell-prices,
+        {
+            width: 10%;
+            input {
+                text-align: center;
+            }
+        }
+        .first-stock,
+        .stock-in,
+        .stock-out {
+            width: 7.5%;
+            input {
+                text-align: center;
+            }
+        }
+    }
+}

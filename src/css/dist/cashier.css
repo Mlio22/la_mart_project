@@ -1,0 +1,277 @@
+* {
+  padding: 0;
+  margin: 0;
+  border-spacing: 0;
+  font-family: "Goudy Old Style";
+  user-select: none;
+  transition: 0.5s all;
+}
+
+div.submenuCover {
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(170, 170, 170, 0.6);
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+div.submenuCover div.submenu {
+  background-color: #D0D0D0;
+  padding: 10px;
+  border-radius: 10px;
+  color: #272626;
+}
+div.submenuCover.hidden {
+  display: none;
+}
+
+div.cashier {
+  z-index: 1;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  color: #707070;
+}
+div.cashier div.left-bar {
+  width: 70%;
+  height: 100vh;
+  background-color: #F6F6F6;
+}
+div.cashier div.left-bar div.purchases-wrapper {
+  height: calc(100vh - 70px);
+  overflow: auto;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases {
+  width: 100%;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases td,
+div.cashier div.left-bar div.purchases-wrapper table.purchases th {
+  border-right: 1px solid #E6E6E6;
+  border-bottom: 1px solid #E6E6E6;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases th {
+  font-size: 20px;
+  position: sticky;
+  top: 0;
+  background-color: #E6E6E6;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases td {
+  font-size: 18px;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr:hover,
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.active {
+  background-color: #eeeeee;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-headers {
+  width: 100%;
+  height: 40px;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-headers th.action-header {
+  width: 30px;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-headers th.barcode-header {
+  width: 15%;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-headers th.name-header {
+  width: calc(30% - 30px);
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-headers th.amount-header {
+  width: 7.5%;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-headers th.price-header {
+  width: 12.5%;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-headers th.type-header {
+  width: 12.5%;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-headers th.total-price-header {
+  width: 20%;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content button {
+  outline: none;
+  border: none;
+  background-color: transparent;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content button i {
+  font-size: 20px;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content:not(.disabled) {
+  cursor: pointer;
+  transition: 0.2s all;
+  background-color: transparent;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content:not(.disabled) button {
+  cursor: pointer;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content:not(.disabled):hover {
+  background-color: #f89e9e;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content:not(.disabled):hover i.fas.fa-times {
+  color: red;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.no-input {
+  padding: 10px;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td input {
+  font-size: 18px !important;
+  padding: 10px;
+  background-color: transparent;
+  border: transparent;
+  width: calc(100% - 20px);
+  transition: 0.2s all;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td input.invalid {
+  background-color: #f89e9e !important;
+}
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.amount-content input,
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.price-content,
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.type-content,
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.total-price-content {
+  text-align: center;
+}
+div.cashier div.left-bar div.left-bottom-bar {
+  border-top: 1px solid #E6E6E6;
+  height: 69px;
+  display: flex;
+}
+div.cashier div.left-bar div.left-bottom-bar > div {
+  width: 50%;
+}
+div.cashier div.left-bar div.left-bottom-bar div.notification {
+  font-size: 22px;
+  margin: 10px 0;
+  margin-left: 15px;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: #00000012 0px 3px 6px;
+}
+div.cashier div.left-bar div.left-bottom-bar div.notification i.notification-icon {
+  margin-right: 20px;
+}
+div.cashier div.left-bar div.left-bottom-bar div.notification.success {
+  background-color: #b1f8a3;
+}
+div.cashier div.left-bar div.left-bottom-bar div.notification.warning {
+  background-color: #f8e39e;
+}
+div.cashier div.left-bar div.left-bottom-bar div.notification.error {
+  background-color: #f89e9e;
+}
+div.cashier div.left-bar div.left-bottom-bar div.total-price {
+  display: flex;
+}
+div.cashier div.left-bar div.left-bottom-bar div.total-price > div {
+  width: 50%;
+  padding: 20px;
+}
+div.cashier div.left-bar div.left-bottom-bar div.total-price div.total-price-header {
+  text-align: center;
+  font-size: 24px;
+}
+div.cashier div.left-bar div.left-bottom-bar div.total-price div.total-price-content {
+  font-size: 28px;
+}
+div.cashier div.right-bar {
+  width: calc(30% - 1px);
+  height: 100vh;
+  background-color: #E6E6E6;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+div.cashier div.right-bar div.payment {
+  border-bottom: 1px solid #DBDBDB;
+}
+div.cashier div.right-bar div.payment div.payment-header {
+  padding-top: 30px;
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 70px;
+}
+div.cashier div.right-bar div.payment div.payment-content {
+  font-size: 24px;
+  padding: 20px 40px;
+}
+div.cashier div.right-bar div.payment div.payment-content .customer-money-bar,
+div.cashier div.right-bar div.payment div.payment-content .price-money-bar,
+div.cashier div.right-bar div.payment div.payment-content .change-money-bar {
+  display: flex;
+}
+div.cashier div.right-bar div.payment div.payment-content .customer-money-bar > div,
+div.cashier div.right-bar div.payment div.payment-content .price-money-bar > div,
+div.cashier div.right-bar div.payment div.payment-content .change-money-bar > div {
+  padding: 15px 0;
+  width: 50%;
+}
+div.cashier div.right-bar div.payment div.payment-content div.divider {
+  width: 100%;
+  height: 1px;
+  background-color: #707070;
+}
+div.cashier div.right-bar div.payment div.payment-content div.customer-money-bar-content,
+div.cashier div.right-bar div.payment div.payment-content div.price-money-bar-content,
+div.cashier div.right-bar div.payment div.payment-content div.change-money-bar-content {
+  text-align: right;
+}
+div.cashier div.right-bar div.shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+div.cashier div.right-bar div.shortcuts div.shortcut {
+  width: calc(100% / 4);
+  height: calc((100% / 3) - 40px);
+  padding: 20px 0;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.25s all;
+  font-size: 18px;
+}
+div.cashier div.right-bar div.shortcuts div.shortcut i.shortcut-icon {
+  font-size: 40px !important;
+  margin-bottom: 10px;
+}
+div.cashier div.right-bar div.shortcuts div.shortcut.disabled {
+  cursor: default;
+  opacity: 0.4;
+  background-color: #00000049;
+}
+div.cashier div.right-bar div.shortcuts div.shortcut:not(.disabled):hover {
+  background-color: #dbdbdb;
+  box-shadow: inset 7px 7px 15px rgba(167, 166, 166, 0.3), inset -7px -7px 7px #c7c7c726, 0px 0px 4px rgba(167, 166, 166, 0.3);
+}
+
+@media (max-width: 1250px) {
+  div.total-price-header {
+    font-size: 20px !important;
+  }
+
+  div.total-price-content {
+    font-size: 24px !important;
+  }
+
+  div.payment-header {
+    font-size: 24px !important;
+  }
+
+  div.payment-content {
+    font-size: 20px !important;
+  }
+
+  div.purchase-detail {
+    font-size: 24px !important;
+  }
+
+  div.notification {
+    font-size: 18px !important;
+  }
+
+  i.shortcut-icon {
+    font-size: 30px !important;
+  }
+}

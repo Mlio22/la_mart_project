@@ -1,0 +1,29 @@
+.open-transaction {
+    font-size: 20px;
+    padding: 10px;
+    .open-transaction-header {
+        width: 25vw;
+        text-align: center;
+        padding: 10px;
+    }
+    .open-transaction-table {
+        overflow: auto;
+        max-height: 450px;
+        .open-transaction-table__header {
+            border-top: 1px solid #707070;
+            border-bottom: 1px solid #707070;
+        }
+        >div {
+            display: flex;
+            text-align: center;
+            >div {
+                padding: 10px 0;
+                width: 50%;
+            }
+            &:hover {
+                cursor: pointer;
+                background-color: #BCBCBC;
+            }
+        }
+    }
+}

@@ -1,0 +1,28 @@
+.cancel {
+  padding: 40px;
+}
+.cancel .cancel-transaction-header {
+  margin-bottom: 50px;
+  font-size: 26px;
+  text-align: center;
+}
+.cancel .cancel-transaction-options {
+  display: flex;
+}
+.cancel .cancel-transaction-options > div {
+  width: 100px;
+  margin: auto 20px;
+  text-align: center;
+  padding: 20px;
+  background-color: #DCDCDC;
+  font-size: 20px;
+  border-radius: 10px;
+  transition: 0.1s all;
+  cursor: pointer;
+}
+.cancel .cancel-transaction-options > div > i {
+  margin-right: 10px;
+}
+.cancel .cancel-transaction-options > div:hover {
+  box-shadow: inset 7px 7px 15px rgba(167, 166, 166, 0.3), inset -7px -7px 7px #c7c7c726, 0px 0px 4px rgba(167, 166, 166, 0.3);
+}

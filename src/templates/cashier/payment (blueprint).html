@@ -1,0 +1,36 @@
+<div class="payment">
+    <div class="payment-header">Pembayaran</div>
+    <div class="payment-content">
+        <div class="payment-content__customer">
+            <div class="payment-content__customer__header">Uang:</div>
+            Rp.<input class="payment-content__customer__content">
+        </div>
+        <div class="payment-content__price">
+            <div class="payment-content__price__header">Total Belanja:</div>
+            Rp.<input class="payment-content__price__content" readonly>
+        </div>
+        <div class="payment-content__divider"></div>
+        <div class="payment-content__change">
+            <div class="payment-content__change__header">Kembalian:</div>
+            Rp.<input class="payment-content__change__content" readonly>
+        </div>
+    </div>
+    <div class="payment-actions">
+        <div class="payment-actions__proceed">
+            <i class="fas fa-check"></i>F4
+        </div>
+        <div class="payment-actions__cancel">
+            <i class="fas fa-times"></i>F3
+        </div>
+    </div>
+</div>
+
+<script>
+    const a = document.querySelector('.payment-content__customer__content');
+
+    a.addEventListener('change', () => {
+        console.log('a');
+    })
+
+    a.value = 'z';
+</script>
