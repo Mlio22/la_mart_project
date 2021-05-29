@@ -1,5 +1,6 @@
 import { SubElement } from "./secondary/subElement.js";
 import { Transaction } from "./primary/transactions/transaction.js";
+import { TotalPrice } from "./primary/totalPrice.js";
 // import { Notification } from './ui/notification.js'
 // import { Shortcuts } from './ui/shortcuts.js'
 
@@ -30,21 +31,16 @@ class CashierUI {
 
     // set child classes
     this.__transaction = new Transaction(this, this.__itemListElement);
+    this.__totalPrice = new TotalPrice(this.__totalPriceElement);
 
     // this.__notification = new Notification(this, this.__notificationElement);
     // this.__shortcuts = new Shortcuts(this, this.__shortcutElement, this.__submenuCoverElement);
-
-    this.__childComponents = {
-      transaction: this.__transaction,
-      // 'notification': this.__notification,
-      // 'shortcuts': this.__shortcuts
-    };
   }
 
   // function called from child to child through parent
 
   openSubmenu(name, params) {
-    // create submenu
+    // create a submenu
     // used from transation to submenu(search-item)
     this.__submenu.createSubmenu(name, params);
   }
@@ -52,6 +48,12 @@ class CashierUI {
   createNewItem(itemData) {
     // used in submenu(search-item) to transaction
     this.__transaction.createNewItem(itemData);
+  }
+
+  setTotalPrice(totalPrice) {
+    console.log(totalPrice);
+    // refresh the total price content
+    this.__totalPrice.totalPrice = totalPrice;
   }
 }
 

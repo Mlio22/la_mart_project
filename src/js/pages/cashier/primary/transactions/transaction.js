@@ -1,4 +1,4 @@
-import { Item } from "./item2.js";
+import { Item } from "./item.js";
 
 const EXAMPLE_ITEM_FROM_SEARCH_ITEM = {
   barcode: "12",
@@ -31,20 +31,12 @@ export class Transaction {
     // todo: get new id using API
   }
 
-  __changeTransactionProperty() {
-    // todo: change property of Transaction
-    // list of properties
-    // total price
-    //
-  }
-
   // function called from above and below
   createNewItem(itemData) {
     // above: used in submenu(search-item)
     // below: used in Item
 
     if (itemData !== undefined) {
-      console.log(itemData);
       // check if item is already on list
       const itemIndexOnList = this.__compareItemWithList(itemData);
 
@@ -77,7 +69,6 @@ export class Transaction {
         const { amount } = itemReference.data;
         duplicatedItem.increaseAmount(amount);
       }
-
       return true;
     }
     return false;
@@ -128,5 +119,17 @@ export class Transaction {
 
   openSearchItem(params) {
     this.__cashier.openSubmenu("search-item", params);
+  }
+
+  refreshTotalPrice() {
+    let currentTotalPrice = 0;
+    this.__transactionItems.forEach((item) => {
+      const { valid, price, amount } = item.data;
+      if (valid) {
+        currentTotalPrice += price * amount;
+      }
+    });
+
+    this.__cashier.setTotalPrice(currentTotalPrice);
   }
 }
