@@ -103,12 +103,10 @@ export class SearchItem {
     if (this.__itemReference !== null) {
       // if itemReference params exists,
       // change that reference's item using item's method
-
       this.__itemReference.data = this.__selectedItem;
     } else {
       // if itemReference doesn't exist (e.g. search-item accessed from shortcut)
       // create new item data on transaction
-      console.log(this.__selectedItem);
       this.__submenu.createNewItem(this.__selectedItem);
     }
   }
@@ -211,7 +209,7 @@ class SearchItemResults {
     this.__matchedItemList = [];
     this.__matchedItemElements = [];
 
-    this.__selectedItem = this.__setInitalElement();
+    this.__setInitalElement();
   }
 
   // set results header for initial
@@ -260,8 +258,10 @@ class SearchItemResults {
       resultElement.addEventListener("click", () => {
         const selectedItemIndexOnList =
           this.__matchedItemElements.indexOf(resultElement);
-        this.__searchItem.selectedItem =
-          this.__matchedItemList[selectedItemIndexOnList];
+
+        this.__searchItem.selectedItem = {
+          ...this.__matchedItemList[selectedItemIndexOnList],
+        };
       });
 
       this.__resultsElement.appendChild(resultElement);

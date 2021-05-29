@@ -1,6 +1,33 @@
-const set_proper_price = function (value) {
-  // added function to add dot between a string
+const EMPTY_ITEM = {
+  barcode: "",
+  name: "",
+  quantity: "",
+  price: 0,
+  amount: 1,
+  valid: false,
+};
+
+function checkShallowObjectEquality(obj1, obj2) {
+  const key1 = Object.keys(obj1),
+    key2 = Object.keys(obj2);
+
+  if (key1.length !== key2.length) {
+    return false;
+  }
+
+  for (let key of key1) {
+    if (obj1[key] !== obj2[key]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// set ordinary number strings to proper price string
+export const set_proper_price = function (value) {
   String.prototype.insertDot = function (index) {
+    // add dot between a string
     if (index > 0) {
       return this.substring(0, index) + "." + this.substr(index);
     }
@@ -39,41 +66,64 @@ const set_proper_price = function (value) {
 
 export class Item {
   constructor(transaction, listElement, data) {
-    // default item data
-    const EMPTY_ITEM = {
-      barcode: "",
-      name: "",
-      quantity: "",
-      price: 0,
-    };
-
-    if (data === undefined) data = EMPTY_ITEM;
-    // data untuk jika item dipanggil dari search item
     this.__transaction = transaction;
     this.__listElement = listElement;
-    this.__data = data;
 
-    // check if data is already valid
-    const isDataAlreadyValid = data !== EMPTY_ITEM;
+    // variable for check if data is already valid
+    let isDataAlreadyValid;
 
-    this.__data = data;
+    // default item data
+    if (data === undefined) {
+      data = { ...EMPTY_ITEM };
+      isDataAlreadyValid = false;
+    } else {
+      isDataAlreadyValid = true;
+    }
+
+    this.__data = { ...data };
+
+    // adding other properties
     this.__data = Object.assign(this.__data, {
       amount: 1,
       valid: isDataAlreadyValid,
     });
 
+    // add ui to Html document
     this.__ui = new ItemUI(this, this.__listElement, this.__data);
 
     // setting timeout to fix item's index in transaction
     setTimeout(() => {
+      this.__transaction.refreshTotalPrice();
       this.__checkData();
     }, 50);
   }
 
   // data getter and setter
-
   get data() {
     return this.__data;
+  }
+
+  set data(data) {
+    // set data absolutely, from e.g. search-item
+    // so the data will be always valid
+    // function called from search-item
+
+    const { amount: previousAmount } = this.__data;
+    this.__data = Object.assign(data, {
+      amount: previousAmount,
+    });
+
+    const isDuplicate = this.__transaction.checkDuplicateOnList(this);
+
+    if (isDuplicate) {
+      // reset to empty item
+      this.__data = { ...EMPTY_ITEM };
+    } else {
+      this.__data.valid = true;
+    }
+
+    this.__ui.itemContent = this.__data;
+    this.__checkData();
   }
 
   __checkData() {
@@ -90,35 +140,8 @@ export class Item {
     // function only called from action
     this.__transaction.removeItemFromList(this);
     this.__ui.removeUi();
-  }
 
-  set data(data) {
-    const EMPTY_ITEM = {
-      barcode: "",
-      name: "",
-      quantity: "",
-      price: 0,
-      amount: 1,
-      valid: false,
-    };
-
-    // set data absolutely, from e.g. search-item
-    // so the data will be always valid
-    // function called from search-item
-    const { amount: previousAmount } = this.__data;
-    this.__data = Object.assign(data, {
-      amount: previousAmount,
-      valid: true,
-    });
-
-    const isDuplicate = this.__transaction.checkDuplicateOnList(this);
-
-    if (isDuplicate) {
-      this.__data = EMPTY_ITEM;
-    }
-
-    this.__ui.itemContent = this.__data;
-    this.__checkData();
+    this.__transaction.refreshTotalPrice();
   }
 
   checkDuplicateOnList() {
@@ -127,7 +150,12 @@ export class Item {
 
   increaseAmount(amount) {
     // function called only from above (transaction)
-    this.__data.amount += amount;
+
+    // get previous amount
+    const previousAmount = this.__data.amount;
+    this.setSingleData("amount", previousAmount + amount);
+
+    // refresh ui
     this.__ui.itemContent = this.__data;
   }
 
@@ -142,6 +170,8 @@ export class Item {
     // function only called from below (barcode, amount)
     this.__data[dataType] = value;
     this.__ui.itemContent = this.__data;
+
+    this.__transaction.refreshTotalPrice();
   }
 }
 
@@ -292,6 +322,7 @@ class BarcodeElement {
 
     const firstBarcode = this.__item.data.barcode;
 
+    // create the barcode ui
     this.__createBarcodeElement(firstBarcode);
   }
 
@@ -309,6 +340,7 @@ class BarcodeElement {
     // listen to the input
     this.__listenBarcode();
 
+    // append input to the wrapper
     this.__barcodeWrapper.appendChild(this.__barcodeElement);
   }
 
@@ -328,10 +360,10 @@ class BarcodeElement {
 
         if (isDuplicate) {
           // if duplicate, then clear the barcode and set amount to 1
-          this.__barcodeElement.value = "";
+          this.__item.setSingleData("barcode", "");
+          this.__item.setSingleData("amount", 1);
           this.focus();
         } else {
-          console.log("opening search item");
           // if doesn't duplicate,
           // set the barcode value in item
           // check it with search-item
@@ -424,6 +456,6 @@ class AmountElement {
   set amount(amount) {
     // set amount input value
     // function called from itemUi
-    this.__amountElement.value = `${amount}`;
+    this.__amountElement.value = amount;
   }
 }
