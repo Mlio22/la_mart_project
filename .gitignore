@@ -90,6 +90,3 @@ out/
 
 # vscode settings
 .vscode/
-
-# others
-src/js/pages/cashier/ui/

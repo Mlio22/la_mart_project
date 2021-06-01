@@ -1,64 +1,89 @@
-import { submenuButtons } from './shortcuts/shortcutList.js'
-const { ipcRenderer } = require('electron');
-
+import { submenuButtons } from "../primary/shortcuts/shortcutList.js";
+const { ipcRenderer } = require("electron");
 
 export class Shortcuts {
-    constructor(cashier, shortcutElement, submenuCoverElement) {
-        this.__cashier = cashier
+  constructor(cashier, shortcutElement, submenuCoverElement) {
+    this.__cashier = cashier;
 
-        this.__shortcutElement = shortcutElement;
-        this.__submenuCoverElement = submenuCoverElement;
-        this.__submenuElement = this.__submenuCoverElement.childNodes[1];
+    this.__shortcutElement = shortcutElement;
+    this.__submenuCoverElement = submenuCoverElement;
+    this.__submenuElement = this.__submenuCoverElement.querySelector(".submenu");
 
-        this.__openedSubmenu = null;
+    this.__openedSubmenu = null;
 
-        this.__listenIPC();
-        this.__listenEvent();
-    }
+    this.__listenIPC();
+    this.__listenEvent();
+  }
 
-    __listenIPC() {
-        // closes the submenu when IPCMain send a close-submenu
-        ipcRenderer.on('close-submenu', () => {
-            this.closeSubmenu()
-        })
+  __listenIPC() {
+    // closes the submenu when IPCMain send a close-submenu
+    ipcRenderer.on("close-submenu", () => {
+      this.hideSubmenu();
+    });
 
-        submenuButtons.forEach(submenu => {
-            const { channel, object } = submenu;
+    Object.keys(submenuButtons).forEach((submenuName) => {
+      const { object } = submenuButtons[submenuName];
 
-            ipcRenderer.on(channel, () => {
-                this.__openedSubMenu = new object(this.__submenuElement);
-                this.__submenuCoverElement.classList.remove('hidden');
-            });
-        })
-    }
+      ipcRenderer.on(submenuName, () => {
+        this.__openedSubMenu = new object(this.__submenuElement);
+        this.__submenuCoverElement.classList.remove("hidden");
+      });
+    });
+  }
 
-    __listenEvent() {
-        this.__submenuCoverElement.addEventListener('click', (e) => {
-            if (e.target === this.__submenuCoverElement) {
-                this.closeSubmenu()
-            }
-        })
+  __listenEvent() {
+    // listening to cover,
+    // when a submenu is showed, and the cover clicked, then the submenu will close
+    this.__submenuCoverElement.addEventListener("click", (e) => {
+      if (e.target === this.__submenuCoverElement) {
+        this.hideSubmenu();
+      }
+    });
 
-        submenuButtons.forEach(submenu => {
-            const { element } = submenu;
+    // listening to each shortcut button
+    Object.keys(submenuButtons).forEach((submenuName) => {
+      const { element: shortcutElement } = submenuButtons[submenuName];
 
-            document.querySelector(element).addEventListener('click', () => {
-                this.openShortcut(submenuButtons.indexOf(submenu), {})
-            })
-        })
-    }
+      document.querySelector(shortcutElement).addEventListener("click", () => {
+        this.openShortcut(submenuName, {});
+      });
+    });
+  }
 
-    openShortcut(submenuNumber, props) {
-        const { channel, object } = submenuButtons[submenuNumber];
-        ipcRenderer.send(channel);
-        this.__openedSubMenu = new object(this.__submenuElement, props);
+  //   opening a shortcut
+  openShortcut(submenuName, props) {
+    const { object: ShortcutObject } = submenuButtons[submenuName];
 
-        this.__submenuCoverElement.classList.remove('hidden');
-    }
+    // send to IPC
+    ipcRenderer.send(submenuName);
 
-    closeSubmenu() {
-        this.__openedSubMenu = null;
-        this.__submenuCoverElement.classList.add('hidden');
-    }
+    // create shortcut object
+    this.__openedSubMenu = new ShortcutObject(this, this.__submenuElement, props);
+  }
 
+  showSubmenu() {
+    //!   this method only called by child submenu
+    this.__submenuCoverElement.classList.remove("hidden");
+  }
+
+  hideSubmenu() {
+    this.__submenuCoverElement.classList.add("hidden");
+    this.__openedSubMenu = null;
+
+    // clear the submenu element
+    this.__submenuElement.innerHTML = "";
+  }
+
+  // extraordinary methods
+
+  // function to transaction
+  // function called from search-item
+  createNewItem(itemData) {
+    this.__cashier.createNewItem(itemData);
+  }
+
+  // function to transaction
+  getTotalPrice() {
+    return this.__cashier.getTotalPrice();
+  }
 }

@@ -40,8 +40,9 @@ export class SearchItem {
     this.__selectedItem = null;
 
     // extraction from params
-    this.__itemReference = params.itemReference || null;
-    this.__hint = params.hint || "";
+
+    this.__itemReference = params.itemReference ?? null;
+    this.__hint = params.hint ?? "";
 
     const immediatelyMatchedItems = this.__firstSearchFound();
 
@@ -52,6 +53,7 @@ export class SearchItem {
       // proceed to continue searching if matched item is more than one
       // or no item found in first search
       // set child UI and classes
+
       this.__searchItemHeader = new SearchItemHeader(this, this.__hint);
       this.__searchItemResult = new SearchItemResults(this);
 
@@ -69,10 +71,7 @@ export class SearchItem {
     this.__searchItemElement.className = "search-item";
 
     // append header and result list element
-    this.__searchItemElement.append(
-      this.__searchItemHeader.element,
-      this.__searchItemResult.element
-    );
+    this.__searchItemElement.append(this.__searchItemHeader.element, this.__searchItemResult.element);
 
     this.__submenuElement.appendChild(this.__searchItemElement);
     this.__submenu.showSubmenu();
@@ -256,8 +255,7 @@ class SearchItemResults {
       // set listener to result item
       // when onclick, it'll be selected item from the list
       resultElement.addEventListener("click", () => {
-        const selectedItemIndexOnList =
-          this.__matchedItemElements.indexOf(resultElement);
+        const selectedItemIndexOnList = this.__matchedItemElements.indexOf(resultElement);
 
         this.__searchItem.selectedItem = {
           ...this.__matchedItemList[selectedItemIndexOnList],
