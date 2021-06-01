@@ -53,6 +53,10 @@ class CashierUI {
     // refresh the total price content
     this.__totalPrice.totalPrice = totalPrice;
   }
+
+  clearTransactionList() {
+    this.__transaction.clearTransactionList();
+  }
 }
 
 const cashierUIElement = document.querySelector(".cashier");

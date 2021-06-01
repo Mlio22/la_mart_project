@@ -9,6 +9,17 @@ const EXAMPLE_ITEM_FROM_SEARCH_ITEM = {
   valid: true,
 };
 
+const EMPTY_TRANSACTION_HTML = `
+<tr class="purchases-headers">
+  <th class="purchases-header action-header">&nbsp;</th>
+  <th class="purchases-header barcode-header">Barcode</th>
+  <th class="purchases-header name-header">Nama Barang</th>
+  <th class="purchases-header type-header">Satuan</th>
+  <th class="purchases-header price-header">Harga</th>
+  <th class="purchases-header amount-header">Jumlah</th>
+  <th class="purchases-header total-price-header">Harga Total</th>
+</tr>`;
+
 export class Transaction {
   constructor(cashier, element) {
     this.__cashier = cashier;
@@ -135,5 +146,14 @@ export class Transaction {
     // set total price to be check for payment
     this.__totalPrice = currentTotalPrice;
     this.__cashier.setTotalPrice(currentTotalPrice);
+  }
+
+  clearTransactionList() {
+    console.log(this.__itemElement);
+    // delete all item elements and items in transactionList
+    this.__itemElement.innerHTML = EMPTY_TRANSACTION_HTML;
+    this.__transactionItems = [];
+
+    this.createNewItem();
   }
 }

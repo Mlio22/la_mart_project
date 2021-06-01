@@ -125,7 +125,7 @@ export class Payment {
 
   __proceedPayment() {
     if (this.__isSufficient) {
-      console.log("payment success");
+      this.__submenu.clearTransactionList();
       //todo: access to API/DB and end payment
       this.__submenu.hideSubmenu();
     }

@@ -83,7 +83,14 @@ export class Shortcuts {
   }
 
   // function to transaction
+  // function called from payment
   getTotalPrice() {
     return this.__cashier.getTotalPrice();
+  }
+
+  // function to transaction
+  // function called from payment and cancel
+  clearTransactionList() {
+    this.__cashier.clearTransactionList();
   }
 }
