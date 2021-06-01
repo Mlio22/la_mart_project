@@ -11,7 +11,7 @@
         padding: 25px 25px;
         margin-top: 20px;
         font-size: 24px;
-        >div:not(.payment-content__divider) {
+        >div:not(.divider) {
             margin: 15px 0;
             display: flex;
             >div {
@@ -25,11 +25,11 @@
                 outline: none;
                 padding: 0 10px;
             }
-            input:not(.payment-content__customer__content) {
+            input:not(.customer-content) {
                 cursor: default;
             }
         }
-        .payment-content__divider {
+        .divider {
             height: 1px;
             background-color: #707070;
             width: 100%;
@@ -39,21 +39,25 @@
         padding: 0 40px;
         display: flex;
         width: calc(100% - 80px);
-        >div {
+        >button {
             margin: auto;
-            width: 60px;
             text-align: center;
-            padding: 25px;
+            padding: 25px 30px;
             background-color: #DCDCDC;
             font-size: 20px;
             border-radius: 10px;
             transition: .1s all;
-            cursor: pointer;
+            border: #c5c4c4 1px solid;
+            
             >i {
                 margin-right: 10px;
             }
-            &:hover {
+            &:hover:not(:disabled) {
                 box-shadow: inset 7px 7px 15px rgb(167 166 166 / 30%), inset -7px -7px 7px #c7c7c726, 0px 0px 4px rgb(167 166 166 / 30%);
+                cursor: pointer;
+            }
+            &:hover:disabled{
+                cursor: not-allowed;
             }
         }
     }
