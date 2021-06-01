@@ -26,6 +26,9 @@ function checkShallowObjectEquality(obj1, obj2) {
 
 // set ordinary number strings to proper price string
 export const set_proper_price = function (value) {
+  // if the input was not a string
+  value = value.toString();
+
   String.prototype.insertDot = function (index) {
     // add dot between a string
     if (index > 0) {
@@ -196,10 +199,7 @@ class ItemUI {
       quantityElement: new TextElement("type-content", quantity),
       priceElement: new TextElement("price-content", set_proper_price(price)),
       amountElement: new AmountElement(this.__item, this),
-      totalPriceElement: new TextElement(
-        "total-price-content",
-        set_proper_price(price * amount)
-      ),
+      totalPriceElement: new TextElement("total-price-content", set_proper_price(price * amount)),
     };
 
     Object.keys(this.__itemContentElement).forEach((key) => {
@@ -233,14 +233,8 @@ class ItemUI {
 
   set itemContent(itemContent) {
     const { name, barcode, quantity, price, amount, valid } = itemContent;
-    const {
-      actionElement,
-      barcodeElement,
-      nameElement,
-      quantityElement,
-      priceElement,
-      totalPriceElement,
-    } = this.__itemContentElement;
+    const { actionElement, barcodeElement, nameElement, quantityElement, priceElement, totalPriceElement } =
+      this.__itemContentElement;
 
     barcodeElement.barcode = barcode;
     actionElement.deletable = valid;

@@ -1,8 +1,7 @@
-import { SubElement } from "./secondary/subElement.js";
 import { Transaction } from "./primary/transactions/transaction.js";
 import { TotalPrice } from "./primary/totalPrice.js";
 // import { Notification } from './ui/notification.js'
-// import { Shortcuts } from './ui/shortcuts.js'
+import { Shortcuts } from "./ui/shortcuts.js";
 
 class CashierUI {
   /**
@@ -19,22 +18,17 @@ class CashierUI {
 
     // child elements
     this.__itemListElement = this.__cashierElement.querySelector(".purchases");
-    this.__notificationElement =
-      this.__cashierElement.querySelector(".notification");
-    this.__totalPriceElement =
-      this.__cashierElement.querySelector(".total-price");
+    this.__notificationElement = this.__cashierElement.querySelector(".notification");
+    this.__totalPriceElement = this.__cashierElement.querySelector(".total-price");
     this.__paymentElement = this.__cashierElement.querySelector(".payment");
     this.__shortcutElement = this.__cashierElement.querySelector(".shortcuts");
-
-    // set submenu class
-    this.__submenu = new SubElement(this, this.__submenuCoverElement);
 
     // set child classes
     this.__transaction = new Transaction(this, this.__itemListElement);
     this.__totalPrice = new TotalPrice(this.__totalPriceElement);
 
     // this.__notification = new Notification(this, this.__notificationElement);
-    // this.__shortcuts = new Shortcuts(this, this.__shortcutElement, this.__submenuCoverElement);
+    this.__shortcuts = new Shortcuts(this, this.__shortcutElement, this.__submenuCoverElement);
   }
 
   // function called from child to child through parent
@@ -42,7 +36,7 @@ class CashierUI {
   openSubmenu(name, params) {
     // create a submenu
     // used from transation to submenu(search-item)
-    this.__submenu.createSubmenu(name, params);
+    this.__shortcuts.openShortcut(name, params);
   }
 
   createNewItem(itemData) {
@@ -50,8 +44,12 @@ class CashierUI {
     this.__transaction.createNewItem(itemData);
   }
 
+  getTotalPrice() {
+    // used in submenu(payment) to transaction
+    return this.__transaction.totalPrice;
+  }
+
   setTotalPrice(totalPrice) {
-    console.log(totalPrice);
     // refresh the total price content
     this.__totalPrice.totalPrice = totalPrice;
   }

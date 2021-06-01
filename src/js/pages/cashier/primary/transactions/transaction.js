@@ -24,7 +24,11 @@ export class Transaction {
     this.__totalProfit = 0;
 
     this.__transactionItems = [];
-    this.createNewItem(EXAMPLE_ITEM_FROM_SEARCH_ITEM);
+    this.createNewItem();
+  }
+
+  get totalPrice() {
+    return this.__totalPrice;
   }
 
   __getNewId() {
@@ -44,21 +48,21 @@ export class Transaction {
         this.__increaseItemAmount(itemIndexOnList);
         return;
       }
-    }
 
-    // add item if not duplicate (including empty item)
-    const newItem = new Item(this, this.__itemElement, itemData);
-    this.__transactionItems.push(newItem);
+      // add item to latest idle item in list
+      this.__transactionItems[this.__transactionItems.length - 1].data = itemData;
+    } else {
+      // add item if not duplicate (including empty item)
+      const newItem = new Item(this, this.__itemElement, itemData);
+      this.__transactionItems.push(newItem);
+    }
   }
 
   // check for duplicate items
   checkDuplicateOnList(itemReference) {
     const indexOnList = this.__transactionItems.indexOf(itemReference);
 
-    const duplicatedItemIndex = this.__compareItemWithList(
-      itemReference.data,
-      indexOnList
-    );
+    const duplicatedItemIndex = this.__compareItemWithList(itemReference.data, indexOnList);
 
     if (duplicatedItemIndex >= 0) {
       const duplicatedItem = this.__transactionItems[duplicatedItemIndex];
@@ -87,14 +91,12 @@ export class Transaction {
         continue;
       }
 
-      const { barcode: barcodeFromList } =
-        this.__transactionItems[itemIndex].data;
+      const { barcode: barcodeFromList } = this.__transactionItems[itemIndex].data;
 
       if (comparedBarcode === barcodeFromList) {
         return itemIndex;
       }
     }
-
     return;
   }
 
@@ -130,6 +132,8 @@ export class Transaction {
       }
     });
 
+    // set total price to be check for payment
+    this.__totalPrice = currentTotalPrice;
     this.__cashier.setTotalPrice(currentTotalPrice);
   }
 }
