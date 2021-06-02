@@ -1,32 +1,11 @@
 import { Item } from "./item.js";
 
-const EXAMPLE_ITEM_FROM_SEARCH_ITEM = {
-  barcode: "12",
-  name: "ABC",
-  quantity: "20",
-  price: 20000,
-  amount: 1,
-  valid: true,
-};
-
-const EMPTY_TRANSACTION_HTML = `
-<tr class="purchases-headers">
-  <th class="purchases-header action-header">&nbsp;</th>
-  <th class="purchases-header barcode-header">Barcode</th>
-  <th class="purchases-header name-header">Nama Barang</th>
-  <th class="purchases-header type-header">Satuan</th>
-  <th class="purchases-header price-header">Harga</th>
-  <th class="purchases-header amount-header">Jumlah</th>
-  <th class="purchases-header total-price-header">Harga Total</th>
-</tr>`;
+const TRANSACTION_LOG = [];
 
 export class Transaction {
   constructor(cashier, element) {
     this.__cashier = cashier;
     this.__itemElement = element;
-
-    this.__transaction_id = this.__getNewId();
-    this.__transaction_status = 1;
 
     // transaction properties
     this.__totalPrice = 0;
@@ -149,7 +128,6 @@ export class Transaction {
   }
 
   clearTransactionList() {
-    console.log(this.__itemElement);
     // delete all item elements and items in transactionList
     this.__itemElement.innerHTML = EMPTY_TRANSACTION_HTML;
     this.__transactionItems = [];
