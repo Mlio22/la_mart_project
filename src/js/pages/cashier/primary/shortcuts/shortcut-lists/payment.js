@@ -32,7 +32,6 @@ export class Payment {
     this.__parentElement = parentElement;
 
     this.__total = this.__submenu.getTotalPrice();
-
     this.__customerMoney = this.__total;
 
     this.__setSubmenu();
@@ -125,14 +124,13 @@ export class Payment {
 
   __proceedPayment() {
     if (this.__isSufficient) {
-      this.__submenu.clearTransactionList();
+      this.__submenu.completeCurrentTransaction();
       //todo: access to API/DB and end payment
       this.__submenu.hideSubmenu();
     }
   }
 
   __cancelPayment() {
-    console.log("payment cancelled");
     this.__submenu.hideSubmenu();
   }
 }

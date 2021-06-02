@@ -19,7 +19,7 @@ export class Cancel {
 
   __listenCancel() {
     this.__yesButton.addEventListener("click", () => {
-      this.__submenu.clearTransactionList();
+      this.__submenu.cancelCurrentTransaction();
       this.__submenu.hideSubmenu();
     });
 

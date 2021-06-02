@@ -90,7 +90,13 @@ export class Shortcuts {
 
   // function to transaction
   // function called from payment and cancel
-  clearTransactionList() {
-    this.__cashier.clearTransactionList();
+  cancelCurrentTransaction() {
+    this.__cashier.cancelCurrentTransaction();
+  }
+
+  // function to transaction
+  // function called from payment
+  completeCurrentTransaction() {
+    this.__cashier.completeCurrentTransaction();
   }
 }
