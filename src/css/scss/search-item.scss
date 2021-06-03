@@ -66,12 +66,21 @@
         }
 
         .search-item-result-content {
+            transition: all .1s;
             >* {
                 text-align: left;
             }
 
             &:hover {
                 cursor: pointer;
+                background-color: #eeeeee;
+
+                >p {
+                    border: #eeeeee 1px solid;
+                }
+            }
+
+            &:focus{
                 background-color: #eeeeee;
 
                 >p {

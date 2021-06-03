@@ -77,6 +77,29 @@ export class SearchItem {
     this.__submenu.showSubmenu();
 
     this.__searchItemHeader.focusToHint();
+    this.__listenToSearchItem();
+  }
+
+  __listenToSearchItem() {
+    // listen when keyboard input
+    this.__searchItemElement.addEventListener("keydown", (e) => {
+      const key = e.key;
+
+      // arrow up / down to change item selection
+      if (key === "ArrowUp" || key === "ArrowDown") {
+        this.__searchItemResult.focusToResultItem(key === "ArrowDown" ? "next" : "previous");
+      }
+
+      // enter to select item to list
+      else if (key === "Enter") {
+        this.__searchItemResult.selectFilteredItem();
+      }
+
+      // other to edit text in input
+      else {
+        this.__searchItemHeader.focusToHint();
+      }
+    });
   }
 
   // searching item on DB with hint (simulation)
@@ -208,6 +231,8 @@ class SearchItemResults {
     this.__matchedItemList = [];
     this.__matchedItemElements = [];
 
+    this.__focusedItemIndex = null;
+
     this.__setInitalElement();
   }
 
@@ -234,15 +259,8 @@ class SearchItemResults {
     this.__matchedItemList.forEach((matchedItem) => {
       const { barcode, name, quantity, price } = matchedItem;
 
-      // example of result
-      // <div class="search-item-result-content">
-      // <p class="item-barcode">${barcode}</p>
-      // <p class="item-name">${name}</p>
-      // <p class="item-type">${type}</p>
-      // <p class="item-price">${price}</p>
-      // </div>;
-
       const resultElement = document.createElement("div");
+      resultElement.tabIndex = "-1";
       resultElement.className = "search-item-result-content";
 
       resultElement.innerHTML = `
@@ -255,16 +273,46 @@ class SearchItemResults {
       // set listener to result item
       // when onclick, it'll be selected item from the list
       resultElement.addEventListener("click", () => {
-        const selectedItemIndexOnList = this.__matchedItemElements.indexOf(resultElement);
-
-        this.__searchItem.selectedItem = {
-          ...this.__matchedItemList[selectedItemIndexOnList],
-        };
+        this.__focusedItemIndex = this.__matchedItemElements.indexOf(resultElement);
+        this.selectFilteredItem();
       });
 
       this.__resultsElement.appendChild(resultElement);
       this.__matchedItemElements.push(resultElement);
     });
+
+    // focus to first child of result element
+    this.__focusedItemIndex = 0;
+    this.__focusToResultItemWithIndex();
+  }
+
+  __focusToResultItemWithIndex() {
+    const focusedElement = this.__matchedItemElements[this.__focusedItemIndex];
+
+    if (focusedElement) focusedElement.focus();
+  }
+
+  //
+  focusToResultItem(position = "next") {
+    // position: next/previous
+    const previousFocusedIndex = this.__focusedItemIndex;
+    if (position === "next" && this.__focusedItemIndex < this.__matchedItemElements.length - 1) {
+      this.__focusedItemIndex += 1;
+    } else if (position === "previous" && this.__focusedItemIndex > 0) {
+      this.__focusedItemIndex -= 1;
+    }
+
+    if (previousFocusedIndex !== this.__focusedItemIndex) {
+      this.__focusToResultItemWithIndex();
+    }
+  }
+
+  selectFilteredItem() {
+    // index will be the index from click listener @__setResultsElement
+    // or be
+    this.__searchItem.selectedItem = {
+      ...this.__matchedItemList[this.__focusedItemIndex],
+    };
   }
 
   get element() {

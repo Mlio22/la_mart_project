@@ -58,6 +58,9 @@
 .search-item .search-item-results .search-item-result-content > .item-price {
   width: 20%;
 }
+.search-item .search-item-results .search-item-result-content {
+  transition: all 0.1s;
+}
 .search-item .search-item-results .search-item-result-content > * {
   text-align: left;
 }
@@ -66,5 +69,11 @@
   background-color: #eeeeee;
 }
 .search-item .search-item-results .search-item-result-content:hover > p {
+  border: #eeeeee 1px solid;
+}
+.search-item .search-item-results .search-item-result-content:focus {
+  background-color: #eeeeee;
+}
+.search-item .search-item-results .search-item-result-content:focus > p {
   border: #eeeeee 1px solid;
 }
