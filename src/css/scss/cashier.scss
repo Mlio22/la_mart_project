@@ -279,11 +279,19 @@ div.cashier {
                 cursor: pointer;
                 border-radius: 5px;
                 transition: .25s all;
-                font-size: 18px;
 
                 i.shortcut-icon {
                     font-size: 40px !important;
                     margin-bottom: 10px;
+                }
+
+                .shortcut-text{
+                    font-size: 18px;
+                }
+
+                .shortcut-key{
+                    color: #aaa9a9;
+                    font-size: 14px;
                 }
             }
 
