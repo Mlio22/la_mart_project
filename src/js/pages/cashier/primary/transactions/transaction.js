@@ -110,7 +110,7 @@ export class Transaction {
   }
 
   openSearchItem(params) {
-    this.__cashier.openSubmenu("search-item", params);
+    this.__cashier.openSubmenu("F2", params);
   }
 
   refreshTotalPrice() {

@@ -1,15 +1,15 @@
-.cancel {
+.cancel-transaction {
   padding: 40px;
 }
-.cancel .header {
+.cancel-transaction .header {
   margin-bottom: 50px;
   font-size: 26px;
   text-align: center;
 }
-.cancel .options {
+.cancel-transaction .options {
   display: flex;
 }
-.cancel .options > div {
+.cancel-transaction .options > div {
   width: 100px;
   margin: auto 20px;
   text-align: center;
@@ -20,9 +20,9 @@
   transition: 0.1s all;
   cursor: pointer;
 }
-.cancel .options > div > i {
+.cancel-transaction .options > div > i {
   margin-right: 10px;
 }
-.cancel .options > div:hover {
+.cancel-transaction .options > div:hover {
   box-shadow: inset 7px 7px 15px rgba(167, 166, 166, 0.3), inset -7px -7px 7px #c7c7c726, 0px 0px 4px rgba(167, 166, 166, 0.3);
 }

@@ -33,10 +33,10 @@ class CashierUI {
 
   // function called from child to child through parent
 
-  openSubmenu(name, params) {
+  openSubmenu(key, params) {
     // create a submenu
     // used from transation to submenu(search-item)
-    this.__shortcuts.openShortcut(name, params);
+    this.__shortcuts.openShortcut(key, params);
   }
 
   createNewItem(itemData) {
