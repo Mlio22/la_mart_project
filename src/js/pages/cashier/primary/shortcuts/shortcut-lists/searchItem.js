@@ -1,3 +1,5 @@
+import { Submenu } from "./Submenu.js";
+
 const EXAMPLE_ITEMS_FROM_API = [
   {
     barcode: "121",
@@ -31,58 +33,64 @@ const EXAMPLE_ITEMS_FROM_API = [
   },
 ];
 
-export class SearchItem {
-  constructor(submenu, submenuElement, params) {
-    this.__submenu = submenu;
-    this.__submenuElement = submenuElement;
+// ! sedang mencari cara untuk mencari ulang this.__filteredItems sehingga tidak perlu mengecek API berkali-kali
+
+function example_api_searcher(hint, params = ["name", "barcode"]) {
+  const matchedItems = [];
+
+  // set the hint to lowercase
+  hint = hint.toLowerCase();
+
+  EXAMPLE_ITEMS_FROM_API.forEach((item) => {
+    let isMatch = false;
+
+    // if anyone of the parameter is match then return the item
+    params.forEach((param) => {
+      isMatch = isMatch || item[param].toLowerCase().includes(hint);
+    });
+
+    if (isMatch) matchedItems.push(item);
+  });
+
+  return matchedItems;
+}
+
+export class SearchItem extends Submenu {
+  constructor(submenu, submenuWraper, submenuProperties, params = {}) {
+    super(submenu, submenuWraper, submenuProperties);
 
     // seleted item from searchItem
     this.__selectedItem = null;
+    this.__filteredItems = [];
 
     // extraction from params
-
     this.__itemReference = params.itemReference ?? null;
     this.__hint = params.hint ?? "";
 
-    const immediatelyMatchedItems = this.__firstSearchFound();
+    this.__firstSearchItemOrStartSearchItem();
 
-    if (immediatelyMatchedItems.length === 1) {
-      // immediately set selected item and close the search-item if item (barcode) is already found
-      this.selectedItem = immediatelyMatchedItems[0];
-    } else {
-      // proceed to continue searching if matched item is more than one
-      // or no item found in first search
-      // set child UI and classes
-
-      this.__searchItemHeader = new SearchItemHeader(this, this.__hint);
-      this.__searchItemResult = new SearchItemResults(this);
-
-      this.__createSearchItemElement();
-
-      if (this.__hint != "") {
-        this.__searchItemFromDB();
-      }
-    }
+    // focus to hint
+    this.__searchItemHeader.focusToHint();
   }
 
   // create element for search-item
-  __createSearchItemElement() {
-    this.__searchItemElement = document.createElement("div");
-    this.__searchItemElement.className = "search-item";
+  _createSubmenu() {
+    this._submenuElement = document.createElement("div");
+    this._submenuElement.className = "search-item";
 
     // append header and result list element
-    this.__searchItemElement.append(this.__searchItemHeader.element, this.__searchItemResult.element);
+    this._submenuElement.append(this.__searchItemHeader.element, this.__searchItemResult.element);
 
-    this.__submenuElement.appendChild(this.__searchItemElement);
-    this.__submenu.showSubmenu();
+    this._submenuWrapper.appendChild(this._submenuElement);
 
     this.__searchItemHeader.focusToHint();
-    this.__listenToSearchItem();
   }
 
-  __listenToSearchItem() {
+  _setSubmenu() {}
+
+  _setListener() {
     // listen when keyboard input
-    this.__searchItemElement.addEventListener("keydown", (e) => {
+    this._submenuElement.addEventListener("keydown", (e) => {
       const key = e.key;
 
       // arrow up / down to change item selection
@@ -102,23 +110,39 @@ export class SearchItem {
     });
   }
 
-  // searching item on DB with hint (simulation)
-  __searchItemFromDB() {
-    const matchedItems = [];
+  __firstSearchItemOrStartSearchItem() {
+    // search the DB from hint (first barcode)
+    // if matches only to one item then choose item directly and close the search-item
+    // the barcode item must be same to the hint
 
-    // set the hint to lowercase
-    this.__hint = this.__hint.toLowerCase();
+    const matchedItemsWithBarcode = example_api_searcher(this.__hint, ["barcode"]);
 
-    EXAMPLE_ITEMS_FROM_API.forEach((item) => {
-      const isBarcodeMatch = item.barcode.toLowerCase().includes(this.__hint),
-        isNameMatch = item.name.toLowerCase().includes(this.__hint);
+    if (matchedItemsWithBarcode.length === 1) {
+      // immediately set selected item and close the search-item if item (barcode) is already found
+      this.selectedItem = matchedItemsWithBarcode[0];
+    } else {
+      // proceed to continue searching if matched item is more than one
+      // or no item found in first search
+      // set child UI and classes
 
-      if (isBarcodeMatch || isNameMatch) {
-        matchedItems.push(item);
+      this.__searchItemHeader = new SearchItemHeader(this, this.__hint);
+      this.__searchItemResult = new SearchItemResults(this);
+
+      // set the html
+      this._initializeSubmenu();
+
+      // search the item if hint is not empty string
+      if (this.__hint !== "") {
+        this.__searchItemMatchBoth();
       }
-    });
+    }
+  }
 
-    this.__searchItemResult.setResults(matchedItems);
+  __searchItemMatchBoth() {
+    const matchedItemsWithBoth = example_api_searcher(this.__hint);
+
+    // set the results
+    this.__searchItemResult.setResults(matchedItemsWithBoth);
   }
 
   __addToSelectedItemToTransaction() {
@@ -129,7 +153,7 @@ export class SearchItem {
     } else {
       // if itemReference doesn't exist (e.g. search-item accessed from shortcut)
       // create new item data on transaction
-      this.__submenu.createNewItem(this.__selectedItem);
+      this._submenu.createNewItem(this.__selectedItem);
     }
   }
 
@@ -137,7 +161,7 @@ export class SearchItem {
     // change hint
     // function called from SearchItemHeader
     this.__hint = hint;
-    this.__searchItemFromDB();
+    this.__searchItemMatchBoth();
   }
 
   set selectedItem(selectedItem) {
@@ -146,37 +170,7 @@ export class SearchItem {
     this.__addToSelectedItemToTransaction();
 
     // when item is selected, close the search-item
-    this.removeSubmenu();
-  }
-
-  // function called from above
-  // function called from subElement
-  removeSubmenu() {
-    // removes search-item element
-    this.__submenu.hideSubmenu();
-
-    if (this.__searchItemElement !== undefined) {
-      this.__searchItemElement.remove();
-    }
-  }
-
-  __firstSearchFound() {
-    // search the DB from hint (first barcode)
-    // if matches only to one item then choose item directly and close the search-item
-    // the barcode item must be same to the hint
-
-    const matchedItems = [];
-
-    // set the hint to lowercase
-    this.__hint = this.__hint.toLowerCase();
-
-    EXAMPLE_ITEMS_FROM_API.forEach((item) => {
-      const isBarcodeMatch = item.barcode.toLowerCase() === this.__hint;
-
-      if (isBarcodeMatch) matchedItems.push(item);
-    });
-
-    return matchedItems;
+    this._submenu.hideSubmenu();
   }
 }
 

@@ -1,73 +1,28 @@
 import { set_proper_price } from "../../transactions/item.js";
+import { Submenu } from "./Submenu.js";
 
-const paymentHTML = `
-<div class="payment-header">Pembayaran</div>
-<div class="payment-content">
-    <div class="customer">
-        <div class="customer-header">Uang:</div>
-        Rp.<input class="customer-content">
-    </div>
-    <div class="price">
-        <div class="price-header">Total Belanja:</div>
-        Rp.<input class="price-content" readonly>
-    </div>
-    <div class="divider"></div>
-    <div class="change">
-        <div class="change-header">Kembalian:</div>
-        Rp.<input class="change-content" readonly>
-    </div>
-</div>
-<div class="payment-actions">
-    <button class="proceed">
-        <i class="fas fa-check"></i>F3
-    </button>
-    <button class="cancel">
-        <i class="fas fa-times"></i>F4
-    </button>
-</div>`;
+export class Payment extends Submenu {
+  constructor(submenu, submenuWrapper, submenuProperties) {
+    super(submenu, submenuWrapper, submenuProperties);
 
-export class Payment {
-  constructor(submenu, parentElement) {
-    this.__submenu = submenu;
-    this.__parentElement = parentElement;
-
-    this.__total = this.__submenu.getTotalPrice();
+    this.__total = submenu.getTotalPrice();
     this.__customerMoney = this.__total;
 
-    this.__setSubmenu();
-    this.__setListener();
-  }
+    this._initializeSubmenu();
 
-  __setSubmenu() {
-    this.__paymentElement = document.createElement("div");
-    this.__paymentElement.className = "payment";
-    this.__paymentElement.innerHTML = paymentHTML;
-
-    this.__parentElement.appendChild(this.__paymentElement);
-
-    // price elements
-    this.__customerMoneyElement = this.__paymentElement.querySelector(".customer-content");
-    this.__totalElement = this.__paymentElement.querySelector(".price-content");
-    this.__changeElement = this.__paymentElement.querySelector(".change-content");
-
-    // button elements
-    this.__proceedButton = this.__paymentElement.querySelector("button.proceed");
-    this.__cancelButton = this.__paymentElement.querySelector("button.cancel");
-
-    // initial value assignment
-    this.__customerMoneyElement.value = set_proper_price(this.__customerMoney);
-    this.__totalElement.value = set_proper_price(this.__total);
-    this.__refreshChange();
-
-    this.__submenu.showSubmenu();
     // auto select to the customer money value
     this.__customerMoneyElement.select();
   }
 
-  __setListener() {
+  // protected methods
+  _setSubmenu() {
+    this.__gatherElementInputs();
+    this.__assignInitialValue();
+  }
+
+  _setListener() {
     // listen to payment div
-    this.__paymentElement.addEventListener("keyup", ({ key }) => {
-      console.log(key);
+    this._submenuElement.addEventListener("keydown", ({ key }) => {
       if (key === "Enter" || key === "F3") {
         // on enter to proceed payment and end the payment
         // this only works if the __sufficient is true
@@ -104,6 +59,25 @@ export class Payment {
     });
   }
 
+  // private methods
+  __gatherElementInputs() {
+    console.log(this._submenuElement);
+    this.__customerMoneyElement = this._submenuElement.querySelector(".customer-content");
+    this.__totalElement = this._submenuElement.querySelector(".price-content");
+    this.__changeElement = this._submenuElement.querySelector(".change-content");
+
+    // button elements
+    this.__proceedButton = this._submenuElement.querySelector("button.proceed");
+    this.__cancelButton = this._submenuElement.querySelector("button.cancel");
+  }
+
+  __assignInitialValue() {
+    // initial value assignment
+    this.__customerMoneyElement.value = set_proper_price(this.__customerMoney);
+    this.__totalElement.value = set_proper_price(this.__total);
+    this.__refreshChange();
+  }
+
   __refreshChange() {
     // refresh the change value everytime the customer money changed
     this.__change = this.__customerMoney - this.__total;
@@ -124,13 +98,13 @@ export class Payment {
 
   __proceedPayment() {
     if (this.__isSufficient) {
-      this.__submenu.completeCurrentTransaction();
+      this._submenu.completeCurrentTransaction();
       //todo: access to API/DB and end payment
-      this.__submenu.hideSubmenu();
+      this._submenu.hideSubmenu();
     }
   }
 
   __cancelPayment() {
-    this.__submenu.hideSubmenu();
+    this._submenu.hideSubmenu();
   }
 }

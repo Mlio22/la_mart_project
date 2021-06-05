@@ -1,43 +1,24 @@
-const cancelHTML = `<div class="header">Batalkan Transaksi?</div>
-<div class="options">
-    <div class="option-yes">
-        <i class="fas fa-check"></i>Ya
-    </div>
-    <div class="option-no">
-        <i class="fas fa-times"></i>Tidak
-    </div>
-</div>`;
+import { Submenu } from "./Submenu.js";
+export class Cancel extends Submenu {
+  constructor(submenu, submenuWrapper, submenuProperties) {
+    super(submenu, submenuWrapper, submenuProperties);
 
-export class Cancel {
-  constructor(submenu, parentElement) {
-    this.__submenu = submenu;
-    this.__parentElement = parentElement;
-
-    this.__setSubmenu();
-    this.__listenCancel();
+    this._initializeSubmenu();
   }
 
-  __listenCancel() {
+  _setListener() {
     this.__yesButton.addEventListener("click", () => {
-      this.__submenu.cancelCurrentTransaction();
-      this.__submenu.hideSubmenu();
+      this._submenu.cancelCurrentTransaction();
+      this._submenu.hideSubmenu();
     });
 
     this.__noButton.addEventListener("click", () => {
-      this.__submenu.hideSubmenu();
+      this._submenu.hideSubmenu();
     });
   }
 
-  __setSubmenu() {
-    this.__cancelElement = document.createElement("div");
-    this.__cancelElement.className = "cancel";
-    this.__cancelElement.innerHTML = cancelHTML;
-
-    // button elements
-    this.__yesButton = this.__cancelElement.querySelector(".option-yes");
-    this.__noButton = this.__cancelElement.querySelector(".option-no");
-
-    this.__parentElement.appendChild(this.__cancelElement);
-    this.__submenu.showSubmenu();
+  _setSubmenu() {
+    this.__yesButton = this._submenuElement.querySelector(".option-yes");
+    this.__noButton = this._submenuElement.querySelector(".option-no");
   }
 }
