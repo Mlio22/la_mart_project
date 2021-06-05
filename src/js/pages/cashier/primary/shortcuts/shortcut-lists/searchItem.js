@@ -35,13 +35,14 @@ const EXAMPLE_ITEMS_FROM_API = [
 
 // ! sedang mencari cara untuk mencari ulang this.__filteredItems sehingga tidak perlu mengecek API berkali-kali
 
-function example_api_searcher(hint, params = ["name", "barcode"]) {
+function item_searcher(hint, params = ["name", "barcode"], filteredItems = EXAMPLE_ITEMS_FROM_API) {
+  // filteredItem is an array of filteredItems from search-item that need be researched again to prevent over-searching the API
   const matchedItems = [];
 
   // set the hint to lowercase
   hint = hint.toLowerCase();
 
-  EXAMPLE_ITEMS_FROM_API.forEach((item) => {
+  filteredItems.forEach((item) => {
     let isMatch = false;
 
     // if anyone of the parameter is match then return the item
@@ -68,9 +69,6 @@ export class SearchItem extends Submenu {
     this.__hint = params.hint ?? "";
 
     this.__firstSearchItemOrStartSearchItem();
-
-    // focus to hint
-    this.__searchItemHeader.focusToHint();
   }
 
   // create element for search-item
@@ -115,8 +113,7 @@ export class SearchItem extends Submenu {
     // if matches only to one item then choose item directly and close the search-item
     // the barcode item must be same to the hint
 
-    const matchedItemsWithBarcode = example_api_searcher(this.__hint, ["barcode"]);
-
+    const matchedItemsWithBarcode = item_searcher(this.__hint, ["barcode"], undefined);
     if (matchedItemsWithBarcode.length === 1) {
       // immediately set selected item and close the search-item if item (barcode) is already found
       this.selectedItem = matchedItemsWithBarcode[0];
@@ -131,6 +128,9 @@ export class SearchItem extends Submenu {
       // set the html
       this._initializeSubmenu();
 
+      // focus to hint
+      this.__searchItemHeader.focusToHint();
+
       // search the item if hint is not empty string
       if (this.__hint !== "") {
         this.__searchItemMatchBoth();
@@ -138,10 +138,15 @@ export class SearchItem extends Submenu {
     }
   }
 
-  __searchItemMatchBoth() {
-    const matchedItemsWithBoth = example_api_searcher(this.__hint);
+  __searchItemMatchBoth(preventOversearch = false) {
+    const matchedItemsWithBoth = item_searcher(
+      this.__hint,
+      undefined,
+      preventOversearch ? this.__filteredItems : undefined
+    );
 
     // set the results
+    this.__filteredItems = matchedItemsWithBoth;
     this.__searchItemResult.setResults(matchedItemsWithBoth);
   }
 
@@ -160,8 +165,14 @@ export class SearchItem extends Submenu {
   set hint(hint) {
     // change hint
     // function called from SearchItemHeader
+
+    // get the previous hint and compare with the new hint
+    // if the new hint is the same previous hint plus one character
+    // prevent oversearch the API and let to research with the last filteredItem
+    const previousHint = this.__hint;
     this.__hint = hint;
-    this.__searchItemMatchBoth();
+
+    this.__searchItemMatchBoth(this.__hint.includes(previousHint));
   }
 
   set selectedItem(selectedItem) {
