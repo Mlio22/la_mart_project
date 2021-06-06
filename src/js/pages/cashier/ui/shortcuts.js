@@ -1,5 +1,4 @@
 import { submenuButtons } from "../primary/shortcuts/shortcutList.js";
-const { ipcRenderer } = require("electron");
 
 export class Shortcuts {
   constructor(cashier, shortcutElement, submenuCoverElement) {
@@ -7,28 +6,11 @@ export class Shortcuts {
 
     this.__shortcutElement = shortcutElement;
     this.__submenuCoverElement = submenuCoverElement;
-    this.__submenuElement = this.__submenuCoverElement.querySelector(".submenu");
+    this.__submenuWrapperElement = this.__submenuCoverElement.querySelector(".submenu");
 
     this.__openedSubmenu = null;
 
-    this.__listenIPC();
     this.__listenEvent();
-  }
-
-  __listenIPC() {
-    // closes the submenu when IPCMain send a close-submenu
-    ipcRenderer.on("close-submenu", () => {
-      this.hideSubmenu();
-    });
-
-    Object.keys(submenuButtons).forEach((submenuName) => {
-      const { object } = submenuButtons[submenuName];
-
-      ipcRenderer.on(submenuName, () => {
-        this.__openedSubMenu = new object(this.__submenuElement);
-        this.__submenuCoverElement.classList.remove("hidden");
-      });
-    });
   }
 
   __listenEvent() {
@@ -41,24 +23,25 @@ export class Shortcuts {
     });
 
     // listening to each shortcut button
-    Object.keys(submenuButtons).forEach((submenuName) => {
-      const { element: shortcutElement } = submenuButtons[submenuName];
+    Object.keys(submenuButtons).forEach((shortcutKey) => {
+      const { name: shortcutName } = submenuButtons[shortcutKey];
 
-      document.querySelector(shortcutElement).addEventListener("click", () => {
-        this.openShortcut(submenuName, {});
+      document.querySelector(`.shortcut.${shortcutName}`).addEventListener("click", () => {
+        this.openShortcut(shortcutKey, {});
       });
     });
   }
 
   //   opening a shortcut
-  openShortcut(submenuName, props) {
-    const { object: ShortcutObject } = submenuButtons[submenuName];
-
-    // send to IPC
-    ipcRenderer.send(submenuName);
+  openShortcut(shortcutKey, props) {
+    const { name, object, html } = submenuButtons[shortcutKey];
+    const submenuProperties = {
+      name: name,
+      html: html,
+    };
 
     // create shortcut object
-    this.__openedSubMenu = new ShortcutObject(this, this.__submenuElement, props);
+    this.__openedSubMenu = new object(this, this.__submenuWrapperElement, submenuProperties, props);
   }
 
   showSubmenu() {
@@ -71,7 +54,25 @@ export class Shortcuts {
     this.__openedSubMenu = null;
 
     // clear the submenu element
-    this.__submenuElement.innerHTML = "";
+    this.__submenuWrapperElement.innerHTML = "";
+
+    this.__cashier.focusToCashier();
+  }
+
+  setCashierShortcutKeys(cashierElement) {
+    // set cashier shortcut key listeners
+    // called by cashier
+    this.__openedSubMenu ??= null;
+
+    cashierElement.addEventListener("keydown", ({ key }) => {
+      if (this.__openedSubMenu === null && submenuButtons[key]) {
+        this.openShortcut(key);
+      }
+
+      if (this.__openedSubMenu && key === "Escape") {
+        this.hideSubmenu();
+      }
+    });
   }
 
   // extraordinary methods

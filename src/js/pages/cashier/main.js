@@ -29,6 +29,13 @@ class CashierUI {
 
     // this.__notification = new Notification(this, this.__notificationElement);
     this.__shortcuts = new Shortcuts(this, this.__shortcutElement, this.__submenuCoverElement);
+
+    // set shortcut key listeners
+    this.__shortcuts.setCashierShortcutKeys(this.__cashierElement);
+  }
+
+  focusToCashier() {
+    this.__cashierElement.focus();
   }
 
   // function called from child to child through parent
