@@ -26,6 +26,7 @@ export class Transactions {
 
     this.__transactionList = [];
     this.__currentTransaction = null;
+    this.__currentTransactionId = this.__getTransactionId();
 
     // initial transaction
     this.__createTransaction();
@@ -98,15 +99,14 @@ export class Transactions {
     this.__currentTransaction.object.restoreItems();
   }
 
-  completeCurrentTransaction() {
+  completeCurrentTransaction(paymentNominals) {
     console.log(`transaction with id: ${this.__currentTransaction.id} done!`);
+
+    this.__cashier.paymentDetails.setAndShow({ ...paymentNominals, id: this.__currentTransactionId });
 
     // change current transaction's status to 3 (completed)
     this.__currentTransaction.status = 3;
     this.__storeDataToDB();
-
-    // create new transaction
-    this.__createTransaction();
   }
 
   // extra ordinary methods

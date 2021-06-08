@@ -1,26 +1,26 @@
-.payment {
+.submenu .payment {
   margin: auto;
   height: 400px;
   width: 400px;
 }
-.payment .payment-header {
+.submenu .payment .payment-header {
   text-align: center;
   font-size: 28px;
   padding-top: 20px;
 }
-.payment .payment-content {
+.submenu .payment .payment-content {
   padding: 25px 25px;
   margin-top: 20px;
   font-size: 24px;
 }
-.payment .payment-content > div:not(.divider) {
+.submenu .payment .payment-content > div:not(.divider) {
   margin: 15px 0;
   display: flex;
 }
-.payment .payment-content > div:not(.divider) > div {
+.submenu .payment .payment-content > div:not(.divider) > div {
   width: calc(50% - 20px);
 }
-.payment .payment-content > div:not(.divider) > input {
+.submenu .payment .payment-content > div:not(.divider) > input {
   width: 50%;
   background-color: transparent;
   border: none;
@@ -28,20 +28,20 @@
   outline: none;
   padding: 0 10px;
 }
-.payment .payment-content > div:not(.divider) input:not(.customer-content) {
+.submenu .payment .payment-content > div:not(.divider) input:not(.customer-content) {
   cursor: default;
 }
-.payment .payment-content .divider {
+.submenu .payment .payment-content .divider {
   height: 1px;
   background-color: #707070;
   width: 100%;
 }
-.payment .payment-actions {
+.submenu .payment .payment-actions {
   padding: 0 40px;
   display: flex;
   width: calc(100% - 80px);
 }
-.payment .payment-actions > button {
+.submenu .payment .payment-actions > button {
   margin: auto;
   text-align: center;
   padding: 25px 30px;
@@ -51,13 +51,13 @@
   transition: 0.1s all;
   border: #c5c4c4 1px solid;
 }
-.payment .payment-actions > button > i {
+.submenu .payment .payment-actions > button > i {
   margin-right: 10px;
 }
-.payment .payment-actions > button:hover:not(:disabled) {
+.submenu .payment .payment-actions > button:hover:not(:disabled) {
   box-shadow: inset 7px 7px 15px rgba(167, 166, 166, 0.3), inset -7px -7px 7px #c7c7c726, 0px 0px 4px rgba(167, 166, 166, 0.3);
   cursor: pointer;
 }
-.payment .payment-actions > button:hover:disabled {
+.submenu .payment .payment-actions > button:hover:disabled {
   cursor: not-allowed;
 }

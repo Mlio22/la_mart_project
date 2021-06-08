@@ -2,6 +2,7 @@ import { Transactions } from "./primary/transactions/transactions.js";
 import { TotalPrice } from "./primary/totalPrice.js";
 // import { Notification } from './ui/notification.js'
 import { ShortcutWrapper } from "./ui/shortcuts.js";
+import { PaymentDetails } from "./primary/paymentDetails.js";
 
 class CashierUI {
   /**
@@ -20,18 +21,16 @@ class CashierUI {
     this.__itemListElement = this.__cashierElement.querySelector(".purchases");
     this.__notificationElement = this.__cashierElement.querySelector(".notification");
     this.__totalPriceElement = this.__cashierElement.querySelector(".total-price");
-    this.__paymentElement = this.__cashierElement.querySelector(".payment");
+    this.__paymentDetailsElement = this.__cashierElement.querySelector(".right-bar .payment");
     this.__shortcutElement = this.__cashierElement.querySelector(".shortcuts");
 
     // this.__notification = new Notification(this, this.__notificationElement);
     this.__shortcuts = new ShortcutWrapper(this, this.__shortcutElement, this.__submenuCoverElement);
+    this.paymentDetails = new PaymentDetails(this.__paymentDetailsElement);
 
     // set child classes
     this.__transactions = new Transactions(this, this.__itemListElement);
     this.__totalPrice = new TotalPrice(this.__totalPriceElement);
-
-    // this.__notification = new Notification(this, this.__notificationElement);
-    this.__shortcuts = new Shortcuts(this, this.__shortcutElement, this.__submenuCoverElement);
 
     // set shortcut key listeners
     this.__shortcuts.setCashierShortcutKeys(this.__cashierElement);
@@ -68,7 +67,8 @@ class CashierUI {
     this.__transactions.cancelCurrentTransaction();
   }
 
-  completeCurrentTransaction() {
+  completeCurrentTransaction(paymentNominals) {
+    this.__transactions.completeCurrentTransaction(paymentNominals);
     this.__shortcuts.setShortcutAvailabilty("F2", false);
     this.__shortcuts.setShortcutAvailabilty("F4", false);
     this.__shortcuts.setShortcutAvailabilty("F6", false);

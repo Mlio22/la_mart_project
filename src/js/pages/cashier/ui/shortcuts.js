@@ -102,7 +102,7 @@ export class ShortcutWrapper {
 
   // function to transaction
   // function called from payment
-  completeCurrentTransaction() {
-    this.__cashier.completeCurrentTransaction();
+  completeCurrentTransaction(paymentNominals) {
+    this.__cashier.completeCurrentTransaction(paymentNominals);
   }
 }

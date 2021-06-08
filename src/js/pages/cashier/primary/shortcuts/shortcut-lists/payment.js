@@ -98,7 +98,10 @@ export class Payment extends Submenu {
 
   __proceedPayment() {
     if (this.__isSufficient) {
-      this._submenu.completeCurrentTransaction();
+      this._submenu.completeCurrentTransaction({
+        customer: this.__customerMoney,
+        totalPrice: this.__total,
+      });
       //todo: access to API/DB and end payment
       this._submenu.hideSubmenu();
     }
