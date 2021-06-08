@@ -45,34 +45,43 @@ export const submenuButtons = {
   F2: {
     name: "search-item",
     object: SearchItem,
+    initialAvailabiilty: true,
   },
   F4: {
     name: "payment",
     object: Payment,
     html: paymentHTML,
+    initialAvailabiilty: false,
   },
   F5: {
     name: "print-bill",
+    initialAvailabiilty: false,
   },
   F6: {
     name: "save-transaction",
+    initialAvailabiilty: false,
   },
   F7: {
     name: "open-transaction",
     object: OpenTransaction,
+    initialAvailabiilty: false,
   },
   F9: {
     name: "cancel-transaction",
     object: Cancel,
     html: cancelHTML,
+    initialAvailabiilty: false,
   },
   F10: {
     name: "close-cashier",
+    initialAvailabiilty: true,
   },
   F11: {
     name: "new-page",
+    initialAvailabiilty: false,
   },
   F12: {
     name: "check-balance",
+    initialAvailabiilty: true,
   },
 };

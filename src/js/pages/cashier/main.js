@@ -1,7 +1,7 @@
 import { Transactions } from "./primary/transactions/transactions.js";
 import { TotalPrice } from "./primary/totalPrice.js";
 // import { Notification } from './ui/notification.js'
-import { Shortcuts } from "./ui/shortcuts.js";
+import { ShortcutWrapper } from "./ui/shortcuts.js";
 
 class CashierUI {
   /**
@@ -23,6 +23,9 @@ class CashierUI {
     this.__paymentElement = this.__cashierElement.querySelector(".payment");
     this.__shortcutElement = this.__cashierElement.querySelector(".shortcuts");
 
+    // this.__notification = new Notification(this, this.__notificationElement);
+    this.__shortcuts = new ShortcutWrapper(this, this.__shortcutElement, this.__submenuCoverElement);
+
     // set child classes
     this.__transactions = new Transactions(this, this.__itemListElement);
     this.__totalPrice = new TotalPrice(this.__totalPriceElement);
@@ -43,7 +46,7 @@ class CashierUI {
   openSubmenu(key, params) {
     // create a submenu
     // used from transation to submenu(search-item)
-    this.__shortcuts.openShortcut(key, params);
+    this.__shortcuts.openSubmenu(key, params);
   }
 
   createNewItem(itemData) {
@@ -66,7 +69,16 @@ class CashierUI {
   }
 
   completeCurrentTransaction() {
-    this.__transactions.completeCurrentTransaction();
+    this.__shortcuts.setShortcutAvailabilty("F2", false);
+    this.__shortcuts.setShortcutAvailabilty("F4", false);
+    this.__shortcuts.setShortcutAvailabilty("F6", false);
+    this.__shortcuts.setShortcutAvailabilty("F9", false);
+    this.__shortcuts.setShortcutAvailabilty("F10", true);
+    this.__shortcuts.setShortcutAvailabilty("F11", true);
+  }
+
+  setShortcutAvailability(shortcutKey, availability) {
+    this.__shortcuts.setShortcutAvailabilty(shortcutKey, availability);
   }
 }
 

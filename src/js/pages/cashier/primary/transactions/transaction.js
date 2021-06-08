@@ -46,6 +46,29 @@ export class Transaction {
       const newItem = new Item(this, this.__itemElement, itemData);
       this.__transactionItems.push(newItem);
     }
+
+    this.__checkItemToAffectShortcut();
+  }
+
+  __checkItemToAffectShortcut() {
+    // if any item is enlisted in list
+    // shortcut payment, save-transaction, cancel-transaction is available
+    // but
+    // print-bill (only if a transaction ever finished) will be unavailable
+
+    if (this.__transactionItems.length > 0) {
+      if (this.__transactionItems[0].data.valid) {
+        this.__cashier.setShortcutAvailability("F4", true);
+        this.__cashier.setShortcutAvailability("F6", true);
+        this.__cashier.setShortcutAvailability("F9", true);
+        this.__cashier.setShortcutAvailability("F10", false);
+        // this.__cashier.setShortcutAvailability("F5", false);
+      } else {
+        this.__cashier.setShortcutAvailability("F4", false);
+        this.__cashier.setShortcutAvailability("F6", false);
+        this.__cashier.setShortcutAvailability("F9", false);
+      }
+    }
   }
 
   // check for duplicate items
@@ -96,17 +119,14 @@ export class Transaction {
     this.__transactionItems[itemIndex].increaseAmount(amount);
   }
 
-  __deleteThisItemFromTransaction(item) {
-    item.removeThisItemFromTransaction();
-    this.removeItemFromList(item);
-  }
-
   removeItemFromList(item) {
     const index = this.__transactionItems.indexOf(item);
 
     if (index !== undefined) {
       this.__transactionItems.splice(index, 1);
     }
+
+    this.__checkItemToAffectShortcut();
   }
 
   openSearchItem(params) {

@@ -1,6 +1,7 @@
 import { submenuButtons } from "../primary/shortcuts/shortcutList.js";
+import { Shortcut } from "./shortcut.js";
 
-export class Shortcuts {
+export class ShortcutWrapper {
   constructor(cashier, shortcutElement, submenuCoverElement) {
     this.__cashier = cashier;
 
@@ -8,9 +9,18 @@ export class Shortcuts {
     this.__submenuCoverElement = submenuCoverElement;
     this.__submenuWrapperElement = this.__submenuCoverElement.querySelector(".submenu");
 
+    this.__shortcuts = {};
     this.__openedSubmenu = null;
 
+    this.__setShortcuts();
     this.__listenEvent();
+  }
+
+  __setShortcuts() {
+    Object.keys(submenuButtons).forEach((key) => {
+      console.log(submenuButtons[key]);
+      this.__shortcuts[key] = new Shortcut(this, key, submenuButtons[key]);
+    });
   }
 
   __listenEvent() {
@@ -21,19 +31,10 @@ export class Shortcuts {
         this.hideSubmenu();
       }
     });
-
-    // listening to each shortcut button
-    Object.keys(submenuButtons).forEach((shortcutKey) => {
-      const { name: shortcutName } = submenuButtons[shortcutKey];
-
-      document.querySelector(`.shortcut.${shortcutName}`).addEventListener("click", () => {
-        this.openShortcut(shortcutKey, {});
-      });
-    });
   }
 
   //   opening a shortcut
-  openShortcut(shortcutKey, props) {
+  openSubmenu(shortcutKey, props) {
     const { name, object, html } = submenuButtons[shortcutKey];
     const submenuProperties = {
       name: name,
@@ -73,6 +74,10 @@ export class Shortcuts {
         this.hideSubmenu();
       }
     });
+  }
+
+  setShortcutAvailabilty(shortcutKey, availability) {
+    this.__shortcuts[shortcutKey].availability = availability;
   }
 
   // extraordinary methods
