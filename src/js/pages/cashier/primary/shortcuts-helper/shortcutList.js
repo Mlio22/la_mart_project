@@ -42,6 +42,10 @@ const paymentHTML = `
 </div>`;
 
 export const submenuButtons = {
+  F1: {
+    name: "help",
+    initialAvailabiilty: true,
+  },
   F2: {
     name: "search-item",
     object: SearchItem,

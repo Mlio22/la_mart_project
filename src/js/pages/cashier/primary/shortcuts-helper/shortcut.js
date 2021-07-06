@@ -20,12 +20,19 @@ export class Shortcut {
 
   #setShortcutAvailability() {
     this.#shortcutElement.className = `shortcut ${!this.#shortcutAvailablity ? "disabled" : ""}`;
+    this.#shortcutElement.setAttribute("tabindex", this.#shortcutAvailablity ? "0" : "");
   }
 
   // listening to each shortcut button
   #listenShortcutElement() {
     this.#shortcutElement.addEventListener("click", () => {
       if (this.#shortcutAvailablity) {
+        this.#shortcutWrapper.cashier.childs.submenu.openSubmenu(this.#shortcutKey, {});
+      }
+    });
+
+    this.#shortcutElement.addEventListener("keydown", (e) => {
+      if (this.#shortcutAvailablity && e.key === "Enter") {
         this.#shortcutWrapper.cashier.childs.submenu.openSubmenu(this.#shortcutKey, {});
       }
     });
