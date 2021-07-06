@@ -1,4 +1,4 @@
-import { Transaction } from "./transaction.js";
+import { Transaction } from "./transactions-helper/transaction.js";
 const EMPTY_TRANSACTION_HTML = `
     <tr class="purchases-headers">
       <th class="purchases-header action-header">&nbsp;</th>

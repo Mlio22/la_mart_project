@@ -1,4 +1,5 @@
 import { BarcodeElement, TextElement, ActionElement, AmountElement } from "./itemElement.js";
+import { set_proper_price } from "../../../etc/others.js";
 
 const EMPTY_ITEM = {
   barcode: "",
@@ -6,49 +7,6 @@ const EMPTY_ITEM = {
   quantity: "",
   amount: 1,
   price: 0,
-};
-
-// set ordinary number strings to proper price string
-export const set_proper_price = function (value) {
-  // if the input was not a string
-  value = value.toString();
-
-  String.prototype.insertDot = function (index) {
-    // add dot between a string
-    if (index > 0) {
-      return this.substring(0, index) + "." + this.substr(index);
-    }
-
-    return this;
-  };
-
-  // added function to reverse a string
-  function reverseString(string) {
-    let stringArray = string.split("");
-    stringArray = stringArray.reverse();
-
-    return stringArray.join("");
-  }
-
-  // turn number to string
-  let stringValue = value.toString();
-
-  // reverse the string
-  stringValue = reverseString(stringValue);
-
-  // add a dot for every 3 digit
-  let addedDot = 0;
-  for (let index = 0; index < stringValue.length; index++) {
-    if (index >= 3 + addedDot * 4) {
-      stringValue = stringValue.insertDot(3 + addedDot * 4);
-      addedDot += 1;
-    }
-  }
-
-  // reverse the string again
-  stringValue = reverseString(stringValue);
-
-  return stringValue;
 };
 
 export class Item {

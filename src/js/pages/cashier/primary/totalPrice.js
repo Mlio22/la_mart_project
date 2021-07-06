@@ -1,4 +1,4 @@
-import { set_proper_price } from "./transactions/item.js";
+import { set_proper_price } from "../../etc/others.js";
 
 export class TotalPrice {
   #currentTotalPrice = 0;

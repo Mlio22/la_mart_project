@@ -28,18 +28,19 @@ const openTransactionHTML = `
     `;
 
 export class OpenTransaction {
-    constructor(parentElement, props) {
-        this.__parentElement = parentElement;
-        this.__parentElement.innerHTML = '';
-        this.__setSubmenu();
-    }
+  constructor(submenu, parentElement) {
+    this.__submenu = submenu;
+    this.__parentElement = parentElement;
 
-    __setSubmenu() {
-        this.__openTransactionElement = document.createElement('div');
-        this.__openTransactionElement.className = 'open-transaction';
-        this.__openTransactionElement.innerHTML = openTransactionHTML;
+    this.__setSubmenu();
+  }
 
-        this.__parentElement.appendChild(this.__openTransactionElement);
-    }
+  __setSubmenu() {
+    this.__openTransactionElement = document.createElement("div");
+    this.__openTransactionElement.className = "open-transaction";
+    this.__openTransactionElement.innerHTML = openTransactionHTML;
 
+    this.__parentElement.appendChild(this.__openTransactionElement);
+    this.__submenu.showSubmenu();
+  }
 }

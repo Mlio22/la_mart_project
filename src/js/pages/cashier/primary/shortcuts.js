@@ -1,9 +1,9 @@
-import { submenuButtons } from "../primary/shortcuts/shortcutList.js";
-import { Shortcut } from "./shortcut.js";
+import { submenuButtons } from "./shortcuts-helper/shortcutList.js";
+import { Shortcut } from "./shortcuts-helper/shortcut.js";
 
 export class ShortcutWrapper {
-  #shortcuts;
-  #openedSubmenu;
+  #shortcuts = {};
+  #openedSubmenu = null;
 
   constructor(cashier) {
     this.cashier = cashier;
@@ -11,9 +11,6 @@ export class ShortcutWrapper {
     this.submenuCoverElement = cashier.element.querySelector(".submenuCover");
 
     this.submenuWrapperElement = this.submenuCoverElement.querySelector(".submenu");
-
-    this.#shortcuts = {};
-    this.#openedSubmenu = null;
 
     this.#setShortcuts();
     this.#listenEvent();
@@ -44,22 +41,6 @@ export class ShortcutWrapper {
     this.submenuWrapperElement.innerHTML = "";
 
     this.cashier.focusToCashier();
-  }
-
-  setCashierShortcutKeys(cashierElement) {
-    // set cashier shortcut key listeners
-    // called by cashier
-    this.#openedSubmenu ??= null;
-
-    cashierElement.addEventListener("keydown", ({ key }) => {
-      if (this.#openedSubmenu === null && submenuButtons[key]) {
-        this.openSubmenu(key);
-      }
-
-      if (this.#openedSubmenu && key === "Escape") {
-        this.hideSubmenu();
-      }
-    });
   }
 
   setShortcutAvailability(keyAndAvailablity) {
@@ -99,6 +80,18 @@ export class ShortcutWrapper {
         } catch (_) {
           this.hideSubmenu();
         }
+      }
+    });
+
+    // set cashier shortcut key listeners
+    // called by cashier
+    this.cashier.element.addEventListener("keydown", ({ key }) => {
+      if (this.#openedSubmenu === null && submenuButtons[key]) {
+        this.openSubmenu(key);
+      }
+
+      if (this.#openedSubmenu && key === "Escape") {
+        this.hideSubmenu();
       }
     });
   }

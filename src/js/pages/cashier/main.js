@@ -1,7 +1,7 @@
-import { Transactions } from "./primary/transactions/transactions.js";
+import { Transactions } from "./primary/transactions.js";
 import { TotalPrice } from "./primary/totalPrice.js";
 // import { Notification } from './ui/notification.js'
-import { ShortcutWrapper } from "./ui/shortcuts.js";
+import { ShortcutWrapper } from "./primary/shortcuts.js";
 import { PaymentDetails } from "./primary/paymentDetails.js";
 
 class CashierUI {
@@ -24,11 +24,7 @@ class CashierUI {
     this.#cashierChild.paymentDetails = new PaymentDetails(this);
     this.#cashierChild.transactions = new Transactions(this);
     this.#cashierChild.totalPrice = new TotalPrice(this);
-
-    // set shortcut key listeners
-    // this.__shortcuts.setCashierShortcutKeys(this.cashierElement);
   }
-  // todo: buat ready state untuk child dari cashier
   get childs() {
     // called from almost child classes
     return this.#cashierChild;

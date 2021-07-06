@@ -1,4 +1,4 @@
-import { set_proper_price } from "../primary/transactions/item.js";
+import { set_proper_price } from "../../etc/others.js";
 
 export class PaymentDetails {
   // detail properties
