@@ -58,11 +58,8 @@ div.cashier div.left-bar div.purchases-wrapper table.purchases th {
   background-color: #E6E6E6;
 }
 div.cashier div.left-bar div.purchases-wrapper table.purchases td {
-  font-size: 18px;
-}
-div.cashier div.left-bar div.purchases-wrapper table.purchases tr:hover,
-div.cashier div.left-bar div.purchases-wrapper table.purchases tr.active {
   background-color: #eeeeee;
+  font-size: 18px;
 }
 div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-headers {
   width: 100%;
@@ -89,26 +86,30 @@ div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-head
 div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-headers th.total-price-header {
   width: 20%;
 }
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content {
+  padding: 0px !important;
+}
 div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content button {
   outline: none;
+  padding: 10px;
   border: none;
   background-color: transparent;
 }
 div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content button i {
   font-size: 20px;
 }
-div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content:not(.disabled) {
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content button:not(.disabled) {
   cursor: pointer;
   transition: 0.2s all;
   background-color: transparent;
 }
-div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content:not(.disabled) button {
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content button:not(.disabled) button {
   cursor: pointer;
 }
-div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content:not(.disabled):hover {
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content button:not(.disabled):hover, div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content button:not(.disabled):focus {
   background-color: #f89e9e;
 }
-div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content:not(.disabled):hover i.fas.fa-times {
+div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content button:not(.disabled):hover i.fas.fa-times, div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.action-content button:not(.disabled):focus i.fas.fa-times {
   color: red;
 }
 div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-contents td.no-input {

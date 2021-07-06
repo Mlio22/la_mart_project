@@ -61,12 +61,8 @@ div.cashier {
                 }
 
                 td {
-                    font-size: 18px;
-                }
-
-                tr:hover,
-                tr.active {
                     background-color: #eeeeee;
+                    font-size: 18px;
                 }
 
                 tr.purchases-headers {
@@ -104,8 +100,10 @@ div.cashier {
 
                 tr.purchases-contents {
                     td.action-content {
+                        padding: 0px !important;
                         button {
                             outline: none;
+                            padding: 10px;
                             border: none;
 
                             i {
@@ -113,23 +111,23 @@ div.cashier {
                             }
 
                             background-color: transparent;
-                        }
 
-                        &:not(.disabled) {
-                            cursor: pointer;
-                            transition: .2s all;
-                            background-color: transparent;
-
-                            button {
+                            &:not(.disabled) {
                                 cursor: pointer;
-                            }
+                                transition: .2s all;
+                                background-color: transparent;
 
-                            &:hover {
-                                i.fas.fa-times {
-                                    color: red;
+                                button {
+                                    cursor: pointer;
                                 }
 
-                                background-color: #f89e9e;
+                                &:hover, &:focus {
+                                    i.fas.fa-times {
+                                        color: red;
+                                    }
+
+                                    background-color: #f89e9e;
+                                }
                             }
                         }
                     }
