@@ -1,5 +1,8 @@
 import { Submenu } from "./Submenu.js";
 export class Cancel extends Submenu {
+  #yesButton;
+  #noButton;
+
   constructor(submenu, submenuWrapper, submenuProperties) {
     super(submenu, submenuWrapper, submenuProperties);
 
@@ -7,18 +10,18 @@ export class Cancel extends Submenu {
   }
 
   _setListener() {
-    this.__yesButton.addEventListener("click", () => {
-      this._submenu.cancelCurrentTransaction();
+    this.#yesButton.addEventListener("click", () => {
+      this._submenu.cashier.childs.transactions.cancelCurrentTransaction();
       this._submenu.hideSubmenu();
     });
 
-    this.__noButton.addEventListener("click", () => {
+    this.#noButton.addEventListener("click", () => {
       this._submenu.hideSubmenu();
     });
   }
 
   _setSubmenu() {
-    this.__yesButton = this._submenuElement.querySelector(".option-yes");
-    this.__noButton = this._submenuElement.querySelector(".option-no");
+    this.#yesButton = this._submenuElement.querySelector(".option-yes");
+    this.#noButton = this._submenuElement.querySelector(".option-no");
   }
 }

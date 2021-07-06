@@ -1,33 +1,39 @@
 export class Shortcut {
+  #shortcutWrapper;
+  #shortcutKey;
+  #shortcutClassname;
+  #shortcutAvailablity;
+  #shortcutElement;
+
   constructor(shortcutWrapper, shortcutKey, { name: shortcutClassname, initialAvailabiilty }) {
-    this.__shortcutWrapper = shortcutWrapper;
-    this.__shortcutKey = shortcutKey;
+    this.#shortcutWrapper = shortcutWrapper;
+    this.#shortcutKey = shortcutKey;
 
-    this.__shortcutClassname = shortcutClassname;
-    this.__shortcutAvailablity = initialAvailabiilty;
+    this.#shortcutClassname = shortcutClassname;
+    this.#shortcutAvailablity = initialAvailabiilty;
 
-    this.__shortcutElement = document.querySelector(`.shortcut.${this.__shortcutClassname}`);
+    this.#shortcutElement = document.querySelector(`.shortcut.${this.#shortcutClassname}`);
 
-    this.__setShortcutAvailability();
-    this.__listenShortcutElement();
+    this.#setShortcutAvailability();
+    this.#listenShortcutElement();
   }
 
-  __setShortcutAvailability() {
-    this.__shortcutElement.className = `shortcut ${!this.__shortcutAvailablity ? "disabled" : ""}`;
+  #setShortcutAvailability() {
+    this.#shortcutElement.className = `shortcut ${!this.#shortcutAvailablity ? "disabled" : ""}`;
   }
 
   set availability(availability) {
-    this.__shortcutAvailablity = availability;
+    this.#shortcutAvailablity = availability;
 
     // reset the element availability
-    this.__setShortcutAvailability();
+    this.#setShortcutAvailability();
   }
 
   // listening to each shortcut button
-  __listenShortcutElement() {
-    this.__shortcutElement.addEventListener("click", () => {
-      if (this.__shortcutAvailablity) {
-        this.__shortcutWrapper.openSubmenu(this.__shortcutKey, {});
+  #listenShortcutElement() {
+    this.#shortcutElement.addEventListener("click", () => {
+      if (this.#shortcutAvailablity) {
+        this.#shortcutWrapper.openSubmenu(this.#shortcutKey, {});
       }
     });
   }

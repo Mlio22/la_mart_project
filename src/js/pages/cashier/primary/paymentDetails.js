@@ -1,53 +1,60 @@
 import { set_proper_price } from "../primary/transactions/item.js";
 
 export class PaymentDetails {
-  constructor(paymentDetailsElement) {
-    this.__paymentDetailsElement = paymentDetailsElement;
+  // detail properties
+  #visible = false;
+  #transactionID = null;
 
-    // detail properties
-    this.__visible = false;
-    this.__transactionID = null;
+  #customerMoney = 0;
+  #totalPrice = 0;
+  #change = 0;
 
-    this.__customerMoney = 0;
-    this.__totalPrice = 0;
-    this.__change = 0;
+  #paymentDetailsElement;
+  #idSpan;
 
-    this.__gatherElements();
-  }
+  #customerMoneyContent;
+  #totalPriceContent;
+  #changeContent;
 
-  __gatherElements() {
-    this.__idSpan = this.__paymentDetailsElement.querySelector("span.id-content");
+  constructor(cashier) {
+    this.#paymentDetailsElement = cashier.element.querySelector(".right-bar .payment");
 
-    this.__customerMoneyContent = this.__paymentDetailsElement.querySelector(".customer-money-bar-content");
-    this.__totalPriceContent = this.__paymentDetailsElement.querySelector(".price-money-bar-content");
-    this.__changeContent = this.__paymentDetailsElement.querySelector(".change-money-bar-content");
-  }
-
-  __setElementText() {
-    this.__idSpan.innerText = this.__transactionID;
-
-    this.__customerMoneyContent.innerText = set_proper_price(this.__customerMoney);
-    this.__totalPriceContent.innerText = set_proper_price(this.__totalPrice);
-    this.__changeContent.innerText = set_proper_price(this.__change);
-  }
-
-  __setElementVisibilty(visiblilty) {
-    this.__visible = visiblilty;
-    this.__paymentDetailsElement.className = `payment ${this.__visible ? "visible" : ""}`;
+    this.#gatherElements();
   }
 
   setAndShow({ id, customer, totalPrice }) {
-    this.__transactionID = id;
+    this.#transactionID = id;
 
-    this.__customerMoney = customer;
-    this.__totalPrice = totalPrice;
-    this.__change = customer - totalPrice;
+    this.#customerMoney = customer;
+    this.#totalPrice = totalPrice;
+    this.#change = customer - totalPrice;
 
-    this.__setElementVisibilty(true);
-    this.__setElementText();
+    this.#setElementVisibilty(true);
+    this.#setElementText();
   }
 
   clearPayment() {
-    this.__setElementVisibilty(false);
+    this.#setElementVisibilty(false);
+  }
+
+  #gatherElements() {
+    this.#idSpan = this.#paymentDetailsElement.querySelector("span.id-content");
+
+    this.#customerMoneyContent = this.#paymentDetailsElement.querySelector(".customer-money-bar-content");
+    this.#totalPriceContent = this.#paymentDetailsElement.querySelector(".price-money-bar-content");
+    this.#changeContent = this.#paymentDetailsElement.querySelector(".change-money-bar-content");
+  }
+
+  #setElementText() {
+    this.#idSpan.innerText = this.#transactionID;
+
+    this.#customerMoneyContent.innerText = set_proper_price(this.#customerMoney);
+    this.#totalPriceContent.innerText = set_proper_price(this.#totalPrice);
+    this.#changeContent.innerText = set_proper_price(this.#change);
+  }
+
+  #setElementVisibilty(visiblilty) {
+    this.#visible = visiblilty;
+    this.#paymentDetailsElement.className = `payment ${this.#visible ? "visible" : ""}`;
   }
 }

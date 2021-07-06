@@ -1,125 +1,88 @@
 import { Transaction } from "./transaction.js";
-
-let TRANSACTION_ID = 0;
-
 const EMPTY_TRANSACTION_HTML = `
-<tr class="purchases-headers">
-  <th class="purchases-header action-header">&nbsp;</th>
-  <th class="purchases-header barcode-header">Barcode</th>
-  <th class="purchases-header name-header">Nama Barang</th>
-  <th class="purchases-header type-header">Satuan</th>
-  <th class="purchases-header price-header">Harga</th>
-  <th class="purchases-header amount-header">Jumlah</th>
-  <th class="purchases-header total-price-header">Harga Total</th>
-</tr>`;
-
-// Status list:
-// 1 : working
-// 2 : saved
-// 3 : completed
-// 4 : cancelled
+    <tr class="purchases-headers">
+      <th class="purchases-header action-header">&nbsp;</th>
+      <th class="purchases-header barcode-header">Barcode</th>
+      <th class="purchases-header name-header">Nama Barang</th>
+      <th class="purchases-header type-header">Satuan</th>
+      <th class="purchases-header price-header">Harga</th>
+      <th class="purchases-header amount-header">Jumlah</th>
+      <th class="purchases-header total-price-header">Harga Total</th>
+    </tr>`;
 
 export class Transactions {
-  constructor(cashier, purchasesElement) {
-    this.__cashier = cashier;
-    this.__purchasesElement = purchasesElement;
+  #transactionList = [];
+  #currentTransaction = null;
+  #currentTransactionId = null;
 
-    this.__transactionList = [];
-    this.__currentTransaction = null;
-    this.__currentTransactionId = this.__getTransactionId();
+  constructor(cashier) {
+    this.cashier = cashier;
+    this.purchasesElement = cashier.element.querySelector(".purchases");
 
     // initial transaction
-    this.__createTransaction();
-  }
-
-  __resetPurchasesElement() {
-    this.__purchasesElement.innerHTML = EMPTY_TRANSACTION_HTML;
-  }
-
-  __getTransactionId() {
-    // example
-    TRANSACTION_ID += 1;
-    return TRANSACTION_ID;
-
-    //   connect to API/DB
-  }
-
-  __storeDataToDB() {
-    // store data to db
-  }
-
-  __createTransaction(cancelledPreviousId) {
-    // create new transaction
-    this.__resetPurchasesElement();
-
-    // if previous transaction is cancelled, then its id can be reused
-    const transactionId = cancelledPreviousId ?? this.__getTransactionId();
-
-    const transactionObject = new Transaction(this.__cashier, this.__purchasesElement),
-      transactionStatus = 1;
-
-    this.__currentTransaction = {
-      id: transactionId,
-      object: transactionObject,
-      status: transactionStatus,
-    };
-
-    console.log(`${cancelledPreviousId ? "re-starting" : "starting"} transaction with id: ${transactionId}`);
-
-    this.__transactionList.push(this.__currentTransaction);
-  }
-
-  __searchTransaction(transactionId) {
-    for (const transaction in this.__transactionList) {
-      if (transaction.id === transactionId) {
-        return transaction;
-      }
-    }
-  }
-
-  saveCurrentTransaction() {
-    // change current transaction's status to 2 (saved)
-    this.__currentTransaction.status = 2;
-
-    console.log(`saving transaction with id: ${this.__currentTransaction.id}`);
-
-    // create new transaction
-    this.__createTransaction();
+    this.#createTransaction();
   }
 
   loadTransaction(transactionId) {
-    this.__currentTransaction = this.__searchTransaction(transactionId);
+    console.log(`loading transaction with id: ${this.#currentTransaction.id}`);
+    this.#currentTransaction = this.#searchTransaction(transactionId);
 
     // change current transaction's status to 1 (working)
-    this.__currentTransaction.status = 1;
-    console.log(`loading transaction with id: ${this.__currentTransaction.id}`);
+    this.#currentTransaction.status = 1;
 
     // clear the purchases element and restore the items
-    this.__resetPurchasesElement();
-    this.__currentTransaction.object.restoreItems();
+    this.#resetPurchasesElement();
+    this.#currentTransaction.restoreTransactionItems();
+  }
+
+  saveCurrentTransaction() {
+    console.log(`saving transaction with id: ${this.#currentTransaction.id}`);
+    // change current transaction's status to 2 (saved)
+    this.#currentTransaction.status = 2;
+
+    // create new transaction
+    this.#createTransaction();
   }
 
   completeCurrentTransaction(paymentNominals) {
-    console.log(`transaction with id: ${this.__currentTransaction.id} done!`);
+    console.log(`transaction with id: ${this.#currentTransaction.id} done!`);
 
-    this.__cashier.paymentDetails.setAndShow({ ...paymentNominals, id: this.__currentTransactionId });
+    this.cashier.childs.paymentDetails.setAndShow({ ...paymentNominals, id: this.#currentTransactionId });
 
     // change current transaction's status to 3 (completed)
-    this.__currentTransaction.status = 3;
-    this.__storeDataToDB();
-  }
-
-  // extra ordinary methods
-  createNewItem(itemData) {
-    // used in submenu(search-item) to transaction
-    this.__currentTransaction.object.createNewItem(itemData);
+    this.#currentTransaction.status = 3;
+    //! this.__storeDataToDB();
   }
 
   cancelCurrentTransaction() {
-    this.__createTransaction(this.__currentTransaction.id);
+    this.#createTransaction();
+    // clear previous transaction data
+  }
+
+  #createTransaction() {
+    // create new transaction
+    this.#resetPurchasesElement();
+    this.#currentTransaction = new Transaction(this.cashier);
+
+    this.#transactionList.push(this.#currentTransaction);
+  }
+
+  #resetPurchasesElement() {
+    this.purchasesElement.innerHTML = EMPTY_TRANSACTION_HTML;
+  }
+
+  #searchTransaction(transactionId) {
+    const transactionIndex = this.#transactionList.findIndex((transaction) => transaction.id === transactionId);
+    if (transactionIndex !== -1) {
+      return this.#transactionList[transactionIndex];
+    }
   }
 
   get currentTransactionObject() {
-    return this.__currentTransaction.object;
+    return this.#currentTransaction.object;
+  }
+
+  get currentTransaction() {
+    return this.#currentTransaction;
   }
 }

@@ -1,23 +1,21 @@
 import { set_proper_price } from "./transactions/item.js";
 
 export class TotalPrice {
-  constructor(totalPriceElement) {
-    this.__currentTotalPrice = 0;
-    this.__totalPriceContent = totalPriceElement.querySelector(
-      ".total-price-content"
-    );
+  #currentTotalPrice = 0;
+  #totalPriceContent = null;
 
-    this.__setTotalPrice();
+  constructor(cashier) {
+    this.#totalPriceContent = cashier.element.querySelector(".total-price .total-price-content");
+
+    this.#setTotalPrice();
   }
 
-  __setTotalPrice() {
-    this.__totalPriceContent.innerText = `Rp. ${set_proper_price(
-      this.__currentTotalPrice
-    )}`;
+  #setTotalPrice() {
+    this.#totalPriceContent.innerText = `Rp. ${set_proper_price(this.#currentTotalPrice)}`;
   }
 
   set totalPrice(totalPrice) {
-    this.__currentTotalPrice = totalPrice;
-    this.__setTotalPrice();
+    this.#currentTotalPrice = totalPrice;
+    this.#setTotalPrice();
   }
 }

@@ -33,9 +33,7 @@ const EXAMPLE_ITEMS_FROM_API = [
   },
 ];
 
-// ! sedang mencari cara untuk mencari ulang this.__filteredItems sehingga tidak perlu mengecek API berkali-kali
-
-function item_searcher(hint, params = ["name", "barcode"], filteredItems = EXAMPLE_ITEMS_FROM_API) {
+function item_searcher(hint, params = ["name", "barcode"], filteredItems = EXAMPLE_ITEMS_FROM_API, full_match = false) {
   // filteredItem is an array of filteredItems from search-item that need be researched again to prevent over-searching the API
   const matchedItems = [];
 
@@ -43,32 +41,42 @@ function item_searcher(hint, params = ["name", "barcode"], filteredItems = EXAMP
   hint = hint.toLowerCase();
 
   filteredItems.forEach((item) => {
-    let isMatch = false;
+    let previousMatch = false;
 
     // if anyone of the parameter is match then return the item
     params.forEach((param) => {
-      isMatch = isMatch || item[param].toLowerCase().includes(hint);
+      let currentMatch;
+      if (full_match) {
+        currentMatch = item[param].toLowerCase() === hint;
+      } else {
+        currentMatch = item[param].toLowerCase().includes(hint);
+      }
+
+      previousMatch = previousMatch || currentMatch;
     });
 
-    if (isMatch) matchedItems.push(item);
+    if (previousMatch) matchedItems.push(item);
   });
 
   return matchedItems;
 }
 
 export class SearchItem extends Submenu {
+  #selectedItem = null;
+  #filteredItems = [];
+  #itemReference;
+  #hint;
+  #searchItemHeader;
+  #searchItemResult;
+
   constructor(submenu, submenuWraper, submenuProperties, params = {}) {
     super(submenu, submenuWraper, submenuProperties);
 
-    // seleted item from searchItem
-    this.__selectedItem = null;
-    this.__filteredItems = [];
-
     // extraction from params
-    this.__itemReference = params.itemReference ?? null;
-    this.__hint = params.hint ?? "";
+    this.#itemReference = params.itemReference ?? null;
+    this.#hint = params.hint ?? "";
 
-    this.__firstSearchItemOrStartSearchItem();
+    this.#firstSearchItemOrStartSearchItem();
   }
 
   // create element for search-item
@@ -77,11 +85,11 @@ export class SearchItem extends Submenu {
     this._submenuElement.className = "search-item";
 
     // append header and result list element
-    this._submenuElement.append(this.__searchItemHeader.element, this.__searchItemResult.element);
+    this._submenuElement.append(this.#searchItemHeader.element, this.#searchItemResult.element);
 
     this._submenuWrapper.appendChild(this._submenuElement);
 
-    this.__searchItemHeader.focusToHint();
+    this.#searchItemHeader.focusToHint();
   }
 
   _setSubmenu() {}
@@ -93,27 +101,27 @@ export class SearchItem extends Submenu {
 
       // arrow up / down to change item selection
       if (key === "ArrowUp" || key === "ArrowDown") {
-        this.__searchItemResult.focusToResultItem(key === "ArrowDown" ? "next" : "previous");
+        this.#searchItemResult.focusToResultItem(key === "ArrowDown" ? "next" : "previous");
       }
 
       // enter to select item to list
       else if (key === "Enter") {
-        this.__searchItemResult.selectFilteredItem();
+        this.#searchItemResult.selectFilteredItem();
       }
 
       // other to edit text in input
       else {
-        this.__searchItemHeader.focusToHint();
+        this.#searchItemHeader.focusToHint();
       }
     });
   }
 
-  __firstSearchItemOrStartSearchItem() {
+  #firstSearchItemOrStartSearchItem() {
     // search the DB from hint (first barcode)
     // if matches only to one item then choose item directly and close the search-item
     // the barcode item must be same to the hint
 
-    const matchedItemsWithBarcode = item_searcher(this.__hint, ["barcode"], undefined);
+    const matchedItemsWithBarcode = item_searcher(this.#hint, ["barcode"], undefined, true);
     if (matchedItemsWithBarcode.length === 1) {
       // immediately set selected item and close the search-item if item (barcode) is already found
       this.selectedItem = matchedItemsWithBarcode[0];
@@ -122,43 +130,43 @@ export class SearchItem extends Submenu {
       // or no item found in first search
       // set child UI and classes
 
-      this.__searchItemHeader = new SearchItemHeader(this, this.__hint);
-      this.__searchItemResult = new SearchItemResults(this);
+      this.#searchItemHeader = new SearchItemHeader(this, this.#hint);
+      this.#searchItemResult = new SearchItemResults(this);
 
       // set the html
       this._initializeSubmenu();
 
       // focus to hint
-      this.__searchItemHeader.focusToHint();
+      this.#searchItemHeader.focusToHint();
 
       // search the item if hint is not empty string
-      if (this.__hint !== "") {
-        this.__searchItemMatchBoth();
+      if (this.#hint !== "") {
+        this.#searchItemMatchBoth();
       }
     }
   }
 
-  __searchItemMatchBoth(preventOversearch = false) {
+  #searchItemMatchBoth(alreadyFilteredItems = null) {
     const matchedItemsWithBoth = item_searcher(
-      this.__hint,
+      this.#hint,
       undefined,
-      preventOversearch ? this.__filteredItems : undefined
+      alreadyFilteredItems ? this.#filteredItems : undefined
     );
 
     // set the results
-    this.__filteredItems = matchedItemsWithBoth;
-    this.__searchItemResult.setResults(matchedItemsWithBoth);
+    this.#filteredItems = matchedItemsWithBoth;
+    this.#searchItemResult.setResults(matchedItemsWithBoth);
   }
 
-  __addToSelectedItemToTransaction() {
-    if (this.__itemReference !== null) {
+  #addToSelectedItemToTransaction() {
+    if (this.#itemReference !== null) {
       // if itemReference params exists,
       // change that reference's item using item's method
-      this.__itemReference.data = this.__selectedItem;
+      this.#itemReference.data = this.#selectedItem;
     } else {
       // if itemReference doesn't exist (e.g. search-item accessed from shortcut)
       // create new item data on transaction
-      this._submenu.createNewItem(this.__selectedItem);
+      this._submenu.cashier.childs.transactions.currentTransaction.createNewItem(this.#selectedItem);
     }
   }
 
@@ -169,81 +177,127 @@ export class SearchItem extends Submenu {
     // get the previous hint and compare with the new hint
     // if the new hint is the same previous hint plus one character
     // prevent oversearch the API and let to research with the last filteredItem
-    const previousHint = this.__hint;
-    this.__hint = hint;
+    const previousHint = this.#hint;
+    this.#hint = hint;
 
-    this.__searchItemMatchBoth(this.__hint.includes(previousHint));
+    if (previousHint !== "") {
+      this.#searchItemMatchBoth(this.#hint.includes(previousHint));
+    } else {
+      this.#searchItemMatchBoth();
+    }
   }
 
   set selectedItem(selectedItem) {
     // set the selected item and automatically add to transaction
-    this.__selectedItem = selectedItem;
-    this.__addToSelectedItemToTransaction();
+    this.#selectedItem = selectedItem;
+    this.#addToSelectedItemToTransaction();
 
     // when item is selected, close the search-item
     this._submenu.hideSubmenu();
+
+    // focus to latest barcode in list if itemReference is exist
+    if (this.#itemReference) {
+      this.#itemReference.transaction.focusToLatestBarcode();
+    }
   }
 }
 
 class SearchItemHeader {
+  #searchItem;
+  #hint;
+  #headerElement;
+  #hintElement;
   constructor(searchItem, hint) {
-    this.__searchItem = searchItem;
-    this.__hint = hint;
+    this.#searchItem = searchItem;
+    this.#hint = hint;
 
-    this.__createSearchItemHeaderElement();
-    this.__listenHint();
+    this.#createSearchItemHeaderElement();
+    this.#listenHint();
   }
 
-  __createSearchItemHeaderElement() {
-    this.__headerElement = document.createElement("div");
-    this.__headerElement.className = "search-item-header";
-    this.__headerElement.innerHTML = '<p class="keyword-text">Kata Kunci:</p>';
+  #createSearchItemHeaderElement() {
+    this.#headerElement = document.createElement("div");
+    this.#headerElement.className = "search-item-header";
+    this.#headerElement.innerHTML = '<p class="keyword-text">Kata Kunci:</p>';
 
-    this.__hintElement = document.createElement("input");
-    this.__hintElement.className = "keywordInput";
-    this.__hintElement.type = "text";
-    this.__hintElement.value = this.__hint;
+    this.#hintElement = document.createElement("input");
+    this.#hintElement.className = "keywordInput";
+    this.#hintElement.type = "text";
+    this.#hintElement.value = this.#hint;
 
-    this.__headerElement.appendChild(this.__hintElement);
+    this.#headerElement.appendChild(this.#hintElement);
   }
 
-  __listenHint() {
-    this.__hintElement.addEventListener("input", (e) => {
-      this.__searchItem.hint = e.target.value;
+  #listenHint() {
+    this.#hintElement.addEventListener("input", (e) => {
+      this.#searchItem.hint = e.target.value;
     });
   }
 
   get element() {
-    return this.__headerElement;
+    return this.#headerElement;
   }
 
   focusToHint() {
-    this.__hintElement.focus();
+    this.#hintElement.focus();
   }
 }
 
 class SearchItemResults {
+  #searchItem;
+  #resultsElement;
+  #matchedItemList;
+  #matchedItemElements;
+  #focusedItemIndex;
   constructor(searchItem) {
-    this.__searchItem = searchItem;
+    this.#searchItem = searchItem;
 
-    this.__createSearchItemResultsElement();
+    this.#createSearchItemResultsElement();
   }
 
-  __createSearchItemResultsElement() {
-    this.__resultsElement = document.createElement("div");
-    this.__resultsElement.className = "search-item-results";
+  setResults(resultObjectList = []) {
+    this.#matchedItemList = resultObjectList;
+    this.#setResultsElements();
+  }
 
-    this.__matchedItemList = [];
-    this.__matchedItemElements = [];
+  //
+  focusToResultItem(position = "next") {
+    // position: next/previous
+    const previousFocusedIndex = this.#focusedItemIndex;
+    if (position === "next" && this.#focusedItemIndex < this.#matchedItemElements.length - 1) {
+      this.#focusedItemIndex += 1;
+    } else if (position === "previous" && this.#focusedItemIndex > 0) {
+      this.#focusedItemIndex -= 1;
+    }
 
-    this.__focusedItemIndex = null;
+    if (previousFocusedIndex !== this.#focusedItemIndex) {
+      this.#focusToResultItemWithIndex();
+    }
+  }
 
-    this.__setInitalElement();
+  selectFilteredItem() {
+    // index will be the index from click listener @#setResultsElement
+    // or be
+    this.#searchItem.selectedItem = {
+      ...this.#matchedItemList[this.#focusedItemIndex],
+    };
+  }
+
+  #createSearchItemResultsElement() {
+    this.#resultsElement = document.createElement("div");
+    this.#resultsElement.className = "search-item-results";
+
+    this.#matchedItemList = [];
+    this.#matchedItemElements = [];
+
+    this.#focusedItemIndex = null;
+
+    this.#setInitalElement();
   }
 
   // set results header for initial
-  __setInitalElement() {
-    this.__resultsElement.innerHTML = `
+  #setInitalElement() {
+    this.#resultsElement.innerHTML = `
         <div class="search-item-result-header">
           <p class="item-barcode">Kode Barang</p>
           <p class="item-name">Nama Barang</p>
@@ -252,16 +306,11 @@ class SearchItemResults {
         </div>`;
   }
 
-  setResults(resultObjectList = []) {
-    this.__matchedItemList = resultObjectList;
-    this.__setResultsElements();
-  }
+  #setResultsElements() {
+    this.#setInitalElement();
+    this.#matchedItemElements = [];
 
-  __setResultsElements() {
-    this.__setInitalElement();
-    this.__matchedItemElements = [];
-
-    this.__matchedItemList.forEach((matchedItem) => {
+    this.#matchedItemList.forEach((matchedItem) => {
       const { barcode, name, quantity, price } = matchedItem;
 
       const resultElement = document.createElement("div");
@@ -278,49 +327,26 @@ class SearchItemResults {
       // set listener to result item
       // when onclick, it'll be selected item from the list
       resultElement.addEventListener("click", () => {
-        this.__focusedItemIndex = this.__matchedItemElements.indexOf(resultElement);
+        this.#focusedItemIndex = this.#matchedItemElements.indexOf(resultElement);
         this.selectFilteredItem();
       });
 
-      this.__resultsElement.appendChild(resultElement);
-      this.__matchedItemElements.push(resultElement);
+      this.#resultsElement.appendChild(resultElement);
+      this.#matchedItemElements.push(resultElement);
     });
 
     // focus to first child of result element
-    this.__focusedItemIndex = 0;
-    this.__focusToResultItemWithIndex();
+    this.#focusedItemIndex = 0;
+    this.#focusToResultItemWithIndex();
   }
 
-  __focusToResultItemWithIndex() {
-    const focusedElement = this.__matchedItemElements[this.__focusedItemIndex];
+  #focusToResultItemWithIndex() {
+    const focusedElement = this.#matchedItemElements[this.#focusedItemIndex];
 
     if (focusedElement) focusedElement.focus();
   }
 
-  //
-  focusToResultItem(position = "next") {
-    // position: next/previous
-    const previousFocusedIndex = this.__focusedItemIndex;
-    if (position === "next" && this.__focusedItemIndex < this.__matchedItemElements.length - 1) {
-      this.__focusedItemIndex += 1;
-    } else if (position === "previous" && this.__focusedItemIndex > 0) {
-      this.__focusedItemIndex -= 1;
-    }
-
-    if (previousFocusedIndex !== this.__focusedItemIndex) {
-      this.__focusToResultItemWithIndex();
-    }
-  }
-
-  selectFilteredItem() {
-    // index will be the index from click listener @__setResultsElement
-    // or be
-    this.__searchItem.selectedItem = {
-      ...this.__matchedItemList[this.__focusedItemIndex],
-    };
-  }
-
   get element() {
-    return this.__resultsElement;
+    return this.#resultsElement;
   }
 }

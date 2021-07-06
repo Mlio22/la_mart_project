@@ -24,6 +24,7 @@ export class Submenu {
   _createSubmenu() {
     // inherited at payment and cancel
     // overrided at search-item
+    // overrided at new-transaction
 
     // creating submenu element
     this._submenuElement = document.createElement("div");
@@ -33,4 +34,7 @@ export class Submenu {
     // add it to wrapper
     this._submenuWrapper.appendChild(this._submenuElement);
   }
+
+  _setSubmenu() {}
+  _setListener() {}
 }

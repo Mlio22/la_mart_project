@@ -2,39 +2,25 @@ import { submenuButtons } from "../primary/shortcuts/shortcutList.js";
 import { Shortcut } from "./shortcut.js";
 
 export class ShortcutWrapper {
-  constructor(cashier, shortcutElement, submenuCoverElement) {
-    this.__cashier = cashier;
+  #shortcuts;
+  #openedSubmenu;
 
-    this.__shortcutElement = shortcutElement;
-    this.__submenuCoverElement = submenuCoverElement;
-    this.__submenuWrapperElement = this.__submenuCoverElement.querySelector(".submenu");
+  constructor(cashier) {
+    this.cashier = cashier;
+    this.shortcutElement = cashier.element.querySelector(".shortcuts");
+    this.submenuCoverElement = cashier.element.querySelector(".submenuCover");
 
-    this.__shortcuts = {};
-    this.__openedSubmenu = null;
+    this.submenuWrapperElement = this.submenuCoverElement.querySelector(".submenu");
 
-    this.__setShortcuts();
-    this.__listenEvent();
-  }
+    this.#shortcuts = {};
+    this.#openedSubmenu = null;
 
-  __setShortcuts() {
-    Object.keys(submenuButtons).forEach((key) => {
-      console.log(submenuButtons[key]);
-      this.__shortcuts[key] = new Shortcut(this, key, submenuButtons[key]);
-    });
-  }
-
-  __listenEvent() {
-    // listening to cover,
-    // when a submenu is showed, and the cover clicked, then the submenu will close
-    this.__submenuCoverElement.addEventListener("click", (e) => {
-      if (e.target === this.__submenuCoverElement) {
-        this.hideSubmenu();
-      }
-    });
+    this.#setShortcuts();
+    this.#listenEvent();
   }
 
   //   opening a shortcut
-  openSubmenu(shortcutKey, props) {
+  openSubmenu(shortcutKey, props = {}) {
     const { name, object, html } = submenuButtons[shortcutKey];
     const submenuProperties = {
       name: name,
@@ -42,67 +28,78 @@ export class ShortcutWrapper {
     };
 
     // create shortcut object
-    this.__openedSubMenu = new object(this, this.__submenuWrapperElement, submenuProperties, props);
+    this.#openedSubmenu = new object(this, this.submenuWrapperElement, submenuProperties, props);
   }
 
   showSubmenu() {
     //!   this method only called by child submenu
-    this.__submenuCoverElement.classList.remove("hidden");
+    this.submenuCoverElement.classList.remove("hidden");
   }
 
   hideSubmenu() {
-    this.__submenuCoverElement.classList.add("hidden");
-    this.__openedSubMenu = null;
+    this.submenuCoverElement.classList.add("hidden");
+    this.#openedSubmenu = null;
 
     // clear the submenu element
-    this.__submenuWrapperElement.innerHTML = "";
+    this.submenuWrapperElement.innerHTML = "";
 
-    this.__cashier.focusToCashier();
+    this.cashier.focusToCashier();
   }
 
   setCashierShortcutKeys(cashierElement) {
     // set cashier shortcut key listeners
     // called by cashier
-    this.__openedSubMenu ??= null;
+    this.#openedSubmenu ??= null;
 
     cashierElement.addEventListener("keydown", ({ key }) => {
-      if (this.__openedSubMenu === null && submenuButtons[key]) {
-        this.openShortcut(key);
+      if (this.#openedSubmenu === null && submenuButtons[key]) {
+        this.openSubmenu(key);
       }
 
-      if (this.__openedSubMenu && key === "Escape") {
+      if (this.#openedSubmenu && key === "Escape") {
         this.hideSubmenu();
       }
     });
   }
 
-  setShortcutAvailabilty(shortcutKey, availability) {
-    this.__shortcuts[shortcutKey].availability = availability;
+  setShortcutAvailability(keyAndAvailablity) {
+    // this.#shortcuts[shortcutKey].availability = availability;
+    Object.keys(keyAndAvailablity).forEach((shortcutKey) => {
+      this.#shortcuts[shortcutKey].availability = keyAndAvailablity[shortcutKey];
+    });
   }
 
-  // extraordinary methods
-
-  // function to transaction
-  // function called from search-item
-  createNewItem(itemData) {
-    this.__cashier.createNewItem(itemData);
+  #setShortcuts() {
+    Object.keys(submenuButtons).forEach((key) => {
+      console.log(submenuButtons[key]);
+      this.#shortcuts[key] = new Shortcut(this, key, submenuButtons[key]);
+    });
   }
 
-  // function to transaction
-  // function called from payment
-  getTotalPrice() {
-    return this.__cashier.getTotalPrice();
-  }
+  #listenEvent() {
+    // listening to cover,
+    // when a submenu is showed, and the cover clicked, then the submenu will close
+    this.submenuCoverElement.addEventListener("click", (e) => {
+      if (e.target === this.submenuCoverElement) {
+        this.hideSubmenu();
+      }
+    });
 
-  // function to transaction
-  // function called from payment and cancel
-  cancelCurrentTransaction() {
-    this.__cashier.cancelCurrentTransaction();
-  }
+    //! prevent other focus when submenu opened
 
-  // function to transaction
-  // function called from payment
-  completeCurrentTransaction(paymentNominals) {
-    this.__cashier.completeCurrentTransaction(paymentNominals);
+    document.querySelector(".cashier .submenuCover").addEventListener("focusout", (e) => {
+      if (e.relatedTarget !== null) {
+        const { tagName: relatedTagName, className: relatedClassName } = e.relatedTarget;
+
+        // checking targeted focusout is child of submenu
+        try {
+          if (document.querySelector(`.submenuCover ${relatedTagName}.${relatedClassName}`) === null) {
+            this.hideSubmenu();
+          }
+        } catch (_) {
+          this.hideSubmenu();
+        }
+      }
+    });
   }
 }

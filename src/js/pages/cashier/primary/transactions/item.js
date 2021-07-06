@@ -1,28 +1,12 @@
+import { BarcodeElement, TextElement, ActionElement, AmountElement } from "./itemElement.js";
+
 const EMPTY_ITEM = {
   barcode: "",
   name: "",
   quantity: "",
-  price: 0,
   amount: 1,
-  valid: false,
+  price: 0,
 };
-
-function checkShallowObjectEquality(obj1, obj2) {
-  const key1 = Object.keys(obj1),
-    key2 = Object.keys(obj2);
-
-  if (key1.length !== key2.length) {
-    return false;
-  }
-
-  for (let key of key1) {
-    if (obj1[key] !== obj2[key]) {
-      return false;
-    }
-  }
-
-  return true;
-}
 
 // set ordinary number strings to proper price string
 export const set_proper_price = function (value) {
@@ -68,10 +52,74 @@ export const set_proper_price = function (value) {
 };
 
 export class Item {
-  constructor(transaction, listElement, data) {
-    this.__transaction = transaction;
-    this.__listElement = listElement;
+  #data;
+  #ui;
 
+  constructor(transaction, listElement = document.querySelector("table.purchases"), data) {
+    this.transaction = transaction;
+
+    // gathering data
+    this.#gatherData(data);
+
+    // add ui to Html document
+    this.#ui = new ItemUI(this, listElement, this.#data);
+
+    // setting timeout to fix item's index in transaction
+    setTimeout(() => {
+      this.transaction.refreshTotalPrice();
+      this.#checkData();
+    }, 50);
+  }
+
+  deleteThisItem() {
+    // function only called from action
+    this.transaction.removeItemFromList(this);
+    this.#ui.removeUi();
+
+    this.transaction.refreshTotalPrice();
+  }
+
+  increaseAmount(amount = 1) {
+    // function called only from above (transaction)
+
+    // get previous amount
+    const previousAmount = this.#data.amount;
+    this.setSeveralItemData({ amount: previousAmount + amount });
+
+    // refresh ui
+    this.#ui.itemContent = this.#data;
+  }
+
+  openSearchFromItem() {
+    this.transaction.cashier.childs.shortcuts.openSubmenu("F2", {
+      itemReference: this,
+      hint: this.#data.barcode,
+    });
+  }
+
+  checkDuplicateFromItem() {
+    return this.transaction.checkDuplicateOnList(this);
+  }
+
+  setSeveralItemData(newData) {
+    // set single data
+    this.#data = { ...this.#data, ...newData };
+    this.#ui.itemContent = this.#data;
+
+    this.transaction.refreshTotalPrice();
+  }
+
+  #checkData() {
+    // go create new item if enough info in previous item
+    if (this.#data.valid) {
+      this.#ui.childElements.barcodeElement.lock();
+      this.transaction.createNewItem();
+    } else {
+      this.#ui.childElements.barcodeElement.focus();
+    }
+  }
+
+  #gatherData(data) {
     // variable for check if data is already valid
     let isDataAlreadyValid;
 
@@ -83,27 +131,21 @@ export class Item {
       isDataAlreadyValid = true;
     }
 
-    this.__data = { ...data };
+    this.#data = { ...data };
 
     // adding other properties
-    this.__data = Object.assign(this.__data, {
+    this.#data = Object.assign(this.#data, {
       amount: 1,
       valid: isDataAlreadyValid,
     });
-
-    // add ui to Html document
-    this.__ui = new ItemUI(this, this.__listElement, this.__data);
-
-    // setting timeout to fix item's index in transaction
-    setTimeout(() => {
-      this.__transaction.refreshTotalPrice();
-      this.__checkData();
-    }, 50);
   }
 
-  // data getter and setter
   get data() {
-    return this.__data;
+    return this.#data;
+  }
+
+  get ui() {
+    return this.#ui;
   }
 
   set data(data) {
@@ -111,345 +153,93 @@ export class Item {
     // so the data will be always valid
     // function called from search-item
 
-    const { amount: previousAmount } = this.__data;
-    this.__data = Object.assign(data, {
+    const { amount: previousAmount } = this.#data;
+    this.#data = Object.assign(data, {
       amount: previousAmount,
     });
 
-    const isDuplicate = this.__transaction.checkDuplicateOnList(this);
+    const isDuplicate = this.checkDuplicateFromItem();
 
     if (isDuplicate) {
       // reset to empty item
-      this.__data = { ...EMPTY_ITEM };
+      this.#data = { ...EMPTY_ITEM };
     } else {
-      this.__data.valid = true;
+      this.#data.valid = true;
     }
 
-    this.__ui.itemContent = this.__data;
-    this.__checkData();
-  }
-
-  __checkData() {
-    // go create new item if enough info in previous item
-    if (this.__data.valid) {
-      this.__ui.lockBarcode();
-      this.__transaction.createNewItem();
-    } else {
-      this.__ui.focusBarcode();
-    }
-  }
-
-  deleteThisItemFromAction() {
-    // function only called from action
-    this.__transaction.removeItemFromList(this);
-    this.__ui.removeUi();
-
-    this.__transaction.refreshTotalPrice();
-  }
-
-  checkDuplicateOnList() {
-    return this.__transaction.checkDuplicateOnList(this);
-  }
-
-  increaseAmount(amount) {
-    // function called only from above (transaction)
-
-    // get previous amount
-    const previousAmount = this.__data.amount;
-    this.setSingleData("amount", previousAmount + amount);
-
-    // refresh ui
-    this.__ui.itemContent = this.__data;
-  }
-
-  openSearchItem() {
-    this.__transaction.openSearchItem({
-      itemReference: this,
-      hint: this.__data.barcode,
-    });
-  }
-
-  setSingleData(dataType, value) {
-    // function only called from below (barcode, amount)
-    this.__data[dataType] = value;
-    this.__ui.itemContent = this.__data;
-
-    this.__transaction.refreshTotalPrice();
+    this.#ui.itemContent = this.#data;
+    this.#checkData();
   }
 }
 
 class ItemUI {
-  constructor(item, listElement, firstUiValue) {
-    this.__item = item;
-    this.__listElement = listElement;
+  #itemContentElement;
+  #itemElement;
 
-    this.__createElement(firstUiValue);
+  constructor(item, listElement, data = { ...EMPTY_ITEM }) {
+    this.item = item;
+    this.listElement = listElement;
+
+    this.#createElement(data);
   }
 
-  __createElement(firstUiValue) {
-    this.__itemElement = document.createElement("tr");
-    this.__itemElement.className = "purchases-contents active";
+  #createElement(data) {
+    this.#itemElement = document.createElement("tr");
+    this.#itemElement.className = "purchases-contents";
 
-    const { name, quantity, price, amount } = firstUiValue;
+    const { name, quantity, price, amount } = data;
 
-    this.__itemContentElement = {
-      actionElement: new ActionElement(this.__item, this),
-      barcodeElement: new BarcodeElement(this.__item, this),
+    this.#itemContentElement = {
+      actionElement: new ActionElement(this.item),
+      barcodeElement: new BarcodeElement(this.item),
       nameElement: new TextElement("name-content", name),
       quantityElement: new TextElement("type-content", quantity),
       priceElement: new TextElement("price-content", set_proper_price(price)),
-      amountElement: new AmountElement(this.__item, this),
+      amountElement: new AmountElement(this.item),
       totalPriceElement: new TextElement("total-price-content", set_proper_price(price * amount)),
     };
 
-    Object.keys(this.__itemContentElement).forEach((key) => {
-      this.__itemElement.appendChild(this.__itemContentElement[key].element);
+    Object.keys(this.#itemContentElement).forEach((key) => {
+      this.#itemElement.appendChild(this.#itemContentElement[key].element);
     });
 
-    this.__listElement.appendChild(this.__itemElement);
+    this.listElement.appendChild(this.#itemElement);
   }
 
   // method that called from parent
   removeUi() {
     // remove ui from document
-    this.__itemElement.remove();
-  }
-
-  focusBarcode() {
-    // focus to barcode
-    // function called from item
-    this.__itemContentElement.barcodeElement.focus();
-  }
-
-  lockBarcode() {
-    this.__itemContentElement.barcodeElement.lock();
+    this.#itemElement.remove();
   }
 
   changeAmount(amount) {
     // above: item
     // below: barcode
-    this.__itemContentElement.amountElement.amount = amount;
+    this.#itemContentElement.amountElement.value = amount;
   }
 
-  set itemContent(itemContent) {
-    const { name, barcode, quantity, price, amount, valid } = itemContent;
-    const { actionElement, barcodeElement, nameElement, quantityElement, priceElement, totalPriceElement } =
-      this.__itemContentElement;
+  set itemContent(newItemData) {
+    const { name, barcode, quantity, price, amount, valid } = newItemData;
+    const {
+      actionElement,
+      barcodeElement,
+      nameElement,
+      quantityElement,
+      priceElement,
+      amountElement,
+      totalPriceElement,
+    } = this.#itemContentElement;
 
-    barcodeElement.barcode = barcode;
     actionElement.deletable = valid;
+    barcodeElement.barcode = barcode;
     nameElement.text = name;
     quantityElement.text = quantity;
     priceElement.text = set_proper_price(price);
+    amountElement.value = amount;
     totalPriceElement.text = set_proper_price(price * amount);
-
-    this.changeAmount(amount);
-  }
-}
-
-class ActionElement {
-  constructor(item, itemUi) {
-    this.__item = item;
-    this.__itemUi = itemUi;
-
-    this.__isDeletable = this.__item.data.valid;
-
-    // local properties
-    this.__createActionElement();
-    this.__listenAction();
   }
 
-  __createActionElement() {
-    this.__actionWrapper = document.createElement("td");
-    this.__actionWrapper.className = `purchases-content action-content no-input`;
-
-    this.__actionButton = document.createElement("button");
-    this.__actionButton.innerHTML = `<i class="fas fa-times "></i>`;
-    this.__setButtonAblity();
-
-    this.__actionWrapper.appendChild(this.__actionButton);
-  }
-
-  __setButtonAblity() {
-    // item can be deleted if it's deletable (valid)
-    // set button disablity
-    this.__actionButton.disabled = !this.__isDeletable;
-
-    // set button disablity class
-    if (this.__isDeletable) {
-      this.__actionButton.classList.remove("disabled");
-    } else {
-      this.__actionButton.classList.add("disabled");
-    }
-  }
-
-  __listenAction() {
-    this.__actionWrapper.addEventListener("click", () => {
-      if (this.__isDeletable) {
-        // delete the item if data is valid and button is clicked
-        this.__deleteThisItemFromAction();
-      }
-    });
-  }
-
-  get element() {
-    return this.__actionWrapper;
-  }
-
-  // to item function
-  __deleteThisItemFromAction() {
-    // delete item through transaction
-    this.__item.deleteThisItemFromAction();
-  }
-
-  set deletable(isDeletable) {
-    this.__isDeletable = isDeletable;
-    this.__setButtonAblity();
-  }
-}
-
-// Barcode element
-class BarcodeElement {
-  constructor(item, itemUi) {
-    this.__item = item;
-    this.__itemUi = itemUi;
-
-    const firstBarcode = this.__item.data.barcode;
-
-    // create the barcode ui
-    this.__createBarcodeElement(firstBarcode);
-  }
-
-  // local related methods
-  __createBarcodeElement(barcode) {
-    // the wrapper element
-    this.__barcodeWrapper = document.createElement("td");
-    this.__barcodeWrapper.className = "purchases-content barcode-content";
-
-    // the input element
-    this.__barcodeElement = document.createElement("input");
-    this.__barcodeElement.type = "text";
-    this.__barcodeElement.value = barcode;
-
-    // listen to the input
-    this.__listenBarcode();
-
-    // append input to the wrapper
-    this.__barcodeWrapper.appendChild(this.__barcodeElement);
-  }
-
-  __listenBarcode() {
-    // if barcode is changed,
-    // first, look for duplicate item on the list,
-    // if it's not duplicate, then check to DB with search-item
-
-    // if search-item is succeed, search-item will change the item data
-    // else if search-item is closed, change item data and set validity to false
-    this.__barcodeElement.addEventListener("change", (e) => {
-      const barcodeValue = e.target.value;
-
-      if (barcodeValue.length > 1) {
-        this.__item.setSingleData("barcode", barcodeValue);
-        const isDuplicate = this.__item.checkDuplicateOnList();
-
-        if (isDuplicate) {
-          // if duplicate, then clear the barcode and set amount to 1
-          this.__item.setSingleData("barcode", "");
-          this.__item.setSingleData("amount", 1);
-          this.focus();
-        } else {
-          // if doesn't duplicate,
-          // set the barcode value in item
-          // check it with search-item
-          this.__item.openSearchItem();
-        }
-      }
-    });
-  }
-
-  // function that called from parent
-  get element() {
-    return this.__barcodeWrapper;
-  }
-
-  focus() {
-    this.__barcodeElement.focus();
-  }
-
-  lock() {
-    // lock the item's barcode
-    // so the barcode cannot be change
-    this.__barcodeElement.disabled = true;
-  }
-
-  set barcode(barcode) {
-    this.__barcodeElement.value = barcode;
-  }
-}
-
-class TextElement {
-  constructor(classname, value = "") {
-    this.__classname = classname;
-
-    this.__createTextElement(value);
-  }
-
-  __createTextElement(firstText) {
-    this.__textElement = document.createElement("td");
-    this.__textElement.className = `purchases-content no-input ${this.__classname}`;
-
-    this.text = firstText;
-  }
-
-  set text(text) {
-    this.__textElement.innerText = text;
-  }
-
-  get element() {
-    return this.__textElement;
-  }
-}
-
-class AmountElement {
-  constructor(item, itemUi) {
-    this.__item = item;
-    this.__itemUI = itemUi;
-
-    this.__createAmountElement();
-    this.__listenAmount();
-  }
-
-  __createAmountElement() {
-    this.__amountWrapper = document.createElement("td");
-    this.__amountWrapper.className = "purchases-content amount-content";
-
-    this.__amountElement = document.createElement("input");
-    this.__amountElement.type = "number";
-    this.__amountElement.value = 1;
-    this.__amountElement.min = 1;
-
-    this.__amountWrapper.appendChild(this.__amountElement);
-  }
-
-  __listenAmount() {
-    this.__amountElement.addEventListener("change", (e) => {
-      let amount = e.target.value;
-      amount = parseInt(amount);
-
-      this.__item.setSingleData("amount", amount);
-    });
-  }
-
-  // function called from above
-
-  get element() {
-    // function called from itemUi
-    return this.__amountWrapper;
-  }
-
-  set amount(amount) {
-    // set amount input value
-    // function called from itemUi
-    this.__amountElement.value = amount;
+  get childElements() {
+    return this.#itemContentElement;
   }
 }
