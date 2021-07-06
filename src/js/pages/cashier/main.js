@@ -3,6 +3,7 @@ import { TotalPrice } from "./primary/totalPrice.js";
 // import { Notification } from './ui/notification.js'
 import { ShortcutWrapper } from "./primary/shortcuts.js";
 import { PaymentDetails } from "./primary/paymentDetails.js";
+import { SubmenuWrapper } from "./primary/submenu.js";
 
 class CashierUI {
   /**
@@ -12,18 +13,19 @@ class CashierUI {
    * This Cashier UI class is for connect to subclasses below it
    */
 
-  #cashierChild;
+  #cashierChild = {};
 
   constructor(cashierElement) {
     this.cashierElement = cashierElement;
 
-    // child elements
-    this.#cashierChild = {};
-
+    // visible childs (primary)
     this.#cashierChild.shortcuts = new ShortcutWrapper(this);
     this.#cashierChild.paymentDetails = new PaymentDetails(this);
     this.#cashierChild.transactions = new Transactions(this);
     this.#cashierChild.totalPrice = new TotalPrice(this);
+
+    // submenu
+    this.#cashierChild.submenu = new SubmenuWrapper(this);
   }
   get childs() {
     // called from almost child classes

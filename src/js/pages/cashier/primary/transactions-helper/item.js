@@ -49,7 +49,7 @@ export class Item {
   }
 
   openSearchFromItem() {
-    this.transaction.cashier.childs.shortcuts.openSubmenu("F2", {
+    this.transaction.cashier.childs.submenu.openSubmenu("F2", {
       itemReference: this,
       hint: this.#data.barcode,
     });

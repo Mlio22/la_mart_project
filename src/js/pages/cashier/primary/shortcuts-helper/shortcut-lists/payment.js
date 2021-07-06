@@ -12,8 +12,8 @@ export class Payment extends Submenu {
   #change;
   #isSufficient;
 
-  constructor(submenu, submenuWrapper, submenuProperties) {
-    super(submenu, submenuWrapper, submenuProperties);
+  constructor(submenu, submenuProperties) {
+    super(submenu, submenuProperties);
 
     this.#total = submenu.cashier.childs.transactions.currentTransaction.totalPrice;
     this.#customerMoney = this.#total;
@@ -71,7 +71,6 @@ export class Payment extends Submenu {
 
   // private methods
   #gatherElementInputs() {
-    console.log(this._submenuElement);
     this.#customerMoneyElement = this._submenuElement.querySelector(".customer-content");
     this.#totalElement = this._submenuElement.querySelector(".price-content");
     this.#changeElement = this._submenuElement.querySelector(".change-content");

@@ -1,10 +1,13 @@
 export class Submenu {
-  constructor(submenu, submenuWraper, submenuProperties) {
+  constructor(submenu, submenuProperties) {
     this._submenu = submenu;
-    this._submenuWrapper = submenuWraper;
+    this._submenuWrapper = submenu.submenuWrapperElement;
 
     this._submenuName = submenuProperties.name;
     this._submenuHTML = submenuProperties.html;
+
+    // refresh wrapper
+    this._submenuWrapper.innerHTML = "";
   }
 
   //   start create submenu and add listener to it

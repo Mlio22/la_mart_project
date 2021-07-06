@@ -22,6 +22,15 @@ export class Shortcut {
     this.#shortcutElement.className = `shortcut ${!this.#shortcutAvailablity ? "disabled" : ""}`;
   }
 
+  // listening to each shortcut button
+  #listenShortcutElement() {
+    this.#shortcutElement.addEventListener("click", () => {
+      if (this.#shortcutAvailablity) {
+        this.#shortcutWrapper.cashier.childs.submenu.openSubmenu(this.#shortcutKey, {});
+      }
+    });
+  }
+
   set availability(availability) {
     this.#shortcutAvailablity = availability;
 
@@ -29,12 +38,7 @@ export class Shortcut {
     this.#setShortcutAvailability();
   }
 
-  // listening to each shortcut button
-  #listenShortcutElement() {
-    this.#shortcutElement.addEventListener("click", () => {
-      if (this.#shortcutAvailablity) {
-        this.#shortcutWrapper.openSubmenu(this.#shortcutKey, {});
-      }
-    });
+  get availability() {
+    return this.#shortcutAvailablity;
   }
 }

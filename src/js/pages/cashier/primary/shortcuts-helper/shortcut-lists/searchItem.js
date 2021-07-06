@@ -69,8 +69,8 @@ export class SearchItem extends Submenu {
   #searchItemHeader;
   #searchItemResult;
 
-  constructor(submenu, submenuWraper, submenuProperties, params = {}) {
-    super(submenu, submenuWraper, submenuProperties);
+  constructor(submenu, submenuProperties, params = {}) {
+    super(submenu, submenuProperties);
 
     // extraction from params
     this.#itemReference = params.itemReference ?? null;

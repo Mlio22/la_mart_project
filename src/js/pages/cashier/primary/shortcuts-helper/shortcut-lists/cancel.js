@@ -3,8 +3,8 @@ export class Cancel extends Submenu {
   #yesButton;
   #noButton;
 
-  constructor(submenu, submenuWrapper, submenuProperties) {
-    super(submenu, submenuWrapper, submenuProperties);
+  constructor(submenu, submenuProperties) {
+    super(submenu, submenuProperties);
 
     this._initializeSubmenu();
   }
