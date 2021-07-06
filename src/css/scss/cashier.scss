@@ -316,9 +316,11 @@ div.cashier {
                 background-color: #00000049;
             }
 
-            div.shortcut:not(.disabled):hover {
-                background-color: #dbdbdb;
-                box-shadow: inset 7px 7px 15px rgb(167 166 166 / 30%), inset -7px -7px 7px #c7c7c726, 0px 0px 4px rgb(167 166 166 / 30%);
+            div.shortcut:not(.disabled) {
+                &:hover, &:focus{
+                    background-color: #dbdbdb;
+                    box-shadow: inset 7px 7px 15px rgb(167 166 166 / 30%), inset -7px -7px 7px #c7c7c726, 0px 0px 4px rgb(167 166 166 / 30%);
+                }
             }
         }
     }

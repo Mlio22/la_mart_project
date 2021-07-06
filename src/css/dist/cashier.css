@@ -262,7 +262,7 @@ div.cashier div.right-bar div.shortcuts div.shortcut.disabled {
   opacity: 0.4;
   background-color: #00000049;
 }
-div.cashier div.right-bar div.shortcuts div.shortcut:not(.disabled):hover {
+div.cashier div.right-bar div.shortcuts div.shortcut:not(.disabled):hover, div.cashier div.right-bar div.shortcuts div.shortcut:not(.disabled):focus {
   background-color: #dbdbdb;
   box-shadow: inset 7px 7px 15px rgba(167, 166, 166, 0.3), inset -7px -7px 7px #c7c7c726, 0px 0px 4px rgba(167, 166, 166, 0.3);
 }
