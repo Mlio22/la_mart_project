@@ -3,6 +3,9 @@ import { Cancel } from "./shortcut-lists/cancel.js";
 import { OpenTransaction } from "./shortcut-lists/openTransaction.js";
 import { SearchItem } from "./shortcut-lists/searchItem.js";
 
+// functions
+import { newTransaction } from "./shortcut-functions/newTransaction.js";
+
 // element HTMLs
 
 const cancelHTML = `<div class="header">Batalkan Transaksi?</div>
@@ -41,6 +44,20 @@ const paymentHTML = `
     </button>
 </div>`;
 
+const openTransactionHTML = `
+<div class="header">Daftar Transaksi</div>
+<div class="type-slider">
+    <div tabindex="0" class="type active">Tersimpan</div>
+    <div tabindex="0" class="type">Selesai</div>
+    <div class="slider">&nbsp;</div>
+</div>
+<div class="content">
+    <div class="content-header">
+        <div class="id">ID</div>
+        <div class="item-bar">Jumlah Item</div>
+        <div class="time">Waktu</div>
+    </div>`;
+
 export const submenuButtons = {
   F1: {
     name: "help",
@@ -68,7 +85,8 @@ export const submenuButtons = {
   F7: {
     name: "open-transaction",
     object: OpenTransaction,
-    initialAvailabiilty: false,
+    html: openTransactionHTML,
+    initialAvailabiilty: true,
   },
   F9: {
     name: "cancel-transaction",
@@ -78,10 +96,12 @@ export const submenuButtons = {
   },
   F10: {
     name: "close-cashier",
+    function: closeCashier,
     initialAvailabiilty: true,
   },
   F11: {
-    name: "new-page",
+    name: "new-transaction",
+    function: newTransaction,
     initialAvailabiilty: false,
   },
   F12: {
