@@ -5,6 +5,7 @@ import { SearchItem } from "./shortcut-lists/searchItem.js";
 
 // functions
 import { newTransaction } from "./shortcut-functions/newTransaction.js";
+import { closeCashier } from "./shortcut-functions/close-cashier.js";
 
 // element HTMLs
 
@@ -96,7 +97,7 @@ export const submenuButtons = {
   },
   F10: {
     name: "close-cashier",
-    function: closeCashier,
+    shortcutFunction: closeCashier,
     initialAvailabiilty: true,
   },
   F11: {
