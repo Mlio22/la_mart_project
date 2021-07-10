@@ -14,12 +14,10 @@ export class OpenTransaction extends Submenu {
   }
 
   #listen() {
-    this._submenuElement.addEventListener("keydown", (e) => {
-      const key = e.key;
+    this._submenuElement.addEventListener("keydown", ({ key }) => {
       if (key === "Tab") {
         this._submenuElement.focus();
         this.slider.toggleSlider();
-        return;
       } else if (key.includes("Arrow")) {
         this.result.arrowAction(key);
       }
@@ -45,11 +43,8 @@ class TypeSlider {
     this.#typeSliderElement = submenu.element.querySelector(".type-slider");
     this.#sliderElement = submenu.element.querySelector(".slider");
 
-    // gather children width and height
-    this.#typeChilds = Array.prototype.slice.call(this.#typeSliderElement.children);
-    this.#typeChilds.forEach((childs) => {
-      this.#childOffsetWidth.push(childs.offsetWidth);
-    });
+    // gather children width
+    this.#gatherChildrenWidth();
 
     // set slider and listen
     this.#setSlider();
@@ -57,6 +52,8 @@ class TypeSlider {
   }
 
   toggleSlider() {
+    // toggle slider
+    // called from parent (OpenTransaction)
     const previousIndex = this.#currentTypeIndex;
 
     this.#currentTypeIndex = previousIndex === 0 ? 1 : 0;
@@ -80,7 +77,7 @@ class TypeSlider {
     let sliderWidth = this.#childOffsetWidth[this.#currentTypeIndex],
       sliderLeft = this.#childOffsetWidth
         .slice(0, this.#currentTypeIndex)
-        .reduce((acc, cur, idx) => acc + cur + 7 * idx, 0);
+        .reduce((sum, currentValue, currentIndex) => sum + (currentValue + 7 * currentIndex), 0);
 
     // change slider pos and width
     this.#sliderElement.style.width = `${sliderWidth}px`;
@@ -92,6 +89,11 @@ class TypeSlider {
 
     // change results
     this.#submenu.result.getTransactionList(this.#currentTypeIndex);
+  }
+
+  #gatherChildrenWidth() {
+    this.#typeChilds = Array.prototype.slice.call(this.#typeSliderElement.children);
+    this.#childOffsetWidth = this.#typeChilds.map((child) => child.offsetWidth);
   }
 }
 
@@ -106,7 +108,6 @@ class ResultTransactions {
 
   constructor(submenu) {
     this.#submenu = submenu;
-
     this.#openTransactionContentElement = submenu.element.querySelector(".content");
 
     this.#listenInteraction();
@@ -123,11 +124,11 @@ class ResultTransactions {
         break;
 
       case "ArrowLeft":
-        this.#arrowCollapseOrNot(this.#resultElements[this.#focusIndex].itemsElement, false);
+        this.#arrowCollapseOrNot("close");
         break;
 
       case "ArrowRight":
-        this.#arrowCollapseOrNot(this.#resultElements[this.#focusIndex].itemsElement, true);
+        this.#arrowCollapseOrNot("open");
         break;
     }
   }
@@ -142,9 +143,7 @@ class ResultTransactions {
   }
 
   #showResults() {
-    // refresh the results
-    this.#resultElements = [];
-
+    // reset the HTML of content
     this.#openTransactionContentElement.innerHTML = `
     <div class="content-header">
       <div class="id">ID</div>
@@ -153,11 +152,30 @@ class ResultTransactions {
     </div>
     `;
 
-    this.#currentFilteredTransactions.forEach(({ transactionInfo }) => {
-      console.log(transactionInfo);
+    // create the result elements
+    this.#createResultElements();
+
+    // listen on each result elements
+    this.#listenInteraction();
+
+    // bug fix: set a delay before focusing element
+    setTimeout(() => {
+      // initial focus index
+      if (this.#resultElements.length > 0) {
+        this.focusIndex = 0;
+      }
+    }, 50);
+  }
+
+  #createResultElements() {
+    // refresh the results element
+    this.#resultElements = [];
+
+    this.#resultElements = this.#currentFilteredTransactions.map(({ transactionInfo }) => {
       const contentItem = document.createElement("div");
       contentItem.className = "content-item";
       contentItem.tabIndex = "0";
+
       contentItem.innerHTML = `
       <div class="id">#${transactionInfo.id}</div>
       <div class="item-bar">
@@ -170,35 +188,24 @@ class ResultTransactions {
             .join("")}</div>
       </div>
       <div class="time">11:02</div>`;
-
-      this.#resultElements.push({ itemsElement: contentItem, collapsed: false });
       this.#openTransactionContentElement.appendChild(contentItem);
+
+      return { itemsElement: contentItem, collapsed: false };
     });
-
-    this.#listenInteraction();
-
-    // bug fix: set a delay before focusing element
-    setTimeout(() => {
-      // initial focus index
-      if (this.#resultElements.length > 0) {
-        this.focusIndex = 0;
-      }
-    }, 50);
   }
 
   #listenInteraction() {
     this.#resultElements.forEach(({ itemsElement: resultElement }) => {
-      const itemBar = resultElement.querySelector(".item-bar"),
-        collapseButtonWrapper = itemBar.querySelector(".collapse-button-wrapper");
+      const itemBar = resultElement.querySelector(".item-bar");
 
-      // item expansion (mouse - single click)
+      //* item list toggle collapse (mouse - single click)
+      const collapseButtonWrapper = itemBar.querySelector(".collapse-button-wrapper");
       collapseButtonWrapper.addEventListener("click", () => {
-        this.#arrowCollapseOrNot(resultElement, "toggle");
+        this.#arrowCollapseOrNot("toggle", resultElement);
       });
 
-      // result selection (mouse - double click)
+      //* result selection (mouse - double click)
       let beforeTimeoutDouble = false;
-
       resultElement.addEventListener("click", (e) => {
         this.focusIndex = this.#resultElements.findIndex(({ itemsElement }) => itemsElement === resultElement);
 
@@ -224,6 +231,7 @@ class ResultTransactions {
         }
       });
 
+      //* result selection (keydown - enter)
       resultElement.addEventListener("keydown", ({ key }) => {
         if (key === "Enter") {
           // select item
@@ -237,22 +245,25 @@ class ResultTransactions {
     });
   }
 
-  #arrowCollapseOrNot(itemsElement, collapse = false) {
-    const itemBar = itemsElement.querySelector(".item-bar");
+  #arrowCollapseOrNot(collapseTarget = "close", itemsElement = this.#resultElements[this.#focusIndex].itemsElement) {
+    //* collapse parameter values:
+    // "close": about to close the collapse
+    // "open": about to open the collapse
+    // "toggle": toggle the collapse
 
-    if (itemBar.classList.contains("active")) {
-      if (collapse === true) return;
+    const itemBar = itemsElement.querySelector(".item-bar"),
+      isCollapsed = itemBar.classList.contains("active");
 
+    if (isCollapsed === true && collapseTarget === "close") {
       itemBar.classList.remove("active");
-    } else {
-      if (collapse === false) return;
+    }
 
-      try {
-        contentItem.querySelector(".item-bar.active").classList.remove("active");
-      } catch (_) {
-      } finally {
-        itemBar.classList.add("active");
-      }
+    if (isCollapsed === false && collapseTarget === "open") {
+      itemBar.classList.add("active");
+    }
+
+    if (collapseTarget === "toggle") {
+      itemBar.classList.toggle("active");
     }
   }
 
