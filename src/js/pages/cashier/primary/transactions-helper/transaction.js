@@ -117,7 +117,6 @@ export class Transaction {
     // shortcut payment, save-transaction, cancel-transaction is available
     // but
     // print-bill (only if a transaction ever finished) will be unavailable
-    console.log(this.cashier);
 
     if (this.#transactionItems.length > 0) {
       if (this.#transactionItems[0].data.valid) {
@@ -126,13 +125,14 @@ export class Transaction {
           F6: true,
           F9: true,
           F10: false,
-          // F5: false,
         });
       } else {
         this.cashier.childs.shortcuts.setShortcutAvailability({
           F4: false,
           F6: false,
+          F5: false,
           F9: false,
+          F10: true,
         });
       }
     }

@@ -1,18 +1,11 @@
 import { Transactions } from "./primary/transactions.js";
 import { TotalPrice } from "./primary/totalPrice.js";
 // import { Notification } from './ui/notification.js'
-import { ShortcutWrapper } from "./primary/shortcuts.js";
+import { ShortcutWrapper } from "./primary/shortcutWrapper.js";
 import { PaymentDetails } from "./primary/paymentDetails.js";
-import { SubmenuWrapper } from "./primary/submenu.js";
+import { SubmenuWrapper } from "./primary/submenuWrapper.js";
 
 class CashierUI {
-  /**
-   *
-   * @param {HTMLElement} cashierElement
-   *
-   * This Cashier UI class is for connect to subclasses below it
-   */
-
   #cashierChild = {};
 
   constructor(cashierElement) {

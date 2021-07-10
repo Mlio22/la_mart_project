@@ -1,10 +1,10 @@
-import { Submenu } from "./Submenu.js";
+import { Submenu } from "./SubmenuPrototype.js";
 export class Cancel extends Submenu {
   #yesButton;
   #noButton;
 
-  constructor(submenu, submenuProperties) {
-    super(submenu, submenuProperties);
+  constructor(submenuWrapper, submenuProperties) {
+    super(submenuWrapper, submenuProperties);
 
     this._initializeSubmenu();
   }

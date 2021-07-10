@@ -1,5 +1,5 @@
 import { set_proper_price } from "../../../../etc/others.js";
-import { Submenu } from "./Submenu.js";
+import { Submenu } from "./SubmenuPrototype.js";
 
 export class Payment extends Submenu {
   #total;
@@ -12,10 +12,10 @@ export class Payment extends Submenu {
   #change;
   #isSufficient;
 
-  constructor(submenu, submenuProperties) {
-    super(submenu, submenuProperties);
+  constructor(submenuWrapper, submenuProperties) {
+    super(submenuWrapper, submenuProperties);
 
-    this.#total = submenu.cashier.childs.transactions.currentTransaction.totalPrice;
+    this.#total = submenuWrapper.cashier.childs.transactions.currentTransaction.totalPrice;
     this.#customerMoney = this.#total;
 
     this._initializeSubmenu();

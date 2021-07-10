@@ -1,4 +1,4 @@
-import { Submenu } from "./Submenu.js";
+import { Submenu } from "./SubmenuPrototype.js";
 
 const EXAMPLE_ITEMS_FROM_API = [
   {
@@ -69,8 +69,8 @@ export class SearchItem extends Submenu {
   #searchItemHeader;
   #searchItemResult;
 
-  constructor(submenu, submenuProperties, params = {}) {
-    super(submenu, submenuProperties);
+  constructor(submenuWrapper, submenuProperties, params = {}) {
+    super(submenuWrapper, submenuProperties);
 
     // extraction from params
     this.#itemReference = params.itemReference ?? null;

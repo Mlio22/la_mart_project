@@ -3,18 +3,18 @@ import { submenuButtons } from "./shortcuts-helper/shortcutList.js";
 export class SubmenuWrapper {
   #openedSubmenu = null;
   #submenuCoverElement;
+  #submenuWrapperElement;
 
   constructor(cashier) {
     this.cashier = cashier;
 
     this.#submenuCoverElement = cashier.element.querySelector(".submenuCover");
-    this.submenuWrapperElement = this.#submenuCoverElement.querySelector(".submenu");
+    this.#submenuWrapperElement = this.#submenuCoverElement.querySelector(".submenu");
 
     this.#listenEvent();
   }
 
   showSubmenu() {
-    //!   this method only called by child submenu
     this.#submenuCoverElement.classList.remove("hidden");
   }
 
@@ -23,21 +23,29 @@ export class SubmenuWrapper {
     this.#openedSubmenu = null;
 
     // clear the submenu element
-    this.submenuWrapperElement.innerHTML = "";
+    this.#submenuWrapperElement.innerHTML = "";
 
     this.cashier.focusToCashier();
   }
 
   //   opening a shortcut
   openSubmenu(shortcutKey, props = {}) {
-    const { name, object, html } = submenuButtons[shortcutKey];
+    const { name, object, shortcutFunction, html } = submenuButtons[shortcutKey];
     const submenuProperties = {
       name: name,
       html: html,
     };
 
-    // create shortcut object
-    this.#openedSubmenu = new object(this, submenuProperties, props);
+    if (object) {
+      // create shortcut object
+      this.#openedSubmenu = new object(this, submenuProperties, props);
+    }
+
+    if (shortcutFunction) {
+      console.log("executing");
+      // execute shortcut function
+      shortcutFunction(this);
+    }
   }
 
   #listenEvent() {
@@ -51,13 +59,12 @@ export class SubmenuWrapper {
 
     //! prevent other focus when submenu opened
 
-    document.querySelector(".cashier .submenuCover").addEventListener("focusout", (e) => {
-      if (e.relatedTarget !== null) {
-        const { tagName: relatedTagName, className: relatedClassName } = e.relatedTarget;
-
-        // checking targeted focusout is child of submenu
+    document.querySelector(".cashier").addEventListener("focus", (e) => {
+      if (this.#openedSubmenu) {
         try {
-          if (document.querySelector(`.submenuCover ${relatedTagName}.${relatedClassName}`) === null) {
+          if (
+            document.querySelector(`.submenuCover ${relatedTagName}.${relatedClassName.replace(" ", ".")}`) === null
+          ) {
             this.hideSubmenu();
           }
         } catch (_) {
@@ -72,5 +79,9 @@ export class SubmenuWrapper {
         this.hideSubmenu();
       }
     });
+  }
+
+  get element() {
+    return this.#submenuWrapperElement;
   }
 }

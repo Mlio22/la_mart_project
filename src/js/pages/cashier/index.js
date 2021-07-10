@@ -1,13 +1,14 @@
-const { BrowserWindow } = require("electron");
+const { ipcMain, BrowserWindow } = require("electron");
 
 class Cashier {
+  #cashierWin;
+
   constructor() {
-    this.__openedSubMenu = null;
-    this.__initCashierWin();
+    this.#initCashierWin();
   }
 
-  __initCashierWin() {
-    this.__cashierWin = new BrowserWindow({
+  #initCashierWin() {
+    this.#cashierWin = new BrowserWindow({
       webPreferences: {
         nodeIntegration: true,
       },
@@ -15,20 +16,24 @@ class Cashier {
       minHeight: 768,
     });
 
-    this.__cashierWin.maximize();
+    this.#cashierWin.maximize();
 
-    this.__cashierWin.loadFile("./src/templates/cashier.html");
-    this.__setCashierListeners();
+    this.#cashierWin.loadFile("./src/templates/cashier.html");
+    this.#setCashierListeners();
   }
 
-  __setCashierListeners() {
-    this.__cashierWin.once("closed", () => {
-      this.__cashierWin = null;
+  #setCashierListeners() {
+    this.#cashierWin.once("closed", () => {
+      this.#cashierWin = null;
+    });
+
+    ipcMain.on("close-cashier", () => {
+      this.#cashierWin.close();
     });
   }
 
   get window() {
-    return this.__cashierWin;
+    return this.#cashierWin;
   }
 }
 
