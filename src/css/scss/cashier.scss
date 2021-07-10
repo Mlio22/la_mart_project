@@ -225,7 +225,11 @@ div.cashier {
         overflow: hidden;
 
         div.payment {
+            transition: none;
+            opacity: 0;
+            
             &.visible{
+                opacity: 1;
                 visibility: initial;
             }
 

@@ -184,6 +184,8 @@ div.cashier div.right-bar {
   overflow: hidden;
 }
 div.cashier div.right-bar div.payment {
+  transition: none;
+  opacity: 0;
   visibility: hidden;
   border-bottom: 1px solid #DBDBDB;
   margin: auto;
@@ -191,6 +193,7 @@ div.cashier div.right-bar div.payment {
   width: 400px;
 }
 div.cashier div.right-bar div.payment.visible {
+  opacity: 1;
   visibility: initial;
 }
 div.cashier div.right-bar div.payment div.payment-header {
