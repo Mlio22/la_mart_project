@@ -1,29 +1,130 @@
 .open-transaction {
-  font-size: 20px;
+  width: 700px;
+  user-select: none;
+  font-family: "Goudy Old Style";
+  color: #707070;
+  background-color: #DCDCDC;
   padding: 10px;
+  border-radius: 5px;
 }
-.open-transaction .open-transaction-header {
-  width: 25vw;
+.open-transaction > .header {
+  font-size: 30px;
+  font-weight: bold;
   text-align: center;
-  padding: 10px;
+  margin-bottom: 30px;
 }
-.open-transaction .open-transaction-table {
-  overflow: auto;
-  max-height: 450px;
+.open-transaction > .type-slider {
+  position: relative;
+  border-bottom: 2px solid #999999;
 }
-.open-transaction .open-transaction-table .open-transaction-table__header {
-  border-top: 1px solid #707070;
-  border-bottom: 1px solid #707070;
+.open-transaction > .type-slider > div {
+  display: inline-block;
+  z-index: 1;
 }
-.open-transaction .open-transaction-table > div {
-  display: flex;
-  text-align: center;
-}
-.open-transaction .open-transaction-table > div > div {
-  padding: 10px 0;
-  width: 50%;
-}
-.open-transaction .open-transaction-table > div:hover {
+.open-transaction > .type-slider > div.type {
+  padding: 10px 20px;
+  position: relative;
   cursor: pointer;
-  background-color: #BCBCBC;
+  font-size: 18px;
+  background-color: transparent;
+  outline: none;
+}
+.open-transaction > .type-slider > div.type.active {
+  cursor: default;
+  color: white;
+}
+.open-transaction > .type-slider > div.slider {
+  padding: 10px 0 10px 0;
+  position: absolute;
+  display: inline-block;
+  background-color: #444444;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  width: 10px;
+  z-index: 0;
+  left: 0;
+  top: 3px;
+}
+.open-transaction > .content {
+  margin-top: 20px;
+  font-size: 19px;
+  font-weight: 600;
+  height: 500px;
+  overflow: auto;
+}
+.open-transaction > .content > div {
+  display: flex;
+}
+.open-transaction > .content > div > div {
+  border: 0.6px solid #707070;
+}
+.open-transaction > .content > div > div.id, .open-transaction > .content > div > div.time {
+  flex: 15% 0 0;
+  padding: 10px 12px;
+}
+.open-transaction > .content > div > div.item-bar {
+  flex: 80% 1 1;
+  padding: 10px 10px 10px 5px;
+}
+.open-transaction > .content > div.content-header {
+  text-align: center;
+}
+.open-transaction > .content > div.content-item > .item-bar {
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.open-transaction > .content > div.content-item > .item-bar > .collapse-button-wrapper {
+  display: inline-block;
+  padding: 10px;
+}
+.open-transaction > .content > div.content-item > .item-bar > .collapse-button-wrapper .collapse-button {
+  padding: 0.5px;
+  display: inline-block;
+  border-right: 7px solid transparent;
+  border-left: 7px solid black;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  background-color: transparent;
+  margin-left: 0;
+  margin-right: 0;
+}
+.open-transaction > .content > div.content-item > .item-bar > .item-count {
+  display: inline-block;
+  width: calc(100% - 60px);
+  padding-left: 7px;
+  margin-bottom: 10px;
+  margin-left: -10px;
+}
+.open-transaction > .content > div.content-item > .item-bar > .item-list {
+  transition: max-height 0.5s;
+  max-height: 0px;
+  overflow: hidden;
+}
+.open-transaction > .content > div.content-item > .item-bar > .item-list > .item-list-child {
+  margin: 5px 20px;
+}
+.open-transaction > .content > div.content-item > .item-bar > .time {
+  text-align: center;
+}
+.open-transaction > .content > div.content-item > .item-bar.active .collapse-button {
+  border-right-color: black;
+  border-left-color: transparent;
+  margin-left: -5px;
+  margin-right: 5px;
+}
+.open-transaction > .content > div.content-item > .item-bar.active > .item-count {
+  border-bottom: 1px solid #444444;
+  padding-bottom: 5px;
+}
+.open-transaction > .content > div.content-item > .item-bar.active > .item-list {
+  max-height: 10000px;
+}
+.open-transaction > .content > div.content-item > .item-bar:focus:not(.active) .collapse-button, .open-transaction > .content > div.content-item > .item-bar:hover:not(.active) .collapse-button {
+  border-left-color: #695959;
+}
+.open-transaction > .content > div.content-item > .item-bar:focus.active .collapse-button, .open-transaction > .content > div.content-item > .item-bar:hover.active .collapse-button {
+  border-right-color: #695959;
+}
+.open-transaction > .content > div.content-item:focus {
+  background-color: #cccccc;
 }

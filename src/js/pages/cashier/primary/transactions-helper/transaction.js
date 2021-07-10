@@ -1,6 +1,7 @@
 import { Item } from "./item.js";
 
 const TRANSACTION_LOG = [];
+let idCounter = 1;
 
 // Status list:
 // 1 : working
@@ -13,7 +14,7 @@ export class Transaction {
 
   // transaction properties
   #transactionInfo = {
-    id: 1, // create get id function
+    id: idCounter++, // create get id function
     status: 1,
     cash: {
       totalPrice: 0,
@@ -23,9 +24,9 @@ export class Transaction {
     },
   };
 
-  constructor(cashier, element) {
+  constructor(cashier) {
     this.cashier = cashier;
-    this.itemElement = element;
+    this.itemElement = cashier.element.querySelector("table.purchases");
 
     // creates new item in list
     this.createNewItem();
@@ -102,7 +103,15 @@ export class Transaction {
     this.cashier.childs.totalPrice.totalPrice = currentTotalPrice;
   }
 
+  removeLastEmptyItem() {
+    this.removeItemFromList(this.#transactionItems.splice(this.#transactionItems.length - 1, 1));
+  }
+
   restoreTransactionItems() {
+    console.log("restoring");
+    this.#transactionItems = this.#transactionItems.map(
+      (item) => new Item(this, this.itemElement, item.data, { isRestore: true })
+    );
     // !
     // called from transactions
     // used when a transaction load, to restore saved items on that transaction
@@ -167,6 +176,10 @@ export class Transaction {
 
   get transactionId() {
     return this.#transactionInfo.id;
+  }
+
+  get transactionInfo() {
+    return { ...this.#transactionInfo, items: this.#transactionItems };
   }
 
   set status(status) {

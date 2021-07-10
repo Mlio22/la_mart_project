@@ -1,11 +1,13 @@
-import { Payment } from "./shortcut-lists/payment.js";
-import { Cancel } from "./shortcut-lists/cancel.js";
-import { OpenTransaction } from "./shortcut-lists/openTransaction.js";
-import { SearchItem } from "./shortcut-lists/searchItem.js";
+// objects
+import { Payment } from "./shortcut-objects/payment.js";
+import { Cancel } from "./shortcut-objects/cancel.js";
+import { OpenTransaction } from "./shortcut-objects/openTransaction.js";
+import { SearchItem } from "./shortcut-objects/searchItem.js";
 
 // functions
 import { newTransaction } from "./shortcut-functions/newTransaction.js";
-import { closeCashier } from "./shortcut-functions/close-cashier.js";
+import { closeCashier } from "./shortcut-functions/closeCashier.js";
+import { saveTransaction } from "./shortcut-functions/saveTransaction.js";
 
 // element HTMLs
 
@@ -81,6 +83,7 @@ export const submenuButtons = {
   },
   F6: {
     name: "save-transaction",
+    shortcutFunction: saveTransaction,
     initialAvailabiilty: false,
   },
   F7: {

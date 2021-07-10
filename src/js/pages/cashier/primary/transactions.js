@@ -20,11 +20,25 @@ export class Transactions {
     this.purchasesElement = cashier.element.querySelector(".purchases");
 
     // initial transaction
-    this.#createTransaction();
+    this.createTransaction();
+  }
+
+  retrieveTransactionList(status = 2) {
+    // Status list:
+    // 1 : working
+    // 2 : saved
+    // 3 : completed
+    // 4 : cancelled
+    //* only used 2, 3
+
+    return this.#transactionList.filter((transaction) => {
+      const transactionStatus = transaction.transactionInfo.status;
+
+      return status === transactionStatus;
+    });
   }
 
   loadTransaction(transactionId) {
-    console.log(`loading transaction with id: ${this.#currentTransaction.id}`);
     this.#currentTransaction = this.#searchTransaction(transactionId);
 
     // change current transaction's status to 1 (working)
@@ -33,6 +47,9 @@ export class Transactions {
     // clear the purchases element and restore the items
     this.#resetPurchasesElement();
     this.#currentTransaction.restoreTransactionItems();
+
+    // add new empty element
+    this.#currentTransaction.createNewItem();
   }
 
   saveCurrentTransaction() {
@@ -72,14 +89,16 @@ export class Transactions {
   }
 
   #searchTransaction(transactionId) {
-    const transactionIndex = this.#transactionList.findIndex((transaction) => transaction.id === transactionId);
+    const transactionIndex = this.#transactionList.findIndex(
+      (transaction) => transaction.transactionInfo.id === transactionId
+    );
     if (transactionIndex !== -1) {
       return this.#transactionList[transactionIndex];
     }
   }
 
   get currentTransactionObject() {
-    return this.#currentTransaction.object;
+    return this.#currentTransaction.transactionInfo.object;
   }
 
   get currentTransaction() {

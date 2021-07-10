@@ -12,9 +12,11 @@ const EMPTY_ITEM = {
 export class Item {
   #data;
   #ui;
+  #itemOptions;
 
-  constructor(transaction, listElement = document.querySelector("table.purchases"), data) {
+  constructor(transaction, listElement, data, options = {}) {
     this.transaction = transaction;
+    this.#itemOptions = options;
 
     // gathering data
     this.#gatherData(data);
@@ -22,11 +24,14 @@ export class Item {
     // add ui to Html document
     this.#ui = new ItemUI(this, listElement, this.#data);
 
-    // setting timeout to fix item's index in transaction
-    setTimeout(() => {
-      this.transaction.refreshTotalPrice();
-      this.#checkData();
-    }, 50);
+    // don't refresh and check data if item is being restored
+    if (!this.#itemOptions.isRestore) {
+      // setting timeout to fix item's index in transaction
+      setTimeout(() => {
+        this.transaction.refreshTotalPrice();
+        this.#checkData();
+      }, 50);
+    }
   }
 
   deleteThisItem() {
