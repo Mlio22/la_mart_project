@@ -10,7 +10,6 @@ import { closeCashier } from "./shortcut-functions/closeCashier.js";
 import { saveTransaction } from "./shortcut-functions/saveTransaction.js";
 
 // element HTMLs
-
 const cancelHTML = `<div class="header">Batalkan Transaksi?</div>
 <div class="options">
     <div class="option-yes">
@@ -105,7 +104,7 @@ export const submenuButtons = {
   },
   F11: {
     name: "new-transaction",
-    function: newTransaction,
+    shortcutFunction: newTransaction,
     initialAvailabiilty: false,
   },
   F12: {

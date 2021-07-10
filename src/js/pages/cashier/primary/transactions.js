@@ -12,6 +12,7 @@ const EMPTY_TRANSACTION_HTML = `
 
 export class Transactions {
   #transactionList = [];
+
   #currentTransaction = null;
   #currentTransactionId = null;
 
@@ -53,16 +54,19 @@ export class Transactions {
   }
 
   saveCurrentTransaction() {
-    console.log(`saving transaction with id: ${this.#currentTransaction.id}`);
     // change current transaction's status to 2 (saved)
     this.#currentTransaction.status = 2;
 
+    // remove last empty item
+    this.#currentTransaction.removeLastEmptyItem();
+
     // create new transaction
-    this.#createTransaction();
+    console.log(this.#transactionList);
+    this.createTransaction();
   }
 
   completeCurrentTransaction(paymentNominals) {
-    console.log(`transaction with id: ${this.#currentTransaction.id} done!`);
+    console.log(`transaction with id: ${this.#currentTransaction.transactionInfo.id} done!`);
 
     this.cashier.childs.paymentDetails.setAndShow({ ...paymentNominals, id: this.#currentTransactionId });
 
@@ -72,11 +76,11 @@ export class Transactions {
   }
 
   cancelCurrentTransaction() {
-    this.#createTransaction();
+    this.createTransaction();
     // clear previous transaction data
   }
 
-  #createTransaction() {
+  createTransaction() {
     // create new transaction
     this.#resetPurchasesElement();
     this.#currentTransaction = new Transaction(this.cashier);
