@@ -14,8 +14,8 @@ export class Item {
   #ui;
   #itemOptions;
 
-  constructor(transaction, listElement, data, options = {}) {
-    this.transaction = transaction;
+  constructor(itemList, listElement, data, options = {}) {
+    this.itemList = itemList;
     this.#itemOptions = options;
 
     // gathering data
@@ -26,9 +26,9 @@ export class Item {
 
     // don't refresh and check data if item is being restored
     if (!this.#itemOptions.isRestore) {
-      // setting timeout to fix item's index in transaction
+      // setting timeout to fix item's index in itemList
       setTimeout(() => {
-        this.transaction.refreshTotalPrice();
+        this.itemList.refreshTotalPrice();
         this.#checkData();
       }, 50);
     }
@@ -36,14 +36,14 @@ export class Item {
 
   deleteThisItem() {
     // function only called from action
-    this.transaction.removeItemFromList(this);
+    this.itemList.removeItemFromList(this);
     this.#ui.removeUi();
 
-    this.transaction.refreshTotalPrice();
+    this.itemList.refreshTotalPrice();
   }
 
   increaseAmount(amount = 1) {
-    // function called only from above (transaction)
+    // function called only from above (itemList)
 
     // get previous amount
     const previousAmount = this.#data.amount;
@@ -54,14 +54,14 @@ export class Item {
   }
 
   openSearchFromItem() {
-    this.transaction.cashier.childs.submenu.openSubmenu("F2", {
+    this.itemList.transaction.transactionList.cashier.childs.submenu.openSubmenu("F2", {
       itemReference: this,
       hint: this.#data.barcode,
     });
   }
 
   checkDuplicateFromItem() {
-    return this.transaction.checkDuplicateOnList(this);
+    return this.itemList.checkDuplicateOnList(this);
   }
 
   setSeveralItemData(newData) {
@@ -69,14 +69,14 @@ export class Item {
     this.#data = { ...this.#data, ...newData };
     this.#ui.itemContent = this.#data;
 
-    this.transaction.refreshTotalPrice();
+    this.itemList.refreshTotalPrice();
   }
 
   #checkData() {
     // go create new item if enough info in previous item
     if (this.#data.valid) {
       this.#ui.childElements.barcodeElement.lock();
-      this.transaction.createNewItem();
+      this.itemList.createNewItem();
     } else {
       this.#ui.childElements.barcodeElement.focus();
     }

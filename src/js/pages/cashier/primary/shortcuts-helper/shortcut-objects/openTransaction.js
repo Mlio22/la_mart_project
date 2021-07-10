@@ -135,7 +135,7 @@ class ResultTransactions {
 
   getTransactionList(sliderIndex = 0) {
     // sliderIndex + 2 equal as transaction's status
-    this.#currentFilteredTransactions = this.#submenu.cashier.childs.transactions.retrieveTransactionList(
+    this.#currentFilteredTransactions = this.#submenu.cashier.childs.transactionList.retrieveTransactionList(
       sliderIndex + 2
     );
 
@@ -176,12 +176,15 @@ class ResultTransactions {
       contentItem.className = "content-item";
       contentItem.tabIndex = "0";
 
+      const items = transactionInfo.itemList.items;
+      console.log(items);
+
       contentItem.innerHTML = `
       <div class="id">#${transactionInfo.id}</div>
       <div class="item-bar">
           <div class="collapse-button-wrapper"><div class="collapse-button"></div></div>
-          <div class="item-count">${transactionInfo.items.length} Item</div>
-          <div class="item-list">${transactionInfo.items
+          <div class="item-count">${items.length} Item</div>
+          <div class="item-list">${items
             .map((item) => {
               return `<div class="item-list-child">- ${item.data.name}</div>`;
             })
@@ -215,7 +218,7 @@ class ResultTransactions {
         ) {
           if (beforeTimeoutDouble) {
             // item selected;
-            this.#submenu.cashier.childs.transactions.loadTransaction(
+            this.#submenu.cashier.childs.transactionList.loadTransaction(
               this.#currentFilteredTransactions[this.#focusIndex].transactionInfo.id
             );
 

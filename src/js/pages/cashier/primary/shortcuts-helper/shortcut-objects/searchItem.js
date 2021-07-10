@@ -158,15 +158,15 @@ export class SearchItem extends Submenu {
     this.#searchItemResult.setResults(matchedItemsWithBoth);
   }
 
-  #addToSelectedItemToTransaction() {
+  #addToSelectedItemToItemList() {
     if (this.#itemReference !== null) {
       // if itemReference params exists,
       // change that reference's item using item's method
       this.#itemReference.data = this.#selectedItem;
     } else {
       // if itemReference doesn't exist (e.g. search-item accessed from shortcut)
-      // create new item data on transaction
-      this._submenu.cashier.childs.transactions.currentTransaction.createNewItem(this.#selectedItem);
+      // create new item data on itemList
+      this._submenu.cashier.childs.transactionList.currentTransaction.itemList.createNewItem(this.#selectedItem);
     }
   }
 
@@ -188,16 +188,16 @@ export class SearchItem extends Submenu {
   }
 
   set selectedItem(selectedItem) {
-    // set the selected item and automatically add to transaction
+    // set the selected item and automatically add to current ItemList
     this.#selectedItem = selectedItem;
-    this.#addToSelectedItemToTransaction();
+    this.#addToSelectedItemToItemList();
 
     // when item is selected, close the search-item
     this._submenu.hideSubmenu();
 
     // focus to latest barcode in list if itemReference is exist
     if (this.#itemReference) {
-      this.#itemReference.transaction.focusToLatestBarcode();
+      this.#itemReference.itemList.focusToLatestBarcode();
     }
   }
 }

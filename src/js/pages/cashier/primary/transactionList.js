@@ -1,4 +1,4 @@
-import { Transaction } from "./transactions-helper/transaction.js";
+import { ItemList } from "./transactions-helper/itemList.js";
 const EMPTY_TRANSACTION_HTML = `
     <tr class="purchases-headers">
       <th class="purchases-header action-header">&nbsp;</th>
@@ -10,7 +10,7 @@ const EMPTY_TRANSACTION_HTML = `
       <th class="purchases-header total-price-header">Harga Total</th>
     </tr>`;
 
-export class Transactions {
+export class TransactionList {
   #transactionList = [];
 
   #currentTransaction = null;
@@ -40,6 +40,8 @@ export class Transactions {
   }
 
   loadTransaction(transactionId) {
+    // if (this.#currentTransaction.transactionItems)
+
     this.#currentTransaction = this.#searchTransaction(transactionId);
 
     // change current transaction's status to 1 (working)
@@ -47,10 +49,10 @@ export class Transactions {
 
     // clear the purchases element and restore the items
     this.#resetPurchasesElement();
-    this.#currentTransaction.restoreTransactionItems();
+    this.#currentTransaction.itemList.restoreItemList();
 
     // add new empty element
-    this.#currentTransaction.createNewItem();
+    this.#currentTransaction.itemList.createNewItem();
   }
 
   saveCurrentTransaction() {
@@ -58,15 +60,14 @@ export class Transactions {
     this.#currentTransaction.status = 2;
 
     // remove last empty item
-    this.#currentTransaction.removeLastEmptyItem();
+    this.#currentTransaction.transactionInfo.itemList.removeLastEmptyItem();
 
     // create new transaction
-    console.log(this.#transactionList);
     this.createTransaction();
   }
 
   completeCurrentTransaction(paymentNominals) {
-    console.log(`transaction with id: ${this.#currentTransaction.transactionInfo.id} done!`);
+    this.#currentTransaction.transactionInfo.itemList.removeLastEmptyItem();
 
     this.cashier.childs.paymentDetails.setAndShow({ ...paymentNominals, id: this.#currentTransactionId });
 
@@ -83,7 +84,7 @@ export class Transactions {
   createTransaction() {
     // create new transaction
     this.#resetPurchasesElement();
-    this.#currentTransaction = new Transaction(this.cashier);
+    this.#currentTransaction = new Transaction(this);
 
     this.#transactionList.push(this.#currentTransaction);
   }
@@ -107,5 +108,45 @@ export class Transactions {
 
   get currentTransaction() {
     return this.#currentTransaction;
+  }
+}
+
+let idCounter = 1;
+
+class Transaction {
+  // transaction properties
+
+  #transactionInfo = {
+    id: idCounter++, // create get id function
+    status: 1,
+    cashInfo: {
+      totalPrice: 0,
+      paidbyCustomer: null,
+      change: null,
+    },
+    itemList: [],
+  };
+
+  constructor(transactionList) {
+    this.transactionList = transactionList;
+
+    this.#transactionInfo.itemList = new ItemList(this);
+    console.log(this.#transactionInfo.itemList);
+  }
+
+  get transactionInfo() {
+    return { ...this.#transactionInfo };
+  }
+
+  get itemList() {
+    return this.#transactionInfo.itemList;
+  }
+
+  set status(status) {
+    this.#transactionInfo.status = status;
+  }
+
+  set cashInfo(cashInfo) {
+    this.#transactionInfo.cashInfo = { ...cashInfo };
   }
 }

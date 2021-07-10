@@ -15,7 +15,7 @@ export class Payment extends Submenu {
   constructor(submenuWrapper, submenuProperties) {
     super(submenuWrapper, submenuProperties);
 
-    this.#total = submenuWrapper.cashier.childs.transactions.currentTransaction.totalPrice;
+    this.#total = submenuWrapper.cashier.childs.transactionList.currentTransaction.transactionInfo.cashInfo.totalPrice;
     this.#customerMoney = this.#total;
 
     this._initializeSubmenu();
@@ -107,7 +107,7 @@ export class Payment extends Submenu {
 
   #proceedPayment() {
     if (this.#isSufficient) {
-      this._submenu.cashier.childs.transactions.completeCurrentTransaction({
+      this._submenu.cashier.childs.transactionList.completeCurrentTransaction({
         customer: this.#customerMoney,
         totalPrice: this.#total,
       });

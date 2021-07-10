@@ -1,4 +1,4 @@
-import { Transactions } from "./primary/transactions.js";
+import { TransactionList } from "./primary/transactions.js";
 import { TotalPrice } from "./primary/totalPrice.js";
 // import { Notification } from './ui/notification.js'
 import { ShortcutWrapper } from "./primary/shortcutWrapper.js";
@@ -14,7 +14,7 @@ class CashierUI {
     // visible childs (primary)
     this.#cashierChild.shortcuts = new ShortcutWrapper(this);
     this.#cashierChild.paymentDetails = new PaymentDetails(this);
-    this.#cashierChild.transactions = new Transactions(this);
+    this.#cashierChild.transactionList = new TransactionList(this);
     this.#cashierChild.totalPrice = new TotalPrice(this);
 
     // submenu

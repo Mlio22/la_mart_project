@@ -11,7 +11,7 @@ export class Cancel extends Submenu {
 
   _setListener() {
     this.#yesButton.addEventListener("click", () => {
-      this._submenu.cashier.childs.transactions.cancelCurrentTransaction();
+      this._submenu.cashier.childs.transactionList.cancelCurrentTransaction();
       this._submenu.hideSubmenu();
     });
 

@@ -1,32 +1,17 @@
 import { Item } from "./item.js";
 
-const TRANSACTION_LOG = [];
-let idCounter = 1;
-
 // Status list:
 // 1 : working
 // 2 : saved
 // 3 : completed
 // 4 : cancelled
 
-export class Transaction {
-  #transactionItems = [];
+export class ItemList {
+  #items = [];
 
-  // transaction properties
-  #transactionInfo = {
-    id: idCounter++, // create get id function
-    status: 1,
-    cash: {
-      totalPrice: 0,
-      paidbyCustomer: null,
-      change: null,
-      profit: 0,
-    },
-  };
-
-  constructor(cashier) {
-    this.cashier = cashier;
-    this.itemElement = cashier.element.querySelector("table.purchases");
+  constructor(transaction) {
+    this.transaction = transaction;
+    this.itemElement = transaction.transactionList.cashier.element.querySelector("table.purchases");
 
     // creates new item in list
     this.createNewItem();
@@ -34,6 +19,7 @@ export class Transaction {
 
   // function called from above and below
   createNewItem(itemData) {
+    console.log("hahah");
     // above: used in submenu(search-item)
     // below: used in Item
 
@@ -44,15 +30,15 @@ export class Transaction {
       if (itemIndexOnList !== -1) {
         console.log(itemIndexOnList);
         // increase the amount
-        this.#transactionItems[itemIndexOnList].increaseAmount(1);
+        this.#items[itemIndexOnList].increaseAmount(1);
       } else {
         // add item to latest empty item in list
-        this.#transactionItems[this.#transactionItems.length - 1].data = itemData;
+        this.#items[this.#items.length - 1].data = itemData;
       }
     } else {
       // add item if not duplicate (including empty item)
       const newItem = new Item(this, this.itemElement, itemData);
-      this.#transactionItems.push(newItem);
+      this.#items.push(newItem);
     }
 
     this.#checkItemToAffectShortcut();
@@ -61,11 +47,11 @@ export class Transaction {
   // check for duplicate items
   checkDuplicateOnList(itemReference) {
     // called from item, itemElement
-    const indexOnList = this.#transactionItems.indexOf(itemReference);
+    const indexOnList = this.#items.indexOf(itemReference);
     const duplicatedItemIndex = this.#returnItemWithSameBarcode(itemReference.data, indexOnList);
 
     if (duplicatedItemIndex >= 0) {
-      const duplicatedItem = this.#transactionItems[duplicatedItemIndex];
+      const duplicatedItem = this.#items[duplicatedItemIndex];
       if (indexOnList <= duplicatedItemIndex) {
         const { amount } = duplicatedItem.data;
         itemReference.increaseAmount(amount);
@@ -79,10 +65,10 @@ export class Transaction {
   }
 
   removeItemFromList(item) {
-    const index = this.#transactionItems.indexOf(item);
+    const index = this.#items.indexOf(item);
 
     if (index !== -1) {
-      this.#transactionItems.splice(index, 1);
+      this.#items.splice(index, 1);
     }
 
     this.#checkItemToAffectShortcut();
@@ -91,7 +77,7 @@ export class Transaction {
   refreshTotalPrice() {
     // called from item
     let currentTotalPrice = 0;
-    this.#transactionItems.forEach((item) => {
+    this.#items.forEach((item) => {
       const { valid, price, amount } = item.data;
       if (valid) {
         currentTotalPrice += price * amount;
@@ -99,26 +85,23 @@ export class Transaction {
     });
 
     // set total price to be check for payment
-    this.#transactionInfo.cash.totalPrice = currentTotalPrice;
-    this.cashier.childs.totalPrice.totalPrice = currentTotalPrice;
+    this.transaction.cashInfo = { totalPrice: currentTotalPrice };
+    this.transaction.transactionList.cashier.childs.totalPrice.totalPrice = currentTotalPrice;
   }
 
   removeLastEmptyItem() {
-    this.removeItemFromList(this.#transactionItems.splice(this.#transactionItems.length - 1, 1));
+    this.removeItemFromList(this.#items.splice(this.#items.length - 1, 1));
   }
 
-  restoreTransactionItems() {
-    console.log("restoring");
-    this.#transactionItems = this.#transactionItems.map(
-      (item) => new Item(this, this.itemElement, item.data, { isRestore: true })
-    );
+  restoreItemList() {
+    this.#items = this.#items.map((item) => new Item(this, this.itemElement, item.data, { isRestore: true }));
     // !
     // called from transactions
     // used when a transaction load, to restore saved items on that transaction
   }
 
   focusToLatestBarcode() {
-    this.#transactionItems[this.#transactionItems.length - 1].ui.childElements.barcodeElement.focus();
+    this.#items[this.#items.length - 1].ui.childElements.barcodeElement.focus();
   }
 
   #checkItemToAffectShortcut() {
@@ -127,16 +110,16 @@ export class Transaction {
     // but
     // print-bill (only if a transaction ever finished) will be unavailable
 
-    if (this.#transactionItems.length > 0) {
-      if (this.#transactionItems[0].data.valid) {
-        this.cashier.childs.shortcuts.setShortcutAvailability({
+    if (this.#items.length > 0) {
+      if (this.#items[0].data.valid) {
+        this.transaction.transactionList.cashier.childs.shortcuts.setShortcutAvailability({
           F4: true,
           F6: true,
           F9: true,
           F10: false,
         });
       } else {
-        this.cashier.childs.shortcuts.setShortcutAvailability({
+        this.transaction.transactionList.cashier.childs.shortcuts.setShortcutAvailability({
           F4: false,
           F6: false,
           F5: false,
@@ -153,7 +136,7 @@ export class Transaction {
     // compared properties: barcode
     const { barcode: comparedBarcode } = comparedItemData;
 
-    const transactionLength = this.#transactionItems.length;
+    const transactionLength = this.#items.length;
     for (let itemIndex = 0; itemIndex < transactionLength; itemIndex++) {
       // skips if it's the index
       if (indexOnList === itemIndex) {
@@ -161,7 +144,7 @@ export class Transaction {
       }
 
       // compare with barcode
-      const { barcode: barcodeFromList } = this.#transactionItems[itemIndex].data;
+      const { barcode: barcodeFromList } = this.#items[itemIndex].data;
 
       if (comparedBarcode === barcodeFromList) {
         return itemIndex;
@@ -170,19 +153,23 @@ export class Transaction {
     return -1;
   }
 
-  get totalPrice() {
-    return this.#transactionInfo.cash.totalPrice;
+  get items() {
+    return this.#items;
   }
 
-  get transactionId() {
-    return this.#transactionInfo.id;
-  }
+  // get totalPrice() {
+  //   return this.#transactionInfo.cash.totalPrice;
+  // }
 
-  get transactionInfo() {
-    return { ...this.#transactionInfo, items: this.#transactionItems };
-  }
+  // get transactionId() {
+  //   return this.#transactionInfo.id;
+  // }
 
-  set status(status) {
-    this.#transactionInfo.status = status;
-  }
+  // get transactionInfo() {
+  //   return { ...this.#transactionInfo, items: this.#transactionItems };
+  // }
+
+  // set status(status) {
+  //   this.#transactionInfo.status = status;
+  // }
 }
