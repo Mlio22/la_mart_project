@@ -178,17 +178,19 @@ export class AmountElement {
   constructor(item) {
     this.item = item;
 
-    this.#createAmountElement();
+    const firstAmount = item.data.amount;
+
+    this.#createAmountElement(firstAmount);
     this.#listenAmount();
   }
 
-  #createAmountElement() {
+  #createAmountElement(firstAmount = 1) {
     this.#amountWrapper = document.createElement("td");
     this.#amountWrapper.className = "purchases-content amount-content focusable";
 
     this.#amountElement = document.createElement("input");
     this.#amountElement.type = "number";
-    this.#amountElement.value = 1;
+    this.#amountElement.value = firstAmount;
     this.#amountElement.min = 1;
 
     this.#amountWrapper.appendChild(this.#amountElement);

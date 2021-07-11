@@ -100,10 +100,13 @@ export class Item {
     this.#data = { ...data };
 
     // adding other properties
-    this.#data = Object.assign(this.#data, {
-      amount: 1,
-      valid: isDataAlreadyValid,
-    });
+    this.#data = Object.assign(
+      {
+        amount: 1,
+        valid: isDataAlreadyValid,
+      },
+      this.#data
+    );
   }
 
   get data() {
