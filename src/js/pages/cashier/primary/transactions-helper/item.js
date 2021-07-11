@@ -25,21 +25,20 @@ export class Item {
     this.#ui = new ItemUI(this, listElement, this.#data);
 
     // don't refresh and check data if item is being restored
-    if (!this.#itemOptions.isRestore) {
+    if (this.#itemOptions.isRestore) {
+      if (this.#itemOptions.readonly) {
+        // lock item in read-only (completed transaction)
+        this.#ui.lockItem();
+      } else {
+        // lock barcode only in load mode (saved -> working transaction)
+        this.#ui.childElements.barcodeElement.lock();
+      }
+    } else {
       // setting timeout to fix item's index in itemList
       setTimeout(() => {
         this.itemList.refreshTotalPrice();
         this.#checkData();
       }, 50);
-    } else {
-      // lock the barcode of restored item
-      this.#ui.childElements.barcodeElement.lock();
-
-      if (this.#itemOptions.readonly) {
-        // lock action and amount in read-only (completed transaction)
-        this.#ui.childElements.actionElement.deletable = false;
-        this.#ui.childElements.amountElement.lock();
-      }
     }
   }
 
@@ -181,7 +180,14 @@ class ItemUI {
     this.listElement.appendChild(this.#itemElement);
   }
 
-  // method that called from parent
+  // lock item (action, barcode, amount)
+  // only used in read-only items
+  lockItem() {
+    this.#itemContentElement.actionElement.deletable = false;
+    this.#itemContentElement.barcodeElement.lock();
+    this.#itemContentElement.amountElement.lock();
+  }
+
   removeUi() {
     // remove ui from document
     this.#itemElement.remove();

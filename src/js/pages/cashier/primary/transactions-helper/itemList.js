@@ -89,10 +89,11 @@ export class ItemList {
   }
 
   removeLastEmptyItem() {
-    this.removeItemFromList(this.#items.splice(this.#items.length - 1, 1));
+    this.#items[this.#items.length - 1].deleteThisItem();
   }
 
   restoreItemList(readonly = false) {
+    // recreate all items UI
     this.#items = this.#items.map((item) => new Item(this, this.itemElement, item.data, { isRestore: true, readonly }));
   }
 
