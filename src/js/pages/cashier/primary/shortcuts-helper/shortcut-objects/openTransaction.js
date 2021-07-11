@@ -177,7 +177,6 @@ class ResultTransactions {
       contentItem.tabIndex = "0";
 
       const items = transactionInfo.itemList.items;
-      console.log(items);
 
       contentItem.innerHTML = `
       <div class="id">#${transactionInfo.id}</div>
@@ -217,12 +216,8 @@ class ResultTransactions {
           e.target !== collapseButtonWrapper.querySelector(".collapse-button")
         ) {
           if (beforeTimeoutDouble) {
-            // item selected;
-            this.#submenu.cashier.childs.transactionList.loadTransaction(
-              this.#currentFilteredTransactions[this.#focusIndex].transactionInfo.id
-            );
-
-            this.#submenu.cashier.childs.submenu.hideSubmenu();
+            // select item
+            this.#selectTransactionAndClose();
           } else {
             beforeTimeoutDouble = true;
 
@@ -238,14 +233,19 @@ class ResultTransactions {
       resultElement.addEventListener("keydown", ({ key }) => {
         if (key === "Enter") {
           // select item
-          this.#submenu.cashier.childs.transactions.loadTransaction(
-            this.#currentFilteredTransactions[this.#focusIndex].transactionInfo.id
-          );
-
-          this.#submenu.cashier.childs.submenu.hideSubmenu();
+          this.#selectTransactionAndClose();
         }
       });
     });
+  }
+
+  #selectTransactionAndClose() {
+    // item selected;
+    this.#submenu.cashier.childs.transactionList.loadTransaction(
+      this.#currentFilteredTransactions[this.#focusIndex].transactionInfo.id
+    );
+
+    this.#submenu.cashier.childs.submenu.hideSubmenu();
   }
 
   #arrowCollapseOrNot(collapseTarget = "close", itemsElement = this.#resultElements[this.#focusIndex].itemsElement) {
