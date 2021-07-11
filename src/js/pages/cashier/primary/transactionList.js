@@ -90,6 +90,12 @@ export class TransactionList {
     this.#currentTransaction = new Transaction(this);
 
     this.#transactionList.push(this.#currentTransaction);
+
+    // set the available shortcuts
+    this.cashier.childs.shortcuts.setShortcutAvailability({
+      F2: true,
+      F11: false,
+    });
   }
 
   #resetPurchasesElement() {
