@@ -39,8 +39,9 @@ export class TransactionList {
   }
 
   loadTransaction(transactionId) {
-    if (this.#currentTransaction.itemList.items.length > 1) {
+    if (this.#currentTransaction.itemList.items.length > 1 && this.#currentTransaction.transactionInfo.status !== 3) {
       // save current transaction before loading other transaction
+      // unless it's already completed
       this.saveCurrentTransaction();
     }
 
