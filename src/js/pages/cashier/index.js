@@ -14,6 +14,7 @@ class Cashier {
       },
       minWidth: 1200,
       minHeight: 768,
+      fullscreenable: false,
     });
 
     this.#cashierWin.maximize();
