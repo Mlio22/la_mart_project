@@ -1,6 +1,6 @@
 export function newTransaction(submenuWrapper) {
   // create new Transaction
-  submenuWrapper.cashier.childs.tramsactionList.createTransaction();
+  submenuWrapper.cashier.childs.transactionList.createTransaction();
 
   // hide the paymentDetails
   submenuWrapper.cashier.childs.paymentDetails.clearPayment();

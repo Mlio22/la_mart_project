@@ -134,7 +134,6 @@ class Transaction {
     this.transactionList = transactionList;
 
     this.#transactionInfo.itemList = new ItemList(this);
-    console.log(this.#transactionInfo.itemList);
   }
 
   get transactionInfo() {
