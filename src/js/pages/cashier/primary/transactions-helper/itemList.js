@@ -19,7 +19,6 @@ export class ItemList {
 
   // function called from above and below
   createNewItem(itemData) {
-    console.log("hahah");
     // above: used in submenu(search-item)
     // below: used in Item
 
@@ -156,20 +155,4 @@ export class ItemList {
   get items() {
     return this.#items;
   }
-
-  // get totalPrice() {
-  //   return this.#transactionInfo.cash.totalPrice;
-  // }
-
-  // get transactionId() {
-  //   return this.#transactionInfo.id;
-  // }
-
-  // get transactionInfo() {
-  //   return { ...this.#transactionInfo, items: this.#transactionItems };
-  // }
-
-  // set status(status) {
-  //   this.#transactionInfo.status = status;
-  // }
 }

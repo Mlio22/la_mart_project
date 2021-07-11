@@ -1,4 +1,4 @@
-import { TransactionList } from "./primary/transactions.js";
+import { TransactionList } from "./primary/transactionList.js";
 import { TotalPrice } from "./primary/totalPrice.js";
 // import { Notification } from './ui/notification.js'
 import { ShortcutWrapper } from "./primary/shortcutWrapper.js";

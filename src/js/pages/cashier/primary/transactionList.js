@@ -40,7 +40,10 @@ export class TransactionList {
   }
 
   loadTransaction(transactionId) {
-    // if (this.#currentTransaction.transactionItems)
+    // save current transaction before loading other transaction
+    if (this.#currentTransaction.itemList.items.length > 1) {
+      this.saveCurrentTransaction();
+    }
 
     this.#currentTransaction = this.#searchTransaction(transactionId);
 
