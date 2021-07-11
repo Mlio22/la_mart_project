@@ -31,6 +31,9 @@ export class Item {
         this.itemList.refreshTotalPrice();
         this.#checkData();
       }, 50);
+    } else {
+      // lock the barcode of restored item
+      this.#ui.childElements.barcodeElement.lock();
     }
   }
 
