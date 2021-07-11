@@ -14,7 +14,6 @@ export class TransactionList {
   #transactionList = [];
 
   #currentTransaction = null;
-  #currentTransactionId = null;
 
   constructor(cashier) {
     this.cashier = cashier;
@@ -35,20 +34,20 @@ export class TransactionList {
     return this.#transactionList.filter((transaction) => {
       const transactionStatus = transaction.transactionInfo.status;
 
-      return status === transactionStatus;
+      return status === transactionStatus && this.#currentTransaction !== transaction;
     });
   }
 
   loadTransaction(transactionId) {
-    // save current transaction before loading other transaction
     if (this.#currentTransaction.itemList.items.length > 1) {
+      // save current transaction before loading other transaction
       this.saveCurrentTransaction();
     }
 
     this.#currentTransaction = this.#searchTransaction(transactionId);
 
     if (this.#currentTransaction.transactionInfo.status === 2) {
-      // saved transaction
+      // load saved transaction
 
       // change current transaction's status to 1 (working)
       this.#currentTransaction.status = 1;
@@ -61,12 +60,28 @@ export class TransactionList {
       this.#currentTransaction.itemList.createNewItem();
     }
 
-    // already completed transactions (status = 3)
     if (this.#currentTransaction.transactionInfo.status === 3) {
+      // load already completed transactions (status = 3)
       // only show transaction data
 
       this.#resetPurchasesElement();
       this.#currentTransaction.itemList.restoreItemList(true);
+
+      // restore the totalPrice
+      this.#currentTransaction.itemList.refreshTotalPrice();
+
+      // and paymentDetails
+      const {
+        id,
+        cashInfo: { customer, totalPrice },
+      } = this.#currentTransaction.transactionInfo;
+
+      this.cashier.childs.paymentDetails.setAndShow({ id, customer, totalPrice });
+
+      // enable new transaction shortcut
+      this.cashier.childs.shortcuts.setShortcutAvailability({
+        F11: true,
+      });
     }
   }
 
@@ -84,7 +99,12 @@ export class TransactionList {
   completeCurrentTransaction(paymentNominals) {
     this.#currentTransaction.transactionInfo.itemList.removeLastEmptyItem();
 
-    this.cashier.childs.paymentDetails.setAndShow({ ...paymentNominals, id: this.#currentTransactionId });
+    this.cashier.childs.paymentDetails.setAndShow({
+      id: this.#currentTransaction.transactionInfo.id,
+      ...paymentNominals,
+    });
+
+    this.#currentTransaction.cashInfo = { ...paymentNominals };
 
     // change current transaction's status to 3 (completed)
     this.#currentTransaction.status = 3;
@@ -141,9 +161,8 @@ class Transaction {
     id: idCounter++, // create get id function
     status: 1,
     cashInfo: {
+      customer: 0,
       totalPrice: 0,
-      paidbyCustomer: null,
-      change: null,
     },
     itemList: [],
   };
@@ -171,6 +190,6 @@ class Transaction {
   }
 
   set cashInfo(cashInfo) {
-    this.#transactionInfo.cashInfo = { ...cashInfo };
+    this.#transactionInfo.cashInfo = { ...this.#transactionInfo.cashInfo, ...cashInfo };
   }
 }
