@@ -47,15 +47,27 @@ export class TransactionList {
 
     this.#currentTransaction = this.#searchTransaction(transactionId);
 
-    // change current transaction's status to 1 (working)
-    this.#currentTransaction.status = 1;
+    if (this.#currentTransaction.transactionInfo.status === 2) {
+      // saved transaction
 
-    // clear the purchases element and restore the items
-    this.#resetPurchasesElement();
-    this.#currentTransaction.itemList.restoreItemList();
+      // change current transaction's status to 1 (working)
+      this.#currentTransaction.status = 1;
 
-    // add new empty element
-    this.#currentTransaction.itemList.createNewItem();
+      // clear the purchases element and restore the items
+      this.#resetPurchasesElement();
+      this.#currentTransaction.itemList.restoreItemList(false);
+
+      // add new empty element
+      this.#currentTransaction.itemList.createNewItem();
+    }
+
+    // already completed transactions (status = 3)
+    if (this.#currentTransaction.transactionInfo.status === 3) {
+      // only show transaction data
+
+      this.#resetPurchasesElement();
+      this.#currentTransaction.itemList.restoreItemList(true);
+    }
   }
 
   saveCurrentTransaction() {
@@ -147,6 +159,10 @@ class Transaction {
   }
 
   get itemList() {
+    /* warning: this can affect directly to the itemlist object. 
+      use transactionInfo getter if you want to get only the value of itemList
+      use this only if you need the reference and wanted to change it directly
+    */
     return this.#transactionInfo.itemList;
   }
 

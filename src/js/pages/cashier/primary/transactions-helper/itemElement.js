@@ -184,6 +184,10 @@ export class AmountElement {
     this.#listenAmount();
   }
 
+  lock() {
+    this.#amountElement.disabled = true;
+  }
+
   #createAmountElement(firstAmount = 1) {
     this.#amountWrapper = document.createElement("td");
     this.#amountWrapper.className = "purchases-content amount-content focusable";

@@ -92,11 +92,8 @@ export class ItemList {
     this.removeItemFromList(this.#items.splice(this.#items.length - 1, 1));
   }
 
-  restoreItemList() {
-    this.#items = this.#items.map((item) => new Item(this, this.itemElement, item.data, { isRestore: true }));
-    // !
-    // called from transactions
-    // used when a transaction load, to restore saved items on that transaction
+  restoreItemList(readonly = false) {
+    this.#items = this.#items.map((item) => new Item(this, this.itemElement, item.data, { isRestore: true, readonly }));
   }
 
   focusToLatestBarcode() {

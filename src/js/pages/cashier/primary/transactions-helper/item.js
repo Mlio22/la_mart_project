@@ -34,6 +34,12 @@ export class Item {
     } else {
       // lock the barcode of restored item
       this.#ui.childElements.barcodeElement.lock();
+
+      if (this.#itemOptions.readonly) {
+        // lock action and amount in read-only (completed transaction)
+        this.#ui.childElements.actionElement.deletable = false;
+        this.#ui.childElements.amountElement.lock();
+      }
     }
   }
 
