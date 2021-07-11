@@ -97,6 +97,10 @@ export class ItemList {
     this.#items = this.#items.map((item) => new Item(this, this.itemElement, item.data, { isRestore: true, readonly }));
   }
 
+  lockAllItems() {
+    this.#items.forEach((item) => item.ui.lockItem());
+  }
+
   focusToLatestBarcode() {
     this.#items[this.#items.length - 1].ui.childElements.barcodeElement.focus();
   }

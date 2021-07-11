@@ -100,6 +100,9 @@ export class TransactionList {
   completeCurrentTransaction(paymentNominals) {
     this.#currentTransaction.transactionInfo.itemList.removeLastEmptyItem();
 
+    // lock items
+    this.#currentTransaction.itemList.lockAllItems();
+
     this.cashier.childs.paymentDetails.setAndShow({
       id: this.#currentTransaction.transactionInfo.id,
       ...paymentNominals,
