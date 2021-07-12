@@ -81,6 +81,7 @@ export class TransactionList {
 
       // enable new transaction shortcut
       this.cashier.childs.shortcuts.setShortcutAvailability({
+        F5: true,
         F11: true,
       });
     }
