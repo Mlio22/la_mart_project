@@ -3,45 +3,45 @@ const { Cashier } = require("../cashier/index.js");
 const { Stock } = require("../stock/index.js");
 
 class Home {
+  #homeWin;
+  #windows = {
+    cashier: null,
+    stock: null,
+    admin: null,
+  };
+
+  #homeChildWindows = [
+    {
+      channel: "open-stock",
+      className: Stock,
+    },
+    {
+      channel: "open-cashier",
+      className: Cashier,
+    },
+  ];
+
   constructor() {
-    this.__homeIpcMainListeners = {
-      "open-stock": () => {
-        if (this.__stockWin) {
-          if (this.__stockWin.window === null) {
-            this.__stockWin = new Stock();
-          } else {
-            this.__stockWin.window.focus();
-          }
-        } else {
-          this.__stockWin = new Stock();
-        }
-      },
-      "open-cashier": () => {
-        if (this.__cashierWin) {
-          if (this.__cashierWin.window === null) {
-            this.__cashierWin = new Cashier();
-          } else {
-            this.__cashierWin.window.focus();
-          }
-        } else {
-          this.__cashierWin = new Cashier();
-        }
-      },
-      "quit-app": () => {
-        // todo: beri peringatan jika ada aplikasi child yang masih hidup
-        app.quit();
-      },
-    };
-
-    this.__initHomeWin();
-    this.__initHomeListeners();
-
-    this.__cashierWin = null;
-    this.__stockWin = null;
+    this.#initHomeWin();
+    this.#initHomeListeners();
   }
 
-  __initHomeWin() {
-    this.__homeWin = new BrowserWindow({
+  #openOtherWindows({ channel, className }) {
+    const propertyName = channel.replace("open-", "");
+
+    if (this.#windows[propertyName]) {
+      if (this.#windows[propertyName].window === null) {
+        this.#windows[propertyName] = new className();
+      } else {
+        this.#windows[propertyName].window.focus();
+      }
+    } else {
+      this.#windows[propertyName] = new className();
+    }
+  }
+
+  #initHomeWin() {
+    this.#homeWin = new BrowserWindow({
       minWidth: 1100,
       height: 720,
       webPreferences: {
@@ -49,31 +49,36 @@ class Home {
       },
     });
 
-    this.__homeWin.loadFile("./src/templates/home.html");
+    this.#homeWin.loadFile("./src/templates/home.html");
   }
 
-  __setIpcListeners() {
-    Object.keys(this.__homeIpcMainListeners).forEach((channel) => {
-      ipcMain.on(channel, this.__homeIpcMainListeners[channel]);
+  #setIpcListeners() {
+    this.#homeChildWindows.forEach((childWindow) => {
+      ipcMain.on(childWindow.channel, () => this.#openOtherWindows(childWindow));
+    });
+
+    ipcMain.on("quit-app", () => {
+      // todo: beri peringatan jika ada aplikasi child yang masih hidup
+      app.quit();
     });
   }
 
-  __unsetIpcListeners() {
-    Object.keys(this.__homeIpcMainListeners).forEach((channel) => {
-      ipcMain.removeListener(channel, this.__homeIpcMainListeners[channel]);
+  #unsetIpcListeners() {
+    this.#homeChildWindows.forEach((childWindow) => {
+      ipcMain.removeListener(childWindow.channel, () => this.#openOtherWindows(childWindow));
     });
   }
 
-  __initHomeListeners() {
-    this.__setIpcListeners();
-    this.__homeWin.once("closed", () => {
-      this.__homeWin = null;
-      this.__unsetIpcListeners();
+  #initHomeListeners() {
+    this.#setIpcListeners();
+    this.#homeWin.once("closed", () => {
+      this.#homeWin = null;
+      this.#unsetIpcListeners();
     });
   }
 
   get window() {
-    return this.__homeWin;
+    return this.#homeWin;
   }
 }
 
