@@ -124,7 +124,15 @@ export class SearchItem extends Submenu {
     const matchedItemsWithBarcode = item_searcher(this.#hint, ["barcode"], undefined, true);
     if (matchedItemsWithBarcode.length === 1) {
       // immediately set selected item and close the search-item if item (barcode) is already found
-      this.selectedItem = matchedItemsWithBarcode[0];
+      setTimeout(() => {
+        // set timeout so SearchItem established completely first
+        // because the process below contains Submenu.hideSubmenu()
+
+        // if Submenu.hideSubmenu() is called before SearchItem established,
+        // then the Submenu.#openedSubmenu won't be null, it'll be a SearchItem instance
+        // which will block other submenu creation when it called
+        this.selectedItem = matchedItemsWithBarcode[0];
+      }, 10);
     } else {
       // proceed to continue searching if matched item is more than one
       // or no item found in first search

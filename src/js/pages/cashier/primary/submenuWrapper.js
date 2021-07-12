@@ -30,21 +30,22 @@ export class SubmenuWrapper {
 
   //   opening a shortcut
   openSubmenu(shortcutKey, props = {}) {
-    const { name, object, shortcutFunction, html } = submenuButtons[shortcutKey];
-    const submenuProperties = {
-      name: name,
-      html: html,
-    };
+    if (this.#openedSubmenu === null) {
+      const { name, object, shortcutFunction, html } = submenuButtons[shortcutKey];
+      const submenuProperties = {
+        name: name,
+        html: html,
+      };
 
-    if (object) {
-      // create shortcut object
-      this.#openedSubmenu = new object(this, submenuProperties, props);
-    }
+      if (object) {
+        // create shortcut object
+        this.#openedSubmenu = new object(this, submenuProperties, props);
+      }
 
-    if (shortcutFunction) {
-      console.log("executing");
-      // execute shortcut function
-      shortcutFunction(this);
+      if (shortcutFunction) {
+        // execute shortcut function
+        shortcutFunction(this);
+      }
     }
   }
 
@@ -59,19 +60,19 @@ export class SubmenuWrapper {
 
     //! prevent other focus when submenu opened
 
-    document.querySelector(".cashier").addEventListener("focus", (e) => {
-      if (this.#openedSubmenu) {
-        try {
-          if (
-            document.querySelector(`.submenuCover ${relatedTagName}.${relatedClassName.replace(" ", ".")}`) === null
-          ) {
-            this.hideSubmenu();
-          }
-        } catch (_) {
-          this.hideSubmenu();
-        }
-      }
-    });
+    // document.querySelector(".cashier").addEventListener("focus", (e) => {
+    //   if (this.#openedSubmenu) {
+    //     try {
+    //       if (
+    //         document.querySelector(`.submenuCover ${relatedTagName}.${relatedClassName.replace(" ", ".")}`) === null
+    //       ) {
+    //         this.hideSubmenu();
+    //       }
+    //     } catch (_) {
+    //       this.hideSubmenu();
+    //     }
+    //   }
+    // });
 
     // escape button listener
     this.cashier.element.addEventListener("keydown", ({ key }) => {
