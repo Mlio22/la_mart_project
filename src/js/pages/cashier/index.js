@@ -28,7 +28,7 @@ class Cashier {
       this.#cashierWin = null;
     });
 
-    ipcMain.on("close-cashier", () => {
+    ipcMain.once("close-cashier", () => {
       this.#cashierWin.close();
     });
   }
