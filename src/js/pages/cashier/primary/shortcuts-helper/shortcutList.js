@@ -89,7 +89,7 @@ export const submenuButtons = {
     name: "open-transaction",
     object: OpenTransaction,
     html: openTransactionHTML,
-    initialAvailabiilty: true,
+    initialAvailabiilty: false,
   },
   F9: {
     name: "cancel-transaction",

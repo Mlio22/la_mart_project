@@ -96,6 +96,7 @@ export class TransactionList {
 
     // create new transaction
     this.createTransaction();
+    this.#checkTransactionsList();
   }
 
   completeCurrentTransaction(paymentNominals) {
@@ -113,6 +114,7 @@ export class TransactionList {
 
     // change current transaction's status to 3 (completed)
     this.#currentTransaction.status = 3;
+    this.#checkTransactionsList();
     //! this.__storeDataToDB();
   }
 
@@ -145,6 +147,21 @@ export class TransactionList {
     );
     if (transactionIndex !== -1) {
       return this.#transactionList[transactionIndex];
+    }
+  }
+
+  #checkTransactionsList() {
+    // this method sets openTransaction shortcut Availability
+    // based on is there saved/completed transaction or not
+
+    const savedOrCompletedTransactionIndex = this.#transactionList.findIndex(({ transactionInfo: { status } }) => {
+      return status === 2 || status === 3;
+    });
+
+    if (savedOrCompletedTransactionIndex >= 0) {
+      this.cashier.childs.shortcuts.setShortcutAvailability({
+        F7: true,
+      });
     }
   }
 
