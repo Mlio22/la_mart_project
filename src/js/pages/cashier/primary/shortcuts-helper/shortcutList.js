@@ -38,11 +38,11 @@ const paymentHTML = `
     </div>
 </div>
 <div class="payment-actions">
-    <button class="proceed">
-        <i class="fas fa-check"></i>F3
-    </button>
     <button class="cancel">
-        <i class="fas fa-times"></i>F4
+        <i class="fas fa-times"></i>Batalkan
+    </button>
+    <button class="proceed">
+        <i class="fas fa-check"></i>Selesai
     </button>
 </div>`;
 

@@ -33,11 +33,11 @@ export class Payment extends Submenu {
   _setListener() {
     // listen to payment div
     this._submenuElement.addEventListener("keydown", ({ key }) => {
-      if (key === "Enter" || key === "F3") {
+      if (key === "Enter") {
         // on enter to proceed payment and end the payment
         // this only works if the #sufficient is true
         this.#proceedPayment();
-      } else if (key === "F4" || key === "Escape") {
+      } else if (key === "Tab") {
         // close submenu
         this.#cancelPayment();
       }
@@ -129,5 +129,6 @@ export class Payment extends Submenu {
 
   #cancelPayment() {
     this._submenu.hideSubmenu();
+    console.log("cancelled");
   }
 }
