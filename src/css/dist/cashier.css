@@ -147,6 +147,7 @@ div.cashier div.left-bar div.left-bottom-bar div.notification {
   padding: 10px;
   border-radius: 10px;
   box-shadow: #00000012 0px 3px 6px;
+  transition: 0.1s background-color;
 }
 div.cashier div.left-bar div.left-bottom-bar div.notification i.notification-icon {
   margin-right: 20px;
