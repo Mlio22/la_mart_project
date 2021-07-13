@@ -79,8 +79,9 @@ export class TransactionList {
 
       this.cashier.childs.paymentDetails.setAndShow({ id, customer, totalPrice });
 
-      // enable new transaction shortcut
+      // change other shortcut availability status
       this.cashier.childs.shortcuts.setShortcutAvailability({
+        F2: false,
         F5: true,
         F11: true,
       });
