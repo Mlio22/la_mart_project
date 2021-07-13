@@ -1,23 +1,49 @@
-const notificationTypes = ['success', 'warning', 'error'];
-
 export class Notification {
-    constructor(cashier, notificationElement) {
-        this.__cashier = cashier;
+  // notification type affects to color and icon will be used
+  #notificationTypes = ["success", "warning", "error"];
+  // icon list
+  #iconTypes = ["fa-check-circle", "fa-exclamation-circle", "fa-exclamation-triangle"];
 
-        this.__notificationElement = notificationElement;
-        this.__notificationTextElement = this.__notificationElement.querySelector('.notification-text');
+  #notificationElement;
+  #notificationIcon;
+  #notificationTextElement;
 
-        this.__isNotificationShowing = false;
+  #currentType;
+
+  constructor(cashier) {
+    this.cashier = cashier;
+
+    this.#notificationElement = cashier.element.querySelector(".notification");
+    this.#notificationIcon = this.#notificationElement.querySelector(".notification-icon");
+    this.#notificationTextElement = this.#notificationElement.querySelector(".notification-text span.display-text");
+
+    // test
+    setInterval(() => {
+      setTimeout(() => {
+        this.setNotification(0, "Success");
+        setTimeout(() => {
+          this.setNotification(1, "Warning");
+          setTimeout(() => {
+            this.setNotification(2, "Error");
+          }, 1000);
+        }, 1000);
+      }, 1000);
+    }, 3000);
+  }
+
+  setNotification(type, text) {
+    if (this.#currentType !== type) {
+      // remove notification previous status
+      this.#notificationElement.classList.remove(this.#notificationTypes[this.#currentType]);
+      this.#notificationIcon.classList.remove(this.#iconTypes[this.#currentType]);
+
+      // change the color and type
+      this.#notificationElement.classList.add(this.#notificationTypes[type]);
+      this.#notificationIcon.classList.add(this.#iconTypes[type]);
+
+      this.#currentType = type;
     }
 
-    setNotification(type, text) {
-        notificationTypes.forEach(notificationType => {
-            this.__notificationElement.classList.remove(notificationType)
-        });
-
-        this.__notificationElement.classList.add(notificationTypes[type]);
-        this.__notificationTextElement.innerText = text;
-
-        this.__isNotificationShowing = true;
-    }
+    this.#notificationTextElement.innerText = text;
+  }
 }
