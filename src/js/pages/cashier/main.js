@@ -29,11 +29,6 @@ class CashierUI {
     // called from children class constructors (transactions, shortcuts, paymentDetails and totalPrice)
     return this.cashierElement;
   }
-
-  focusToCashier() {
-    // called at shortcut.hideSubmenu
-    this.cashierElement.focus();
-  }
 }
 
 const cashierUIElement = document.querySelector(".cashier");

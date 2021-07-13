@@ -25,7 +25,8 @@ export class SubmenuWrapper {
     // clear the submenu element
     this.#submenuWrapperElement.innerHTML = "";
 
-    this.cashier.focusToCashier();
+    // focus to latest item
+    this.cashier.childs.transactionList.currentTransaction.transactionInfo.itemList.focusToLatestBarcode();
   }
 
   //   opening a shortcut
@@ -57,22 +58,6 @@ export class SubmenuWrapper {
         this.hideSubmenu();
       }
     });
-
-    //! prevent other focus when submenu opened
-
-    // document.querySelector(".cashier").addEventListener("focus", (e) => {
-    //   if (this.#openedSubmenu) {
-    //     try {
-    //       if (
-    //         document.querySelector(`.submenuCover ${relatedTagName}.${relatedClassName.replace(" ", ".")}`) === null
-    //       ) {
-    //         this.hideSubmenu();
-    //       }
-    //     } catch (_) {
-    //       this.hideSubmenu();
-    //     }
-    //   }
-    // });
 
     // escape button listener
     this.cashier.element.addEventListener("keydown", ({ key }) => {

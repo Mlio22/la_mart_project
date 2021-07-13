@@ -186,7 +186,7 @@ class Transaction {
       customer: 0,
       totalPrice: 0,
     },
-    itemList: [],
+    itemList: null,
   };
 
   constructor(transactionList) {
