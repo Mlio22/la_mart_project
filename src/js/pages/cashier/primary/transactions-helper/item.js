@@ -104,13 +104,8 @@ export class Item {
   #restoreOrStartUsual() {
     // don't refresh and check data if item is being restored
     if (this.#itemOptions.isRestore) {
-      if (this.#itemOptions.readonly) {
-        // lock item in read-only (completed transaction)
-        this.#ui.lockItem();
-      } else {
-        // lock barcode only in load mode (saved -> working transaction)
-        this.#ui.childElements.barcodeElement.lock();
-      }
+      // lock barcode only in load mode (saved -> working transaction)
+      this.#ui.childElements.barcodeElement.lock();
     } else {
       // setting timeout to fix item's index in itemList
       setTimeout(() => {
@@ -186,14 +181,6 @@ class ItemUI {
     this.listElement.appendChild(this.#itemElement);
   }
 
-  // lock item (action, barcode, amount)
-  // only used in read-only items
-  lockItem() {
-    this.#itemContentElement.actionElement.deletable = false;
-    this.#itemContentElement.barcodeElement.lock();
-    this.#itemContentElement.amountElement.lock();
-  }
-
   removeUi() {
     // remove ui from document
     this.#itemElement.remove();
@@ -241,8 +228,7 @@ class ItemLog {
       section 1: addition / initialization
       10: item initialized (blank)
       11: item initialized by searchItem (already filled)
-      12: item restored (not readonly)
-      13: item restore (readonly)
+      12: item restored
 
       section 2: fillation
       20: item filled from searchItem (usual search)
