@@ -115,7 +115,7 @@ export class BarcodeElement {
     const checkChange = (e) => {
       const barcodeValue = e.target.value;
 
-      if (barcodeValue.length > 1) {
+      if (barcodeValue.length > 0) {
         this.item.setSeveralItemData({ barcode: barcodeValue });
         const isDuplicate = this.item.checkDuplicateFromItem();
 
@@ -133,6 +133,22 @@ export class BarcodeElement {
     };
 
     this.#barcodeElement.addEventListener("change", checkChange);
+
+    let isEnteredBeforeTimeout = false;
+    this.#barcodeElement.addEventListener("keydown", ({ key }) => {
+      if (key === "Enter") {
+        if (isEnteredBeforeTimeout) {
+          isEnteredBeforeTimeout = false;
+          this.item.openSearchFromItem();
+        } else {
+          isEnteredBeforeTimeout = true;
+
+          setTimeout(() => {
+            isEnteredBeforeTimeout = false;
+          }, 200);
+        }
+      }
+    });
   }
 
   // function that called from parent
