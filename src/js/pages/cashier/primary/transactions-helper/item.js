@@ -10,6 +10,8 @@ const EMPTY_ITEM = {
 };
 
 export class Item {
+  #itemLog = [];
+
   #data;
   #ui;
   #itemOptions;
@@ -24,22 +26,7 @@ export class Item {
     // add ui to Html document
     this.#ui = new ItemUI(this, listElement, this.#data);
 
-    // don't refresh and check data if item is being restored
-    if (this.#itemOptions.isRestore) {
-      if (this.#itemOptions.readonly) {
-        // lock item in read-only (completed transaction)
-        this.#ui.lockItem();
-      } else {
-        // lock barcode only in load mode (saved -> working transaction)
-        this.#ui.childElements.barcodeElement.lock();
-      }
-    } else {
-      // setting timeout to fix item's index in itemList
-      setTimeout(() => {
-        this.itemList.refreshTotalPrice();
-        this.#checkData();
-      }, 50);
-    }
+    this.#restoreOrStartUsual();
   }
 
   deleteThisItem() {
@@ -112,6 +99,25 @@ export class Item {
       },
       this.#data
     );
+  }
+
+  #restoreOrStartUsual() {
+    // don't refresh and check data if item is being restored
+    if (this.#itemOptions.isRestore) {
+      if (this.#itemOptions.readonly) {
+        // lock item in read-only (completed transaction)
+        this.#ui.lockItem();
+      } else {
+        // lock barcode only in load mode (saved -> working transaction)
+        this.#ui.childElements.barcodeElement.lock();
+      }
+    } else {
+      // setting timeout to fix item's index in itemList
+      setTimeout(() => {
+        this.itemList.refreshTotalPrice();
+        this.#checkData();
+      }, 50);
+    }
   }
 
   get data() {
@@ -222,5 +228,48 @@ class ItemUI {
 
   get childElements() {
     return this.#itemContentElement;
+  }
+}
+
+class ItemLog {
+  #code;
+  #changes;
+  #date;
+
+  constructor(code, changes = {}) {
+    /*  code list:
+      section 1: addition / initialization
+      10: item initialized (blank)
+      11: item initialized by searchItem (already filled)
+      12: item restored (not readonly)
+      13: item restore (readonly)
+
+      section 2: fillation
+      20: item filled from searchItem (usual search)
+      21: item filled from searchItem (auto search)
+
+      section 3: changes
+      30: barcode changed
+      31: amount changed
+      32: amount changed (on a completed transaction)
+
+      section 4: deletion
+      40: item deleted
+      41: item deleted (on a completed transaction)
+
+      section 5: others
+      50: restore mode
+    */
+    this.#code = code;
+    this.#changes = changes;
+    this.#date = Date.now();
+  }
+
+  get log() {
+    return {
+      code: this.#code,
+      changes: this.#changes,
+      date: this.#date,
+    };
   }
 }
