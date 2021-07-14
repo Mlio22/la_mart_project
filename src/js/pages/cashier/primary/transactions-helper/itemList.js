@@ -49,14 +49,12 @@ export class ItemList {
     const duplicatedItemIndex = this.#returnItemWithSameBarcode(itemReference.data, indexOnList);
 
     if (duplicatedItemIndex >= 0) {
+      // add the same amount of new item to duplicated item
       const duplicatedItem = this.#items[duplicatedItemIndex];
-      if (indexOnList <= duplicatedItemIndex) {
-        const { amount } = duplicatedItem.data;
-        itemReference.increaseAmount(amount);
-      } else {
-        const { amount } = itemReference.data;
-        duplicatedItem.increaseAmount(amount);
-      }
+
+      const { amount } = itemReference.data;
+      duplicatedItem.increaseAmount(amount);
+
       return true;
     }
     return false;
