@@ -10,6 +10,8 @@ const EMPTY_ITEM = {
 };
 
 export class Item {
+  #itemLog = [];
+
   #data;
   #ui;
   #itemOptions;
@@ -222,5 +224,46 @@ class ItemUI {
 
   get childElements() {
     return this.#itemContentElement;
+  }
+}
+
+class ItemLog {
+  #code;
+  #changes;
+  #date;
+
+  constructor(code, changes = {}) {
+    /*  code list:
+      section 1: addition / initialization
+      10: item initialized (blank)
+      11: item initialized by searchItem (already filled)
+      12: item restored
+
+      section 2: fillation
+      20: item filled from searchItem (usual search)
+      21: item filled from searchItem (auto search)
+
+      section 3: changes
+      30: any data changed (barcode or amount or both)
+      31: amount changed (on a completed transaction)
+
+      section 4: deletion
+      40: item deleted
+      41: item deleted (on a completed transaction)
+
+      section 5: others
+      50: restore mode
+    */
+    this.#code = code;
+    this.#changes = changes;
+    this.#date = Date.now();
+  }
+
+  get log() {
+    return {
+      code: this.#code,
+      changes: this.#changes,
+      date: this.#date,
+    };
   }
 }
