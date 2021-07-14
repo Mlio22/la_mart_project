@@ -31,7 +31,7 @@ export class ItemList {
         this.#items[itemIndexOnList].increaseAmount(1);
       } else {
         // add item to latest empty item in list
-        this.#items[this.#items.length - 1].data = itemData;
+        this.#items[this.#items.length - 1].data = { data: itemData, code: 21 };
       }
     } else {
       // add item if not duplicate (including empty item)

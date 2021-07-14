@@ -35,6 +35,9 @@ export class Item {
     this.#ui.removeUi();
 
     this.itemList.refreshTotalPrice();
+
+    // logging
+    this.#itemLog.push(new ItemLog(this.#itemOptions.isAlreadyCompleted ? 41 : 40));
   }
 
   increaseAmount(amount = 1) {
@@ -115,14 +118,14 @@ export class Item {
   #restoreOrStartUsual() {
     // don't refresh and check data if item is being restored
     if (this.#itemOptions.isRestore) {
-      this.#itemLog.push(new ItemLog(12));
+      this.#itemLog.push(new ItemLog(11));
 
       // lock barcode only in load mode (saved -> working transaction)
       this.#ui.childElements.barcodeElement.lock();
     } else {
       // setting timeout to fix item's index in itemList
       setTimeout(() => {
-        this.#itemLog.push(new ItemLog(this.#data.valid ? 11 : 10));
+        this.#itemLog.push(new ItemLog(10));
 
         this.itemList.refreshTotalPrice();
         this.#checkData();
@@ -138,10 +141,13 @@ export class Item {
     return this.#ui;
   }
 
-  set data(data) {
+  set data({ data, code }) {
     // set data absolutely, from e.g. search-item
     // so the data will be always valid
     // function called from search-item
+
+    // logging
+    this.#itemLog.push(new ItemLog(code, data));
 
     const { amount: previousAmount } = this.#data;
     this.#data = Object.assign(data, {
@@ -239,26 +245,23 @@ class ItemLog {
   #date;
 
   constructor(code, changes = {}) {
+    console.log("new Log appear", code, changes);
     /*  code list:
       section 1: addition / initialization
       10: item initialized (blank)
-      11: item initialized by searchItem (already filled)
-      12: item restored
+      11: item restored
 
       section 2: fillation
       20: item filled from searchItem (usual search)
-      21: item filled from searchItem (auto search)
+      21: item filled from searchItem (shortcut button)
 
       section 3: changes
       30: any data changed (barcode or amount or both)
-      31: amount changed (on a completed transaction)
+      31: any data changed (on a completed transaction)
 
       section 4: deletion
       40: item deleted
       41: item deleted (on a completed transaction)
-
-      section 5: others
-      50: restore mode
     */
     this.#code = code;
     this.#changes = changes;

@@ -170,7 +170,7 @@ export class SearchItem extends Submenu {
     if (this.#itemReference !== null) {
       // if itemReference params exists,
       // change that reference's item using item's method
-      this.#itemReference.data = this.#selectedItem;
+      this.#itemReference.data = { data: this.#selectedItem, code: 20 };
     } else {
       // if itemReference doesn't exist (e.g. search-item accessed from shortcut)
       // create new item data on itemList
