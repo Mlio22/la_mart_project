@@ -182,14 +182,6 @@ class ItemUI {
     this.listElement.appendChild(this.#itemElement);
   }
 
-  // lock item (action, barcode, amount)
-  // only used in read-only items
-  lockItem() {
-    this.#itemContentElement.actionElement.deletable = false;
-    this.#itemContentElement.barcodeElement.lock();
-    this.#itemContentElement.amountElement.lock();
-  }
-
   removeUi() {
     // remove ui from document
     this.#itemElement.remove();

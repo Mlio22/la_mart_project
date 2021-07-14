@@ -65,6 +65,7 @@ export class TransactionList {
       // load already completed transactions (status = 3)
       // only show transaction data
 
+      // clear the purchases element and restore the items
       this.#resetPurchasesElement();
       this.#currentTransaction.itemList.restoreItemList(true);
 
@@ -102,9 +103,6 @@ export class TransactionList {
 
   completeCurrentTransaction(paymentNominals) {
     this.#currentTransaction.transactionInfo.itemList.removeLastEmptyItem();
-
-    // lock items
-    this.#currentTransaction.itemList.lockAllItems();
 
     this.cashier.childs.paymentDetails.setAndShow({
       id: this.#currentTransaction.transactionInfo.id,

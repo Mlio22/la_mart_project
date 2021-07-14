@@ -27,7 +27,6 @@ export class ItemList {
       const itemIndexOnList = this.#returnItemWithSameBarcode(itemData);
 
       if (itemIndexOnList !== -1) {
-        console.log(itemIndexOnList);
         // increase the amount
         this.#items[itemIndexOnList].increaseAmount(1);
       } else {
@@ -95,10 +94,6 @@ export class ItemList {
   restoreItemList(readonly = false) {
     // recreate all items UI
     this.#items = this.#items.map((item) => new Item(this, this.itemElement, item.data, { isRestore: true, readonly }));
-  }
-
-  lockAllItems() {
-    this.#items.forEach((item) => item.ui.lockItem());
   }
 
   focusToLatestBarcode() {
