@@ -60,8 +60,19 @@ export class Item {
   }
 
   setSeveralItemData(newData) {
-    // set single data
-    this.#data = { ...this.#data, ...newData };
+    // set single or multiple data
+    const newDataProperty = { ...this.#data, ...newData };
+
+    // logging
+    const logCode = this.#itemOptions.isAlreadyCompleted ? 31 : 30;
+    this.#itemLog.push(
+      new ItemLog(logCode, {
+        before: { ...this.#data },
+        after: { ...newDataProperty },
+      })
+    );
+
+    this.#data = { ...newDataProperty };
     this.#ui.itemContent = this.#data;
 
     this.itemList.refreshTotalPrice();

@@ -89,9 +89,11 @@ export class ItemList {
     this.#items[this.#items.length - 1].deleteThisItem();
   }
 
-  restoreItemList(readonly = false) {
+  restoreItemList(isAlreadyCompleted = false) {
     // recreate all items UI
-    this.#items = this.#items.map((item) => new Item(this, this.itemElement, item.data, { isRestore: true, readonly }));
+    this.#items = this.#items.map(
+      (item) => new Item(this, this.itemElement, item.data, { isRestore: true, isAlreadyCompleted })
+    );
   }
 
   focusToLatestBarcode() {
