@@ -26,22 +26,7 @@ export class Item {
     // add ui to Html document
     this.#ui = new ItemUI(this, listElement, this.#data);
 
-    // don't refresh and check data if item is being restored
-    if (this.#itemOptions.isRestore) {
-      if (this.#itemOptions.readonly) {
-        // lock item in read-only (completed transaction)
-        this.#ui.lockItem();
-      } else {
-        // lock barcode only in load mode (saved -> working transaction)
-        this.#ui.childElements.barcodeElement.lock();
-      }
-    } else {
-      // setting timeout to fix item's index in itemList
-      setTimeout(() => {
-        this.itemList.refreshTotalPrice();
-        this.#checkData();
-      }, 50);
-    }
+    this.#restoreOrStartUsual();
   }
 
   deleteThisItem() {
@@ -114,6 +99,24 @@ export class Item {
       },
       this.#data
     );
+  }
+
+  #restoreOrStartUsual() {
+    // don't refresh and check data if item is being restored
+    if (this.#itemOptions.isRestore) {
+      this.#itemLog.push(new ItemLog(12));
+
+      // lock barcode only in load mode (saved -> working transaction)
+      this.#ui.childElements.barcodeElement.lock();
+    } else {
+      // setting timeout to fix item's index in itemList
+      setTimeout(() => {
+        this.#itemLog.push(new ItemLog(this.#data.valid ? 11 : 10));
+
+        this.itemList.refreshTotalPrice();
+        this.#checkData();
+      }, 50);
+    }
   }
 
   get data() {
