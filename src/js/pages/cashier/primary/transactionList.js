@@ -48,6 +48,7 @@ export class TransactionList {
     }
 
     this.#currentTransaction = this.#searchTransaction(transactionId);
+    this.#currentTransaction.addLog(5);
 
     if (this.#currentTransaction.transactionInfo.status === 2) {
       // load saved transaction
@@ -98,6 +99,8 @@ export class TransactionList {
     // remove last empty item
     this.#currentTransaction.transactionInfo.itemList.removeLastEmptyItem();
 
+    this.#currentTransaction.addLog(2);
+
     // create new transaction
     this.createTransaction();
     this.#checkTransactionsList();
@@ -115,19 +118,27 @@ export class TransactionList {
 
     // change current transaction's status to 3 (completed)
     this.#currentTransaction.status = 3;
+    this.#currentTransaction.addLog(2);
+
     this.#checkTransactionsList();
     //! this.__storeDataToDB();
   }
 
   cancelCurrentTransaction() {
+    if (this.#currentTransaction.status === 3) {
+      this.#currentTransaction.addLog(6);
+    } else {
+      this.#currentTransaction.addLog(4);
+    }
+
     this.createTransaction();
-    // clear previous transaction data
   }
 
   createTransaction() {
     // create new transaction
     this.#resetPurchasesElement();
     this.#currentTransaction = new Transaction(this);
+    this.#currentTransaction.addLog(1);
 
     this.#transactionList.push(this.#currentTransaction);
 
@@ -179,7 +190,7 @@ let idCounter = 1;
 
 class Transaction {
   // transaction properties
-  #transactionLog = [new TransactionLog(1)];
+  #transactionLog = [];
 
   #transactionInfo = {
     id: idCounter++, // create get id function
@@ -195,6 +206,10 @@ class Transaction {
     this.transactionList = transactionList;
 
     this.#transactionInfo.itemList = new ItemList(this);
+  }
+
+  addLog(code) {
+    this.#transactionLog.push(new TransactionLog(code));
   }
 
   get transactionInfo() {
@@ -221,4 +236,3 @@ class Transaction {
     this.#transactionInfo.cashInfo = { ...this.#transactionInfo.cashInfo, ...cashInfo };
   }
 }
-

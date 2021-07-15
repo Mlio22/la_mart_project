@@ -7,7 +7,7 @@ class CashierLog {
 
     this._date = Date.now();
 
-    console.log(`new ${this._logType} appears with code: ${this._code}`);
+    console.log(`new ${logType} appears with code: ${code}, ${codeList[code]}`);
   }
 
   addToDB() {
