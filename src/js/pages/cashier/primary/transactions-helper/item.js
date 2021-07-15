@@ -1,5 +1,6 @@
 import { BarcodeElement, TextElement, ActionElement, AmountElement } from "./itemElement.js";
 import { set_proper_price } from "../../../etc/others.js";
+import { ItemLog } from "../../../etc/Log.js";
 
 const EMPTY_ITEM = {
   barcode: "",
@@ -236,43 +237,5 @@ class ItemUI {
 
   get childElements() {
     return this.#itemContentElement;
-  }
-}
-
-class ItemLog {
-  #code;
-  #changes;
-  #date;
-
-  constructor(code, changes = {}) {
-    console.log("new Log appear", code, changes);
-    /*  code list:
-      section 1: addition / initialization
-      10: item initialized (blank)
-      11: item restored
-
-      section 2: fillation
-      20: item filled from searchItem (usual search)
-      21: item filled from searchItem (shortcut button)
-
-      section 3: changes
-      30: any data changed (barcode or amount or both)
-      31: any data changed (on a completed transaction)
-
-      section 4: deletion
-      40: item deleted
-      41: item deleted (on a completed transaction)
-    */
-    this.#code = code;
-    this.#changes = changes;
-    this.#date = Date.now();
-  }
-
-  get log() {
-    return {
-      code: this.#code,
-      changes: this.#changes,
-      date: this.#date,
-    };
   }
 }

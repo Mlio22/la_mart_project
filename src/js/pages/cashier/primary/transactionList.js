@@ -1,4 +1,6 @@
 import { ItemList } from "./transactions-helper/itemList.js";
+import { TransactionLog } from "../../etc/Log.js";
+
 const EMPTY_TRANSACTION_HTML = `
     <tr class="purchases-headers">
       <th class="purchases-header action-header">&nbsp;</th>
@@ -220,27 +222,3 @@ class Transaction {
   }
 }
 
-class TransactionLog {
-  #code;
-  #date;
-
-  constructor(code) {
-    /* code list
-      1: creating / new
-      2: saved
-      3: completed
-      4: cancelled
-      5: re-opened
-      6: cancelled after completed
-    */
-    this.#code = code;
-    this.#date = Date.now();
-  }
-
-  get log() {
-    return {
-      code: this.#code,
-      date: this.#date,
-    };
-  }
-}
