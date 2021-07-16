@@ -62,12 +62,16 @@ function item_searcher(hint, params = ["name", "barcode"], filteredItems = EXAMP
 }
 
 export class SearchItem extends Submenu {
-  #selectedItem = null;
   #filteredItems = [];
-  #itemReference;
-  #hint;
+  #selectedItem = null;
+
+  #itemReference = null;
+  #hint = null;
+
   #searchItemHeader;
   #searchItemResult;
+
+  #isAutoCompleteSearch = false;
 
   constructor(submenuWrapper, submenuProperties, params = {}) {
     super(submenuWrapper, submenuProperties);
@@ -170,7 +174,7 @@ export class SearchItem extends Submenu {
     if (this.#itemReference !== null) {
       // if itemReference params exists,
       // change that reference's item using item's method
-      this.#itemReference.data = { data: this.#selectedItem, code: 20 };
+      this.#itemReference.data = { data: this.#selectedItem, code: this.#isAutoCompleteSearch ? 21 : 20 };
     } else {
       // if itemReference doesn't exist (e.g. search-item accessed from shortcut)
       // create new item data on itemList

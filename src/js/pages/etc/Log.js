@@ -48,7 +48,8 @@ export class ItemLog extends CashierLog {
 
         // section 2: fillation
         20: "item filled from searchItem (usual search)",
-        21: "item filled from searchItem (shortcut)",
+        21: "Item filled (auto search)",
+        22: "item filled from searchItem (shortcut)",
 
         // section 3: changes
         30: "any data changes (barcode or amount or both)",
