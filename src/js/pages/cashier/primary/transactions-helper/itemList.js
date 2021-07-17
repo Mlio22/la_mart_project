@@ -31,11 +31,11 @@ export class ItemList {
         this.#items[itemIndexOnList].increaseAmount(1);
       } else {
         // add item to latest empty item in list
-        this.#items[this.#items.length - 1].data = { data: itemData, code: 21 };
+        this.#items[this.#items.length - 1].data = { data: itemData, code: 22 };
       }
     } else {
       // add item if not duplicate (including empty item)
-      const newItem = new Item(this, this.itemElement, itemData);
+      const newItem = new Item(this, this.itemElement);
       this.#items.push(newItem);
     }
 

@@ -119,14 +119,14 @@ export class Item {
   #restoreOrStartUsual() {
     // don't refresh and check data if item is being restored
     if (this.#itemOptions.isRestore) {
-      this.#itemLog.push(new ItemLog(11));
+      this.#itemLog.push(new ItemLog(12));
 
       // lock barcode only in load mode (saved -> working transaction)
       this.#ui.childElements.barcodeElement.lock();
     } else {
       // setting timeout to fix item's index in itemList
       setTimeout(() => {
-        this.#itemLog.push(new ItemLog(10));
+        this.#itemLog.push(new ItemLog(this.#itemOptions.isFromShortcut ? 11 : 10));
 
         this.itemList.refreshTotalPrice();
         this.#checkData();

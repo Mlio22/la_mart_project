@@ -31,6 +31,7 @@ export class TransactionList {
     // 2 : saved
     // 3 : completed
     // 4 : cancelled
+    // 5 : cancelled after completed
     //* only used 2, 3
 
     return this.#transactionList.filter((transaction) => {
@@ -48,7 +49,7 @@ export class TransactionList {
     }
 
     this.#currentTransaction = this.#searchTransaction(transactionId);
-    this.#currentTransaction.addLog(5);
+    this.#currentTransaction.addLog(6);
 
     if (this.#currentTransaction.transactionInfo.status === 2) {
       // load saved transaction
@@ -118,7 +119,8 @@ export class TransactionList {
 
     // change current transaction's status to 3 (completed)
     this.#currentTransaction.status = 3;
-    this.#currentTransaction.addLog(2);
+    this.#currentTransaction.addLog(3);
+
 
     this.#checkTransactionsList();
     //! this.__storeDataToDB();
@@ -130,6 +132,8 @@ export class TransactionList {
     } else {
       this.#currentTransaction.addLog(4);
     }
+
+    this.#currentTransaction.status = 4;
 
     this.createTransaction();
   }

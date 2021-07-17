@@ -31,8 +31,8 @@ export class TransactionLog extends CashierLog {
         2: "saved",
         3: "completed",
         4: "cancelled",
-        5: "re-opened",
-        6: "cancelled after completed",
+        5: "cancelled after completed",
+        6: "re-opened",
       };
 
     super(logType, code, codeList, changes);
@@ -53,7 +53,7 @@ export class ItemLog extends CashierLog {
 
         // section 3: changes
         30: "any data changes (barcode or amount or both)",
-        31: "any data changes (on a completed transaction",
+        31: "any data changes (on a completed transaction)",
 
         // section 4: deletion
         40: "item deleted",
