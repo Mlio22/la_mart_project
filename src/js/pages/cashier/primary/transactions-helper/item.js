@@ -31,14 +31,14 @@ export class Item {
   }
 
   deleteThisItem() {
+    // logging
+    this.#itemLog.push(new ItemLog(this.#itemOptions.isAlreadyCompleted ? 41 : 40));
+
     // function only called from action
     this.itemList.removeItemFromList(this);
     this.#ui.removeUi();
 
     this.itemList.refreshTotalPrice();
-
-    // logging
-    this.#itemLog.push(new ItemLog(this.#itemOptions.isAlreadyCompleted ? 41 : 40));
   }
 
   increaseAmount(amount = 1) {

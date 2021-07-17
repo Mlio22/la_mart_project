@@ -77,8 +77,7 @@ export class ItemList {
 
     if (this.#isTransactionCompleted && this.#items.length === 0) {
       // when transaction is already completed and itemlist is none, start other transaction
-      this.transaction.status = 5;
-      this.transaction.transactionList.createTransaction();
+      this.transaction.transactionList.cancelCurrentTransaction();
     } else {
       this.#checkItemToAffectShortcut();
     }

@@ -149,13 +149,11 @@ export class TransactionList {
   }
 
   cancelCurrentTransaction() {
-    if (this.#currentTransaction.status === 3) {
-      this.#currentTransaction.addLog(6);
-    } else {
-      this.#currentTransaction.addLog(4);
-    }
+    const isTransactionCompleted = this.#currentTransaction.transactionInfo.status;
 
-    this.#currentTransaction.status = 4;
+    // change status and logging
+    this.#currentTransaction.status = isTransactionCompleted ? 5 : 4;
+    this.#currentTransaction.addLog(isTransactionCompleted ? 5 : 4);
 
     // check transactionList
     this.#checkTransactionsList();
