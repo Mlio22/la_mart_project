@@ -163,7 +163,7 @@ export class TransactionList {
     this.createTransaction();
   }
 
-  createTransaction() {
+  createTransaction(starterItem) {
     // reset purchases element
     this.#resetPurchasesElement();
 
@@ -171,7 +171,7 @@ export class TransactionList {
     this.cashier.childs.paymentDetails.clearPayment();
 
     // create new transaction
-    this.#currentTransaction = new Transaction(this);
+    this.#currentTransaction = new Transaction(this, starterItem);
     this.#currentTransaction.addLog(1);
     this.#transactionList.push(this.#currentTransaction);
 
@@ -235,10 +235,10 @@ class Transaction {
     itemList: null,
   };
 
-  constructor(transactionList) {
+  constructor(transactionList, starterItem) {
     this.transactionList = transactionList;
 
-    this.#transactionInfo.itemList = new ItemList(this);
+    this.#transactionInfo.itemList = new ItemList(this, starterItem);
   }
 
   addLog(code) {

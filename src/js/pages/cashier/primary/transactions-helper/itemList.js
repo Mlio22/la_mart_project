@@ -10,12 +10,12 @@ export class ItemList {
   #items = [];
   #isTransactionCompleted = false;
 
-  constructor(transaction) {
+  constructor(transaction, starterItem = undefined) {
     this.transaction = transaction;
     this.itemElement = transaction.transactionList.cashier.element.querySelector("table.purchases");
 
     // creates new item in list
-    this.createNewItem();
+    this.createNewItem(starterItem);
   }
 
   // function called from above and below
@@ -23,7 +23,14 @@ export class ItemList {
     // above: used in submenu(search-item)
     // below: used in Item
 
-    if (itemData !== undefined) {
+    if (this.#isTransactionCompleted) {
+      // if transaction is already completed, but an item added from search item (shortcut)
+      // start a new transaction and add that item to it
+      this.transaction.transactionList.createTransaction(itemData);
+      return;
+    }
+
+    if (itemData !== undefined && this.items.length > 0) {
       // check if item is already on list
       const itemIndexOnList = this.#returnItemWithSameBarcode(itemData);
 
@@ -36,7 +43,7 @@ export class ItemList {
       }
     } else {
       // add item if not duplicate (including empty item)
-      const newItem = new Item(this, this.itemElement);
+      const newItem = new Item(this, this.itemElement, itemData);
       this.#items.push(newItem);
     }
 
