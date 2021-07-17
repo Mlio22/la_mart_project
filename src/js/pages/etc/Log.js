@@ -58,6 +58,7 @@ export class ItemLog extends CashierLog {
         // section 4: deletion
         40: "item deleted",
         41: "item deleted (on a completed transaction)",
+        42: "blank item deleted",
 
         // section 5: others
       };

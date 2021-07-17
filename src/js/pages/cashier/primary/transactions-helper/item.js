@@ -10,6 +10,10 @@ const EMPTY_ITEM = {
   price: 0,
 };
 
+const isEqual = function (obj1, obj2) {
+  return JSON.stringify(obj1) === JSON.stringify(obj2);
+};
+
 export class Item {
   #itemLog = [];
 
@@ -31,14 +35,19 @@ export class Item {
   }
 
   deleteThisItem() {
-    // logging
-    this.#itemLog.push(new ItemLog(this.#itemOptions.isAlreadyCompleted ? 41 : 40));
-
     // function only called from action
     this.itemList.removeItemFromList(this);
     this.#ui.removeUi();
 
     this.itemList.refreshTotalPrice();
+
+    // logging
+    // checking if item is blank or not
+    if (isEqual({ ...this.data, ...EMPTY_ITEM }, this.data)) {
+      this.#itemLog.push(new ItemLog(42));
+    } else {
+      this.#itemLog.push(new ItemLog(this.#itemOptions.isAlreadyCompleted ? 41 : 40));
+    }
   }
 
   increaseAmount(amount = 1) {
