@@ -106,24 +106,13 @@ export class Payment extends Submenu {
   }
 
   #proceedPayment() {
+    this._submenu.hideSubmenu();
+
     if (this.#isSufficient) {
       this._submenu.cashier.childs.transactionList.completeCurrentTransaction({
         customer: this.#customerMoney,
         totalPrice: this.#total,
       });
-
-      this._submenu.cashier.childs.shortcuts.setShortcutAvailability({
-        F2: false,
-        F4: false,
-        F5: true,
-        F6: false,
-        F9: false,
-        F10: true,
-        F11: true,
-      });
-
-      //todo: access to API/DB and end payment
-      this._submenu.hideSubmenu();
     }
   }
 

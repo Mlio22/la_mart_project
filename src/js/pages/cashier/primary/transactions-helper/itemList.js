@@ -8,6 +8,7 @@ import { Item } from "./item.js";
 
 export class ItemList {
   #items = [];
+  #isTransactionCompleted = false;
 
   constructor(transaction) {
     this.transaction = transaction;
@@ -67,7 +68,13 @@ export class ItemList {
       this.#items.splice(index, 1);
     }
 
-    this.#checkItemToAffectShortcut();
+    if (this.#isTransactionCompleted && this.#items.length === 0) {
+      // when transaction is already completed and itemlist is none, start other transaction
+      this.transaction.status = 5;
+      this.transaction.transactionList.createTransaction();
+    } else {
+      this.#checkItemToAffectShortcut();
+    }
   }
 
   refreshTotalPrice() {
@@ -89,15 +96,23 @@ export class ItemList {
     this.#items[this.#items.length - 1].deleteThisItem();
   }
 
-  restoreItemList(isAlreadyCompleted = false) {
+  restoreItemList(isTransactionCompleted = false) {
     // recreate all items UI
+    this.#isTransactionCompleted = isTransactionCompleted;
     this.#items = this.#items.map(
-      (item) => new Item(this, this.itemElement, item.data, { isRestore: true, isAlreadyCompleted })
+      (item) => new Item(this, this.itemElement, item.data, { isRestore: true, isTransactionCompleted })
     );
   }
 
   focusToLatestBarcode() {
     this.#items[this.#items.length - 1].ui.childElements.barcodeElement.focus();
+  }
+
+  transactionCompleted() {
+    // this only called once when transaction is completed
+    // because when a transaction is completed it can be set again to working / saved
+    this.#isTransactionCompleted = true;
+    this.#items.forEach((item) => item.itemTransactionCompleted());
   }
 
   #checkItemToAffectShortcut() {

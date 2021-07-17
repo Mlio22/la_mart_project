@@ -48,12 +48,12 @@ export class TransactionList {
       this.saveCurrentTransaction();
     }
 
+    // search transaction and logging
     this.#currentTransaction = this.#searchTransaction(transactionId);
     this.#currentTransaction.addLog(6);
 
+    // load saved transaction
     if (this.#currentTransaction.transactionInfo.status === 2) {
-      // load saved transaction
-
       // change current transaction's status to 1 (working)
       this.#currentTransaction.status = 1;
 
@@ -65,10 +65,8 @@ export class TransactionList {
       this.#currentTransaction.itemList.createNewItem();
     }
 
+    // load already completed transactions (status = 3)
     if (this.#currentTransaction.transactionInfo.status === 3) {
-      // load already completed transactions (status = 3)
-      // only show transaction data
-
       // clear the purchases element and restore the items
       this.#resetPurchasesElement();
       this.#currentTransaction.itemList.restoreItemList(true);
@@ -91,6 +89,14 @@ export class TransactionList {
         F11: true,
       });
     }
+
+    // check transactionList
+    this.#checkTransactionsList();
+
+    // able to delete transaction (both completed or incompleted transactions)
+    this.cashier.childs.shortcuts.setShortcutAvailability({
+      F9: true,
+    });
   }
 
   saveCurrentTransaction() {
@@ -104,24 +110,40 @@ export class TransactionList {
 
     // create new transaction
     this.createTransaction();
+
+    // check transactionList
     this.#checkTransactionsList();
   }
 
   completeCurrentTransaction(paymentNominals) {
     this.#currentTransaction.transactionInfo.itemList.removeLastEmptyItem();
 
+    // set the paymentDetails
     this.cashier.childs.paymentDetails.setAndShow({
       id: this.#currentTransaction.transactionInfo.id,
       ...paymentNominals,
     });
 
+    // set the cash info
     this.#currentTransaction.cashInfo = { ...paymentNominals };
 
     // change current transaction's status to 3 (completed)
     this.#currentTransaction.status = 3;
     this.#currentTransaction.addLog(3);
 
+    // set current item to completed
+    this.#currentTransaction.itemList.transactionCompleted();
 
+    // set shortcut availability
+    this.cashier.childs.shortcuts.setShortcutAvailability({
+      F4: false,
+      F5: true,
+      F6: false,
+      F10: true,
+      F11: true,
+    });
+
+    // check transaction list
     this.#checkTransactionsList();
     //! this.__storeDataToDB();
   }
@@ -135,16 +157,26 @@ export class TransactionList {
 
     this.#currentTransaction.status = 4;
 
+    // check transactionList
+    this.#checkTransactionsList();
+
     this.createTransaction();
   }
 
   createTransaction() {
-    // create new transaction
+    // reset purchases element
     this.#resetPurchasesElement();
+
+    // hide the previous paymentDetails if available
+    this.cashier.childs.paymentDetails.clearPayment();
+
+    // create new transaction
     this.#currentTransaction = new Transaction(this);
     this.#currentTransaction.addLog(1);
-
     this.#transactionList.push(this.#currentTransaction);
+
+    // check transactionList
+    this.#checkTransactionsList();
 
     // set the available shortcuts
     this.cashier.childs.shortcuts.setShortcutAvailability({
@@ -170,19 +202,16 @@ export class TransactionList {
     // this method sets openTransaction shortcut Availability
     // based on is there saved/completed transaction or not
 
-    const savedOrCompletedTransactionIndex = this.#transactionList.findIndex(({ transactionInfo: { status } }) => {
-      return status === 2 || status === 3;
+    const savedOrCompletedTransactionIndex = this.#transactionList.findIndex((transaction) => {
+      const notThisTransaction = transaction !== this.#currentTransaction,
+        status = transaction.transactionInfo.status;
+      return notThisTransaction && (status === 2 || status === 3);
     });
 
-    if (savedOrCompletedTransactionIndex >= 0) {
-      this.cashier.childs.shortcuts.setShortcutAvailability({
-        F7: true,
-      });
-    }
-  }
-
-  get currentTransactionObject() {
-    return this.#currentTransaction.transactionInfo.object;
+    // set openTransaction shortcut availability based by any saved or completed transaction available
+    this.cashier.childs.shortcuts.setShortcutAvailability({
+      F7: savedOrCompletedTransactionIndex >= 0 ? true : false,
+    });
   }
 
   get currentTransaction() {

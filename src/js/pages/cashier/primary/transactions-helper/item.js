@@ -142,7 +142,7 @@ export class Item {
     return this.#ui;
   }
 
-  set data({ data, code }) {
+  set data({ data, code = null }) {
     // set data absolutely, from e.g. search-item
     // so the data will be always valid
     // function called from search-item
@@ -166,6 +166,10 @@ export class Item {
 
     this.#ui.itemContent = this.#data;
     this.#checkData();
+  }
+
+  itemTransactionCompleted() {
+    this.#itemOptions.isAlreadyCompleted = true;
   }
 }
 

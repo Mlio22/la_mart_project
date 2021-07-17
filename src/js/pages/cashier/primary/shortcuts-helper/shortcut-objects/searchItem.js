@@ -135,6 +135,7 @@ export class SearchItem extends Submenu {
         // if Submenu.hideSubmenu() is called before SearchItem established,
         // then the Submenu.#openedSubmenu won't be null, it'll be a SearchItem instance
         // which will block other submenu creation when it called
+        this.#isAutoCompleteSearch = true;
         this.selectedItem = matchedItemsWithBarcode[0];
       }, 10);
     } else {
@@ -178,7 +179,9 @@ export class SearchItem extends Submenu {
     } else {
       // if itemReference doesn't exist (e.g. search-item accessed from shortcut)
       // create new item data on itemList
-      this._submenu.cashier.childs.transactionList.currentTransaction.itemList.createNewItem(this.#selectedItem);
+      this._submenu.cashier.childs.transactionList.currentTransaction.itemList.createNewItem(this.#selectedItem, {
+        isFromShortcut: true,
+      });
     }
   }
 
