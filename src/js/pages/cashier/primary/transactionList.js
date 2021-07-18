@@ -25,142 +25,6 @@ export class TransactionList {
     this.createTransaction();
   }
 
-  retrieveTransactionList(status = 2) {
-    // Status list:
-    // 1 : working
-    // 2 : saved
-    // 3 : completed
-    // 4 : cancelled
-    // 5 : cancelled after completed
-    //* only used 2, 3
-
-    return this.#transactionList.filter((transaction) => {
-      const transactionStatus = transaction.transactionInfo.status;
-
-      return status === transactionStatus && this.#currentTransaction !== transaction;
-    });
-  }
-
-  loadTransaction(transactionId) {
-    if (this.#currentTransaction.itemList.items.length > 1 && this.#currentTransaction.transactionInfo.status !== 3) {
-      // save current transaction before loading other transaction
-      // unless it's already completed
-      this.saveCurrentTransaction();
-    }
-
-    // search transaction and logging
-    this.#currentTransaction = this.#searchTransaction(transactionId);
-    this.#currentTransaction.addLog(6);
-
-    // load saved transaction
-    if (this.#currentTransaction.transactionInfo.status === 2) {
-      // change current transaction's status to 1 (working)
-      this.#currentTransaction.status = 1;
-
-      // clear the purchases element and restore the items
-      this.#resetPurchasesElement();
-      this.#currentTransaction.itemList.restoreItemList(false);
-
-      // add new empty element
-      this.#currentTransaction.itemList.createNewItem();
-    }
-
-    // load already completed transactions (status = 3)
-    if (this.#currentTransaction.transactionInfo.status === 3) {
-      // clear the purchases element and restore the items
-      this.#resetPurchasesElement();
-      this.#currentTransaction.itemList.restoreItemList(true);
-
-      // restore the totalPrice
-      this.#currentTransaction.itemList.refreshTotalPrice();
-
-      // and paymentDetails
-      const {
-        id,
-        cashInfo: { customer, totalPrice },
-      } = this.#currentTransaction.transactionInfo;
-
-      this.cashier.childs.paymentDetails.setAndShow({ id, customer, totalPrice });
-
-      // change other shortcut availability status
-      this.cashier.childs.shortcuts.setShortcutAvailability({
-        F2: false,
-        F5: true,
-        F11: true,
-      });
-    }
-
-    // check transactionList
-    this.#checkTransactionsList();
-
-    // able to delete transaction (both completed or incompleted transactions)
-    this.cashier.childs.shortcuts.setShortcutAvailability({
-      F9: true,
-    });
-  }
-
-  saveCurrentTransaction() {
-    // change current transaction's status to 2 (saved)
-    this.#currentTransaction.status = 2;
-
-    // remove last empty item
-    this.#currentTransaction.transactionInfo.itemList.removeLastEmptyItem();
-
-    this.#currentTransaction.addLog(2);
-
-    // create new transaction
-    this.createTransaction();
-
-    // check transactionList
-    this.#checkTransactionsList();
-  }
-
-  completeCurrentTransaction(paymentNominals) {
-    this.#currentTransaction.transactionInfo.itemList.removeLastEmptyItem();
-
-    // set the paymentDetails
-    this.cashier.childs.paymentDetails.setAndShow({
-      id: this.#currentTransaction.transactionInfo.id,
-      ...paymentNominals,
-    });
-
-    // set the cash info
-    this.#currentTransaction.cashInfo = { ...paymentNominals };
-
-    // change current transaction's status to 3 (completed)
-    this.#currentTransaction.status = 3;
-    this.#currentTransaction.addLog(3);
-
-    // set current item to completed
-    this.#currentTransaction.itemList.transactionCompleted();
-
-    // set shortcut availability
-    this.cashier.childs.shortcuts.setShortcutAvailability({
-      F4: false,
-      F5: true,
-      F6: false,
-      F10: true,
-      F11: true,
-    });
-
-    // check transaction list
-    this.#checkTransactionsList();
-    //! this.__storeDataToDB();
-  }
-
-  cancelCurrentTransaction() {
-    const isTransactionCompleted = this.#currentTransaction.transactionInfo.status;
-
-    // change status and logging
-    this.#currentTransaction.status = isTransactionCompleted ? 5 : 4;
-    this.#currentTransaction.addLog(isTransactionCompleted ? 5 : 4);
-
-    // check transactionList
-    this.#checkTransactionsList();
-
-    this.createTransaction();
-  }
-
   createTransaction(starterItem) {
     // reset purchases element
     this.#resetPurchasesElement();
@@ -170,7 +34,6 @@ export class TransactionList {
 
     // create new transaction
     this.#currentTransaction = new Transaction(this, starterItem);
-    this.#currentTransaction.addLog(1);
     this.#transactionList.push(this.#currentTransaction);
 
     // check transactionList
@@ -183,17 +46,112 @@ export class TransactionList {
     });
   }
 
+  loadTransaction(transactionId) {
+    if (this.#currentTransaction.saveable) {
+      // save current transaction before loading other transaction
+      // unless it's already completed
+      this.saveCurrentTransaction({ createNewTransaction: false });
+    }
+
+    // clear the purchases element and reopen the transaction
+    this.#resetPurchasesElement();
+
+    // search, get and set the currentTransaction
+    this.#currentTransaction = this.#searchTransaction(transactionId);
+
+    if (this.#currentTransaction.completed) {
+      this.cashier.childs.paymentDetails.showFromCurrentTransaction();
+
+      // change other shortcut availability status
+      this.cashier.childs.shortcuts.setShortcutAvailability({
+        F2: false,
+        F5: true,
+        F11: true,
+      });
+    }
+
+    this.#currentTransaction.reopenTransaction();
+
+    // check transactionList
+    this.#checkTransactionsList();
+
+    // able to delete transaction (both completed or incompleted transactions)
+    this.cashier.childs.shortcuts.setShortcutAvailability({
+      F9: true,
+    });
+  }
+
+  saveCurrentTransaction({ createNewTransaction = true }) {
+    // save transaction
+    this.#currentTransaction.saveTransaction();
+
+    if (createNewTransaction) {
+      // create new transaction
+      this.createTransaction();
+
+      // check transactionList
+      this.#checkTransactionsList();
+    }
+  }
+
+  completeCurrentTransaction() {
+    // complete current transaction
+    this.#currentTransaction.completeTransaction();
+
+    // show the payment details
+    this.cashier.childs.paymentDetails.showFromCurrentTransaction();
+
+    // set shortcut availability
+    this.cashier.childs.shortcuts.setShortcutAvailability({
+      F4: false,
+      F5: true,
+      F6: false,
+      F10: true,
+      F11: true,
+    });
+
+    // check transaction list
+    this.#checkTransactionsList();
+  }
+
+  cancelCurrentTransaction() {
+    this.#currentTransaction.cancelTransaction();
+
+    // check transactionList
+    this.#checkTransactionsList();
+
+    this.createTransaction();
+  }
+
+  retrieveTransactionList(status = 2) {
+    // Status list:
+    // 1 : working
+    // 2 : saved
+    // 3 : completed
+    // 4 : cancelled
+    // 5 : cancelled after completed
+    //* only used 2, 3
+
+    return this.#transactionList.filter((transaction) => {
+      const transactionStatus = transaction.status;
+
+      return status === transactionStatus && this.#currentTransaction !== transaction;
+    });
+  }
+
   #resetPurchasesElement() {
+    // refresh the purchases element HTML
     this.purchasesElement.innerHTML = EMPTY_TRANSACTION_HTML;
   }
 
   #searchTransaction(transactionId) {
-    const transactionIndex = this.#transactionList.findIndex(
-      (transaction) => transaction.transactionInfo.id === transactionId
-    );
+    const transactionIndex = this.#transactionList.findIndex((transaction) => transaction.id === transactionId);
+
     if (transactionIndex !== -1) {
       return this.#transactionList[transactionIndex];
     }
+
+    return console.error("transaction not found");
   }
 
   #checkTransactionsList() {
@@ -202,7 +160,7 @@ export class TransactionList {
 
     const savedOrCompletedTransactionIndex = this.#transactionList.findIndex((transaction) => {
       const notThisTransaction = transaction !== this.#currentTransaction,
-        status = transaction.transactionInfo.status;
+        status = transaction.status;
       return notThisTransaction && (status === 2 || status === 3);
     });
 
@@ -221,7 +179,7 @@ let idCounter = 1;
 
 class Transaction {
   // transaction properties
-  #transactionLog = [];
+  #transactionLog = [new TransactionLog(1)];
 
   #transactionInfo = {
     id: idCounter++, // create get id function
@@ -239,12 +197,92 @@ class Transaction {
     this.#transactionInfo.itemList = new ItemList(this, starterItem);
   }
 
-  addLog(code) {
+  #loadTransaction() {
+    // restore items
+    this.#transactionInfo.itemList.restoreItemList({ isTransactionCompleted: false });
+
+    // add new empty element
+    this.transactionInfo.itemList.createNewItem();
+
+    // set transaction status  to 1 (working)
+    this.#transactionInfo.status = 1;
+  }
+
+  #restoreTransaction() {
+    // restore items
+    this.#transactionInfo.itemList.restoreItemList({ isTransactionCompleted: true });
+
+    // restore the totalPrice
+    this.transactionInfo.itemList.refreshTotalPrice();
+
+    // set transaction status  to 3 (completed)
+    this.#transactionInfo.status = 3;
+  }
+
+  #addLog(code) {
     this.#transactionLog.push(new TransactionLog(code));
+  }
+
+  saveTransaction() {
+    // remove last empty item
+    this.transactionInfo.itemList.removeLastEmptyItem();
+
+    // change current transaction's status to 2 (saved)
+    this.#transactionInfo.status = 2;
+
+    // add TransactionLog: saved (2)
+    this.#addLog(2);
+  }
+
+  completeTransaction() {
+    this.transactionInfo.itemList.removeLastEmptyItem();
+
+    // set current item to completed
+    this.itemList.setToTransactionCompletedState();
+
+    // change current transaction's status to 3 (completed)
+    this.#transactionInfo.status = 3;
+
+    // add TransactionLog: completed (3)
+    this.#addLog(3);
+  }
+
+  cancelTransaction() {
+    const isTransactionCompleted = this.#transactionInfo.status === 3;
+
+    // change status to 4 (cancelled) or 5 (cancelled after completed)
+    this.#transactionInfo.status = isTransactionCompleted ? 4 : 5;
+
+    // log with code 4 (cancelled) or 5 (cancelled after completed)
+    this.#addLog(isTransactionCompleted ? 4 : 5);
+  }
+
+  reopenTransaction() {
+    // load or restore the transaction
+    if (this.saved) {
+      this.#loadTransaction();
+    } else if (this.completed) {
+      this.#restoreTransaction();
+    }
+
+    // add TransactionLog : re-opened (6)
+    this.#addLog(6);
   }
 
   get transactionInfo() {
     return { ...this.#transactionInfo };
+  }
+
+  get id() {
+    return this.#transactionInfo.id;
+  }
+
+  get status() {
+    return this.#transactionInfo.status;
+  }
+
+  get cashInfo() {
+    return this.#transactionInfo.cashInfo;
   }
 
   get itemList() {
@@ -257,6 +295,34 @@ class Transaction {
 
   get transactionLog() {
     return this.#transactionLog;
+  }
+
+  get saveable() {
+    // return if a transaction can be saved
+    const { itemList, status } = this.#transactionInfo;
+    return itemList.items.length > 1 && status !== 3;
+  }
+
+  get working() {
+    return this.#transactionInfo.status === 1;
+  }
+
+  get saved() {
+    return this.#transactionInfo.status === 2;
+  }
+
+  get completed() {
+    return this.#transactionInfo.status === 3;
+  }
+
+  get cancelled() {
+    // return true if transaction is cancelled (either it's already completed or not)
+    const status = this.#transactionInfo.status;
+    return status === 4 || status === 5;
+  }
+
+  get restoring() {
+    return this.#transactionInfo.status === 6;
   }
 
   set status(status) {

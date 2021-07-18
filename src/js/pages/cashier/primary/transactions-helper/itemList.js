@@ -69,10 +69,10 @@ export class ItemList {
   }
 
   removeItemFromList(item) {
-    const index = this.#items.indexOf(item);
-
-    if (index !== -1) {
-      this.#items.splice(index, 1);
+    // search the item in list and delete it
+    const itemIndex = this.#items.indexOf(item);
+    if (itemIndex !== -1) {
+      this.#items.splice(itemIndex, 1);
     }
 
     if (this.#isTransactionCompleted && this.#items.length === 0) {
@@ -84,15 +84,7 @@ export class ItemList {
   }
 
   refreshTotalPrice() {
-    // called from item
-    let currentTotalPrice = 0;
-    this.#items.forEach((item) => {
-      const { valid, price, amount } = item.data;
-      if (valid) {
-        currentTotalPrice += price * amount;
-      }
-    });
-
+    const currentTotalPrice = this.totalPrice;
     // set total price to be check for payment
     this.transaction.cashInfo = { totalPrice: currentTotalPrice };
     this.transaction.transactionList.cashier.childs.totalPrice.totalPrice = currentTotalPrice;
@@ -102,9 +94,10 @@ export class ItemList {
     this.#items[this.#items.length - 1].deleteThisItem();
   }
 
-  restoreItemList(isTransactionCompleted = false) {
-    // recreate all items UI
+  restoreItemList({ isTransactionCompleted = false }) {
     this.#isTransactionCompleted = isTransactionCompleted;
+
+    // recreate all items UI
     this.#items = this.#items.map(
       (item) => new Item(this, this.itemElement, item.data, { isRestore: true, isTransactionCompleted })
     );
@@ -114,9 +107,9 @@ export class ItemList {
     this.#items[this.#items.length - 1].ui.childElements.barcodeElement.focus();
   }
 
-  transactionCompleted() {
+  setToTransactionCompletedState() {
     // this only called once when transaction is completed
-    // because when a transaction is completed it can be set again to working / saved
+    // because a completed cannot be set again to working / saved
     this.#isTransactionCompleted = true;
     this.#items.forEach((item) => item.itemTransactionCompleted());
   }
@@ -124,8 +117,7 @@ export class ItemList {
   #checkItemToAffectShortcut() {
     // if any item is enlisted in list
     // shortcut payment, save-transaction, cancel-transaction is available
-    // but
-    // print-bill (only if a transaction ever finished) will be unavailable
+    // but print-bill (only if a transaction ever finished) will be unavailable
 
     if (this.#items.length > 0) {
       if (this.#items[0].data.valid) {
@@ -155,7 +147,7 @@ export class ItemList {
 
     const transactionLength = this.#items.length;
     for (let itemIndex = 0; itemIndex < transactionLength; itemIndex++) {
-      // skips if it's the index
+      // skips if it its (comparedItemData's) index
       if (indexOnList === itemIndex) {
         continue;
       }
@@ -172,5 +164,17 @@ export class ItemList {
 
   get items() {
     return this.#items;
+  }
+
+  get totalPrice() {
+    let currentTotalPrice = 0;
+    this.#items.forEach((item) => {
+      const { valid, price, amount } = item.data;
+      if (valid) {
+        currentTotalPrice += price * amount;
+      }
+    });
+
+    return currentTotalPrice;
   }
 }

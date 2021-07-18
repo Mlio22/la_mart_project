@@ -10,10 +10,6 @@ const EMPTY_ITEM = {
   price: 0,
 };
 
-const isEqual = function (obj1, obj2) {
-  return JSON.stringify(obj1) === JSON.stringify(obj2);
-};
-
 export class Item {
   #itemLog = [];
 
@@ -28,7 +24,7 @@ export class Item {
     // gathering data
     this.#gatherData(data);
 
-    // add ui to Html document
+    // add ui class property
     this.#ui = new ItemUI(this, listElement, this.#data);
 
     this.#restoreOrStartUsual();
@@ -43,7 +39,7 @@ export class Item {
 
     // logging
     // checking if item is blank or not
-    if (isEqual({ ...this.data, ...EMPTY_ITEM }, this.data)) {
+    if (this.#isItemEmpty()) {
       this.#itemLog.push(new ItemLog(42));
     } else {
       this.#itemLog.push(new ItemLog(this.#itemOptions.isAlreadyCompleted ? 41 : 40));
@@ -91,6 +87,10 @@ export class Item {
     this.itemList.refreshTotalPrice();
   }
 
+  itemTransactionCompleted() {
+    this.#itemOptions.isAlreadyCompleted = true;
+  }
+
   #checkData() {
     // go create new item if enough info in previous item
     if (this.#data.valid) {
@@ -102,6 +102,8 @@ export class Item {
   }
 
   #gatherData(data) {
+    // gather data if available
+
     // variable for check if data is already valid
     let isDataAlreadyValid;
 
@@ -113,34 +115,39 @@ export class Item {
       isDataAlreadyValid = true;
     }
 
-    this.#data = { ...data };
-
     // adding other properties
     this.#data = Object.assign(
       {
         amount: 1,
         valid: isDataAlreadyValid,
       },
-      this.#data
+      { ...data }
     );
   }
 
   #restoreOrStartUsual() {
-    // don't refresh and check data if item is being restored
+    //! don't refresh and check data if item is being restored
     if (this.#itemOptions.isRestore) {
-      this.#itemLog.push(new ItemLog(12));
+      // add ItemLog: Item Restored (11)
+      this.#itemLog.push(new ItemLog(11));
 
       // lock barcode only in load mode (saved -> working transaction)
       this.#ui.childElements.barcodeElement.lock();
     } else {
       // setting timeout to fix item's index in itemList
       setTimeout(() => {
-        this.#itemLog.push(new ItemLog(this.#itemOptions.isFromShortcut ? 11 : 10));
+        // add ItemLog: item initialized (blank) (10)
+        this.#itemLog.push(new ItemLog(10));
 
         this.itemList.refreshTotalPrice();
         this.#checkData();
       }, 50);
     }
+  }
+
+  #isItemEmpty() {
+    // checking if the given itemData is the same as EMPTY_ITEM
+    return JSON.stringify({ ...this.#data, ...EMPTY_ITEM }) === JSON.stringify(this.#data);
   }
 
   get data() {
@@ -176,10 +183,6 @@ export class Item {
     this.#ui.itemContent = this.#data;
     this.#checkData();
   }
-
-  itemTransactionCompleted() {
-    this.#itemOptions.isAlreadyCompleted = true;
-  }
 }
 
 class ItemUI {
@@ -194,11 +197,14 @@ class ItemUI {
   }
 
   #createElement(data) {
+    // create tr element
     this.#itemElement = document.createElement("tr");
     this.#itemElement.className = "purchases-contents";
 
+    // get the required data
     const { name, quantity, price, amount } = data;
 
+    // create child elements
     this.#itemContentElement = {
       actionElement: new ActionElement(this.item),
       barcodeElement: new BarcodeElement(this.item),

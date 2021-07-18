@@ -17,20 +17,32 @@ export class PaymentDetails {
   #changeContent;
 
   constructor(cashier) {
+    this.cashier = cashier;
     this.#paymentDetailsElement = cashier.element.querySelector(".right-bar .payment");
 
     this.#gatherElements();
   }
 
-  setAndShow({ id, customer, totalPrice }) {
+  #setDataFromCurrentTransaction() {
+    const transactionInfo = this.cashier.childs.transactionList.currentTransaction.transactionInfo;
+    const {
+      id,
+      cashInfo: { customer, totalPrice },
+    } = transactionInfo;
+
     this.#transactionID = id;
 
     this.#customerMoney = customer;
     this.#totalPrice = totalPrice;
     this.#change = customer - totalPrice;
+  }
 
-    this.#setElementVisibilty(true);
+  // setAndShow({ id, customer, totalPrice }) {
+  showFromCurrentTransaction() {
+    this.#setDataFromCurrentTransaction();
+
     this.#setElementText();
+    this.#setElementVisibilty(true);
   }
 
   clearPayment() {
