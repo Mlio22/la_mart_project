@@ -215,7 +215,12 @@ export class AmountElement {
   #listenAmount() {
     this.#amountElement.addEventListener("change", (e) => {
       let amount = e.target.value;
-      amount = parseInt(amount);
+
+      // set amount to zero if NaN
+      if (amount == "") {
+        this.#amountElement.value = 1;
+        amount = 1;
+      }
 
       this.item.setSeveralItemData({ amount });
     });
