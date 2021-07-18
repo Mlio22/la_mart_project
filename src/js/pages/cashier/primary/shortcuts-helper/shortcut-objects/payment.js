@@ -109,10 +109,14 @@ export class Payment extends Submenu {
     this._submenu.hideSubmenu();
 
     if (this.#isSufficient) {
-      this._submenu.cashier.childs.transactionList.completeCurrentTransaction({
+      // set the current transaction cashInfo
+      this._submenu.cashier.childs.transactionList.currentTransaction.cashInfo = {
         customer: this.#customerMoney,
         totalPrice: this.#total,
-      });
+      };
+
+      // complete the current transaction
+      this._submenu.cashier.childs.transactionList.completeCurrentTransaction();
     }
   }
 

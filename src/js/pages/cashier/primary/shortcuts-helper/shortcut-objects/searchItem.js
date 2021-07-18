@@ -209,11 +209,6 @@ export class SearchItem extends Submenu {
 
     // when item is selected, close the search-item
     this._submenu.hideSubmenu();
-
-    // focus to latest barcode in list if itemReference is exist
-    if (this.#itemReference) {
-      this.#itemReference.itemList.focusToLatestBarcode();
-    }
   }
 }
 
