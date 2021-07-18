@@ -62,26 +62,14 @@ const openTransactionHTML = `
     </div>`;
 
 const checkBalanceHTML = `
-<div class="checkBalance-header">Cek Saldo</div>
+<div class="checkBalance-header">Saldo Kasir</div>
 <div class="checkBalance-content">
-    <div class="customer">
-        <div class="customer-header">Uang:</div>
-        Rp.<input class="customer-content">
-    </div>
-    <div class="price">
-        <div class="price-header">Total Belanja:</div>
-        Rp.<input class="price-content" readonly>
-    </div>
-    <div class="divider"></div>
-    <div class="change">
-        <div class="change-header">Kembalian:</div>
-        Rp.<input class="change-content" readonly>
+    <div class="balance">
+        <div class="balance-header">Jumlah Uang:</div>
+        Rp.<input class="balance-content" readonly>
     </div>
 </div>
-<div class="payment-actions">
-    <button class="cancel">
-        <i class="fas fa-times"></i>Batalkan
-    </button>
+<div class="checkBalance-actions">
     <button class="proceed">
         <i class="fas fa-check"></i>Selesai
     </button>
