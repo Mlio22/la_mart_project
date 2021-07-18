@@ -8,13 +8,14 @@ import { Item } from "./item.js";
 
 export class ItemList {
   #items = [];
+  #isTransactionCompleted = false;
 
-  constructor(transaction) {
+  constructor(transaction, starterItem = undefined) {
     this.transaction = transaction;
     this.itemElement = transaction.transactionList.cashier.element.querySelector("table.purchases");
 
     // creates new item in list
-    this.createNewItem();
+    this.createNewItem(starterItem);
   }
 
   // function called from above and below
@@ -22,17 +23,23 @@ export class ItemList {
     // above: used in submenu(search-item)
     // below: used in Item
 
-    if (itemData !== undefined) {
+    if (this.#isTransactionCompleted) {
+      // if transaction is already completed, but an item added from search item (shortcut)
+      // start a new transaction and add that item to it
+      this.transaction.transactionList.createTransaction(itemData);
+      return;
+    }
+
+    if (itemData !== undefined && this.items.length > 0) {
       // check if item is already on list
       const itemIndexOnList = this.#returnItemWithSameBarcode(itemData);
 
       if (itemIndexOnList !== -1) {
-        console.log(itemIndexOnList);
         // increase the amount
         this.#items[itemIndexOnList].increaseAmount(1);
       } else {
         // add item to latest empty item in list
-        this.#items[this.#items.length - 1].data = itemData;
+        this.#items[this.#items.length - 1].data = { data: itemData, code: 22 };
       }
     } else {
       // add item if not duplicate (including empty item)
@@ -50,14 +57,12 @@ export class ItemList {
     const duplicatedItemIndex = this.#returnItemWithSameBarcode(itemReference.data, indexOnList);
 
     if (duplicatedItemIndex >= 0) {
+      // add the same amount of new item to duplicated item
       const duplicatedItem = this.#items[duplicatedItemIndex];
-      if (indexOnList <= duplicatedItemIndex) {
-        const { amount } = duplicatedItem.data;
-        itemReference.increaseAmount(amount);
-      } else {
-        const { amount } = itemReference.data;
-        duplicatedItem.increaseAmount(amount);
-      }
+
+      const { amount } = itemReference.data;
+      duplicatedItem.increaseAmount(amount);
+
       return true;
     }
     return false;
@@ -70,7 +75,12 @@ export class ItemList {
       this.#items.splice(index, 1);
     }
 
-    this.#checkItemToAffectShortcut();
+    if (this.#isTransactionCompleted && this.#items.length === 0) {
+      // when transaction is already completed and itemlist is none, start other transaction
+      this.transaction.transactionList.cancelCurrentTransaction();
+    } else {
+      this.#checkItemToAffectShortcut();
+    }
   }
 
   refreshTotalPrice() {
@@ -92,17 +102,23 @@ export class ItemList {
     this.#items[this.#items.length - 1].deleteThisItem();
   }
 
-  restoreItemList(readonly = false) {
+  restoreItemList(isTransactionCompleted = false) {
     // recreate all items UI
-    this.#items = this.#items.map((item) => new Item(this, this.itemElement, item.data, { isRestore: true, readonly }));
-  }
-
-  lockAllItems() {
-    this.#items.forEach((item) => item.ui.lockItem());
+    this.#isTransactionCompleted = isTransactionCompleted;
+    this.#items = this.#items.map(
+      (item) => new Item(this, this.itemElement, item.data, { isRestore: true, isTransactionCompleted })
+    );
   }
 
   focusToLatestBarcode() {
     this.#items[this.#items.length - 1].ui.childElements.barcodeElement.focus();
+  }
+
+  transactionCompleted() {
+    // this only called once when transaction is completed
+    // because when a transaction is completed it can be set again to working / saved
+    this.#isTransactionCompleted = true;
+    this.#items.forEach((item) => item.itemTransactionCompleted());
   }
 
   #checkItemToAffectShortcut() {

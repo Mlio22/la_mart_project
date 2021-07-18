@@ -62,12 +62,16 @@ function item_searcher(hint, params = ["name", "barcode"], filteredItems = EXAMP
 }
 
 export class SearchItem extends Submenu {
-  #selectedItem = null;
   #filteredItems = [];
-  #itemReference;
-  #hint;
+  #selectedItem = null;
+
+  #itemReference = null;
+  #hint = null;
+
   #searchItemHeader;
   #searchItemResult;
+
+  #isAutoCompleteSearch = false;
 
   constructor(submenuWrapper, submenuProperties, params = {}) {
     super(submenuWrapper, submenuProperties);
@@ -131,6 +135,7 @@ export class SearchItem extends Submenu {
         // if Submenu.hideSubmenu() is called before SearchItem established,
         // then the Submenu.#openedSubmenu won't be null, it'll be a SearchItem instance
         // which will block other submenu creation when it called
+        this.#isAutoCompleteSearch = true;
         this.selectedItem = matchedItemsWithBarcode[0];
       }, 10);
     } else {
@@ -170,11 +175,13 @@ export class SearchItem extends Submenu {
     if (this.#itemReference !== null) {
       // if itemReference params exists,
       // change that reference's item using item's method
-      this.#itemReference.data = this.#selectedItem;
+      this.#itemReference.data = { data: this.#selectedItem, code: this.#isAutoCompleteSearch ? 21 : 20 };
     } else {
       // if itemReference doesn't exist (e.g. search-item accessed from shortcut)
       // create new item data on itemList
-      this._submenu.cashier.childs.transactionList.currentTransaction.itemList.createNewItem(this.#selectedItem);
+      this._submenu.cashier.childs.transactionList.currentTransaction.itemList.createNewItem(this.#selectedItem, {
+        isFromShortcut: true,
+      });
     }
   }
 
