@@ -17,7 +17,7 @@ export class Item {
   #ui;
   #itemOptions;
 
-  constructor(itemList, listElement, data, options = {}) {
+  constructor(itemList, listElement, data = { ...EMPTY_ITEM }, options = {}) {
     this.itemList = itemList;
     this.#itemOptions = options;
 
@@ -30,8 +30,40 @@ export class Item {
     this.#restoreOrStartUsual();
   }
 
+  // gather data if available
+  #gatherData(data) {
+    this.#data = {
+      amount: 1,
+      ...data,
+    };
+  }
+
+  #restoreOrStartUsual() {
+    //! don't refresh and check data if item is being restored
+    if (this.#itemOptions.isRestore) {
+      // add ItemLog: Item Restored (11)
+      this.#itemLog.push(new ItemLog(11));
+
+      // lock barcode
+      this.#ui.childElements.barcodeElement.lock();
+    } else {
+      // setting timeout to fix item's index in itemList
+      setTimeout(() => {
+        // add ItemLog: item initialized (blank) (10)
+        this.#itemLog.push(new ItemLog(10));
+
+        this.itemList.refreshTotalPrice();
+        this.#checkData();
+      }, 50);
+    }
+  }
+
+  #isItemEmpty() {
+    // checking if the #data is the same as EMPTY_ITEM
+    return JSON.stringify({ ...this.#data, ...EMPTY_ITEM }) === JSON.stringify(this.#data);
+  }
+
   deleteThisItem() {
-    // function only called from action
     this.itemList.removeItemFromList(this);
     this.#ui.removeUi();
 
@@ -47,25 +79,18 @@ export class Item {
   }
 
   increaseAmount(amount = 1) {
-    // function called only from above (itemList)
-
-    // get previous amount
-    const previousAmount = this.#data.amount;
-    this.setSeveralItemData({ amount: previousAmount + amount });
-
-    // refresh ui
-    this.#ui.itemContent = this.#data;
+    const nextAmount = this.#data.amount + amount;
+    this.setSeveralItemData({ amount: nextAmount });
   }
 
-  openSearchFromItem() {
-    this.itemList.transaction.transactionList.cashier.childs.submenu.openSubmenu("F2", {
-      itemReference: this,
-      hint: this.#data.barcode,
-    });
-  }
+  decreaseAmount(amount = 1) {
+    const nextAmount = this.#data.amount - amount;
 
-  checkDuplicateFromItem() {
-    return this.itemList.checkDuplicateOnList(this);
+    if (nextAmount < 1) {
+      nextAmount = 1;
+    }
+
+    this.setSeveralItemData({ amount: nextAmount });
   }
 
   setSeveralItemData(newData) {
@@ -87,10 +112,6 @@ export class Item {
     this.itemList.refreshTotalPrice();
   }
 
-  itemTransactionCompleted() {
-    this.#itemOptions.isAlreadyCompleted = true;
-  }
-
   #checkData() {
     // go create new item if enough info in previous item
     if (this.#data.valid) {
@@ -99,55 +120,6 @@ export class Item {
     } else {
       this.#ui.childElements.barcodeElement.focus();
     }
-  }
-
-  #gatherData(data) {
-    // gather data if available
-
-    // variable for check if data is already valid
-    let isDataAlreadyValid;
-
-    // default item data
-    if (data === undefined) {
-      data = { ...EMPTY_ITEM };
-      isDataAlreadyValid = false;
-    } else {
-      isDataAlreadyValid = true;
-    }
-
-    // adding other properties
-    this.#data = Object.assign(
-      {
-        amount: 1,
-        valid: isDataAlreadyValid,
-      },
-      { ...data }
-    );
-  }
-
-  #restoreOrStartUsual() {
-    //! don't refresh and check data if item is being restored
-    if (this.#itemOptions.isRestore) {
-      // add ItemLog: Item Restored (11)
-      this.#itemLog.push(new ItemLog(11));
-
-      // lock barcode only in load mode (saved -> working transaction)
-      this.#ui.childElements.barcodeElement.lock();
-    } else {
-      // setting timeout to fix item's index in itemList
-      setTimeout(() => {
-        // add ItemLog: item initialized (blank) (10)
-        this.#itemLog.push(new ItemLog(10));
-
-        this.itemList.refreshTotalPrice();
-        this.#checkData();
-      }, 50);
-    }
-  }
-
-  #isItemEmpty() {
-    // checking if the given itemData is the same as EMPTY_ITEM
-    return JSON.stringify({ ...this.#data, ...EMPTY_ITEM }) === JSON.stringify(this.#data);
   }
 
   get data() {
@@ -182,6 +154,21 @@ export class Item {
 
     this.#ui.itemContent = this.#data;
     this.#checkData();
+  }
+
+  checkDuplicateFromItem() {
+    return this.itemList.checkDuplicateOnList(this);
+  }
+
+  openSearchFromItem() {
+    this.itemList.transaction.transactionList.cashier.childs.submenu.openSubmenu("F2", {
+      itemReference: this,
+      hint: this.#data.barcode,
+    });
+  }
+
+  itemTransactionCompleted() {
+    this.#itemOptions.isAlreadyCompleted = true;
   }
 }
 

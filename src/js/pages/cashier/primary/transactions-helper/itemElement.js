@@ -134,8 +134,9 @@ export class BarcodeElement {
 
     this.#barcodeElement.addEventListener("change", checkChange);
 
+    // double enter to open searchItem
     let isEnteredBeforeTimeout = false;
-    this.#barcodeElement.addEventListener("keydown", ({ key }) => {
+    const checkDoubleEnter = (key) => {
       if (key === "Enter") {
         if (isEnteredBeforeTimeout) {
           isEnteredBeforeTimeout = false;
@@ -148,6 +149,20 @@ export class BarcodeElement {
           }, 200);
         }
       }
+    };
+
+    // arrow up / down to change its amount
+    const changeAmountByArrow = (key) => {
+      if (key === "ArrowUp") {
+        this.item.increaseAmount();
+      } else if (key === "ArrowDown") {
+        this.item.decreaseAmount();
+      }
+    };
+
+    this.#barcodeElement.addEventListener("keydown", ({ key }) => {
+      checkDoubleEnter(key);
+      changeAmountByArrow(key);
     });
   }
 
@@ -208,6 +223,7 @@ export class AmountElement {
     this.#amountElement.type = "number";
     this.#amountElement.value = firstAmount;
     this.#amountElement.min = 1;
+    this.#amountElement.max = 10;
 
     this.#amountWrapper.appendChild(this.#amountElement);
   }
