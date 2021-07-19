@@ -15,17 +15,21 @@ export class Item {
 
   #data;
   #ui;
-  #itemOptions;
+  #transactionStatus;
 
-  constructor(itemList, listElement, data = { ...EMPTY_ITEM }, options = {}) {
+  constructor(itemList, listElement, data = { ...EMPTY_ITEM }) {
     this.itemList = itemList;
-    this.#itemOptions = options;
+    this.#transactionStatus = {
+      isWorking: this.itemList.transaction.working,
+      isSaved: this.itemList.transaction.saved,
+      isCompleted: this.itemList.transaction.completed,
+    };
 
     // gathering data
     this.#gatherData(data);
 
     // add ui class property
-    this.#ui = new ItemUI(this, listElement, this.#data);
+    this.#ui = new ItemUI(this, listElement, { ...this.#data });
 
     this.#restoreOrStartUsual();
   }
@@ -39,22 +43,25 @@ export class Item {
   }
 
   #restoreOrStartUsual() {
-    //! don't refresh and check data if item is being restored
-    if (this.#itemOptions.isRestore) {
-      // add ItemLog: Item Restored (11)
-      this.#itemLog.push(new ItemLog(11));
-
-      // lock barcode
-      this.#ui.childElements.barcodeElement.lock();
-    } else {
+    if (this.#transactionStatus.isWorking) {
       // setting timeout to fix item's index in itemList
       setTimeout(() => {
-        // add ItemLog: item initialized (blank) (10)
-        this.#itemLog.push(new ItemLog(10));
-
         this.itemList.refreshTotalPrice();
         this.#checkData();
+
+        // add ItemLog: item initialized (blank) (10)
+        this.#itemLog.push(new ItemLog(10));
       }, 50);
+    }
+
+    // for loading previous transaction and restoring completed transaction
+    else {
+      //! don't refresh and check data if item is being restored
+      // lock barcode
+      this.#ui.childElements.barcodeElement.lock();
+
+      // add ItemLog: Item Restored (11)
+      this.#itemLog.push(new ItemLog(11));
     }
   }
 
@@ -74,7 +81,7 @@ export class Item {
     if (this.#isItemEmpty()) {
       this.#itemLog.push(new ItemLog(42));
     } else {
-      this.#itemLog.push(new ItemLog(this.#itemOptions.isAlreadyCompleted ? 41 : 40));
+      this.#itemLog.push(new ItemLog(this.#transactionStatus.isCompleted ? 41 : 40));
     }
   }
 
@@ -98,7 +105,8 @@ export class Item {
     const newDataProperty = { ...this.#data, ...newData };
 
     // logging
-    const logCode = this.#itemOptions.isAlreadyCompleted ? 31 : 30;
+    const logCode = this.#transactionStatus.isCompleted ? 31 : 30;
+
     this.#itemLog.push(
       new ItemLog(logCode, {
         before: { ...this.#data },
@@ -168,7 +176,8 @@ export class Item {
   }
 
   itemTransactionCompleted() {
-    this.#itemOptions.isAlreadyCompleted = true;
+    this.#transactionStatus.isCompleted = true;
+
   }
 }
 

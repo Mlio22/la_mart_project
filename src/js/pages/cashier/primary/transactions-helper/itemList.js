@@ -14,6 +14,8 @@ export class ItemList {
     this.transaction = transaction;
     this.itemElement = transaction.transactionList.cashier.element.querySelector("table.purchases");
 
+    this.#isTransactionCompleted = this.transaction.completed;
+
     // creates new item in list
     this.createNewItem(starterItem);
   }
@@ -96,13 +98,10 @@ export class ItemList {
     this.#items[this.#items.length - 1].deleteThisItem();
   }
 
-  restoreItemList({ isTransactionCompleted = false }) {
-    this.#isTransactionCompleted = isTransactionCompleted;
-
+  restoreItemList() {
     // recreate all items UI
-    this.#items = this.#items.map(
-      (item) => new Item(this, this.itemElement, item.data, { isRestore: true, isTransactionCompleted })
-    );
+    this.#items = this.#items.map((item) => new Item(this, this.itemElement, item.data));
+
   }
 
   focusToLatestBarcode() {

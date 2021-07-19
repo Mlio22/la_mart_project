@@ -214,7 +214,7 @@ class Transaction {
 
   #loadTransaction() {
     // restore items
-    this.#transactionInfo.itemList.restoreItemList({ isTransactionCompleted: false });
+    this.#transactionInfo.itemList.restoreItemList();
 
     // add new empty element
     this.transactionInfo.itemList.createNewItem();
@@ -225,7 +225,7 @@ class Transaction {
 
   #restoreTransaction() {
     // restore items
-    this.#transactionInfo.itemList.restoreItemList({ isTransactionCompleted: true });
+    this.#transactionInfo.itemList.restoreItemList();
 
     // restore the totalPrice
     this.transactionInfo.itemList.refreshTotalPrice();
