@@ -41,8 +41,10 @@ export class ItemList {
         // add item to latest empty item in list
         this.#items[this.#items.length - 1].data = { data: itemData, code: 22 };
       }
-    } else {
-      // add item if not duplicate (including empty item)
+    }
+
+    // add item if not duplicate (including empty item)
+    else {
       const newItem = new Item(this, this.itemElement, itemData);
       this.#items.push(newItem);
     }

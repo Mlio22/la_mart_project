@@ -112,6 +112,9 @@ export class TransactionList {
 
     // check transaction list
     this.#checkTransactionsList();
+
+    // focus to cashier, especially when transaction completed
+    this.cashier.focus();
   }
 
   cancelCurrentTransaction() {
@@ -172,6 +175,18 @@ export class TransactionList {
 
   get currentTransaction() {
     return this.#currentTransaction;
+  }
+
+  inputFromCashier() {
+    // having cashier input when the cashier is focused
+
+    // if a transaction is completed, start a new one
+    if (this.#currentTransaction.completed) {
+      this.createTransaction();
+    }
+
+    // focus to latest barcode
+    this.#currentTransaction.itemList.focusToLatestBarcode();
   }
 }
 

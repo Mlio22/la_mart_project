@@ -19,7 +19,23 @@ class CashierUI {
 
     // submenu
     this.#cashierChild.submenu = new SubmenuWrapper(this);
+
+    this.#setCashierListener();
   }
+
+  #setCashierListener() {
+    // regex for: letters and numbers only
+    const regex = /^[A-Za-z0-9]*$/;
+    // auto add to item if detected string input when cashier focused
+    this.cashierElement.addEventListener("keydown", ({ target, key }) => {
+      if (target === this.cashierElement) {
+        if (key.length === 1 && regex.test(key)) {
+          this.#cashierChild.transactionList.inputFromCashier(key);
+        }
+      }
+    });
+  }
+
   get childs() {
     // called from almost child classes
     return this.#cashierChild;
@@ -28,6 +44,10 @@ class CashierUI {
   get element() {
     // called from children class constructors (transactions, shortcuts, paymentDetails and totalPrice)
     return this.cashierElement;
+  }
+
+  focus() {
+    this.cashierElement.focus();
   }
 }
 
