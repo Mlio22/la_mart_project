@@ -57,8 +57,8 @@ export class ActionElement {
     return this.#actionWrapper;
   }
 
-  set deletable(isDeletable) {
-    this.#isDeletable = isDeletable;
+  ableToDelete() {
+    this.#isDeletable = true;
     this.#setButtonAblity();
   }
 }
@@ -75,6 +75,8 @@ export class BarcodeElement {
 
     // create the barcode ui
     this.#createBarcodeElement(firstBarcode);
+
+    if (this.item.data.valid) this.lock();
   }
 
   focus() {

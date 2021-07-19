@@ -57,9 +57,6 @@ export class Item {
     // for loading previous transaction and restoring completed transaction
     else {
       //! don't refresh and check data if item is being restored
-      // lock barcode
-      this.#ui.childElements.barcodeElement.lock();
-
       // add ItemLog: Item Restored (11)
       this.#itemLog.push(new ItemLog(11));
     }
