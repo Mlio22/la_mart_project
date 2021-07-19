@@ -6,8 +6,8 @@ const EMPTY_ITEM = {
   barcode: "",
   name: "",
   quantity: "",
-  amount: 1,
   price: 0,
+  valid: false,
 };
 
 export class Item {

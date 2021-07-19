@@ -6,30 +6,35 @@ const EXAMPLE_ITEMS_FROM_API = [
     name: "A",
     quantity: "Kotak",
     price: 200000,
+    valid: true,
   },
   {
     barcode: "132",
     name: "B",
     quantity: "Box",
     price: 10000,
+    valid: true,
   },
   {
     barcode: "221",
     name: "C",
     quantity: "Sachet",
     price: 2000,
+    valid: true,
   },
   {
     barcode: "222",
     name: "C",
     quantity: "Bungkus",
     price: 21000,
+    valid: true,
   },
   {
     barcode: "231",
     name: "D",
     quantity: "Pcs",
     price: 10500,
+    valid: true,
   },
 ];
 
