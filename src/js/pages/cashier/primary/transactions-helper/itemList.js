@@ -101,7 +101,6 @@ export class ItemList {
   restoreItemList() {
     // recreate all items UI
     this.#items = this.#items.map((item) => new Item(this, this.itemElement, item.data));
-
   }
 
   focusToLatestBarcode() {
@@ -112,7 +111,8 @@ export class ItemList {
     // this only called once when transaction is completed
     // because a completed cannot be set again to working / saved
     this.#isTransactionCompleted = true;
-    this.#items.forEach((item) => item.itemTransactionCompleted());
+    // recheck the transaction status in items
+    this.#items.forEach((item) => item.checkTransactionStatus());
   }
 
   #checkItemToAffectShortcut() {

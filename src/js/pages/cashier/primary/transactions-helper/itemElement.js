@@ -18,7 +18,7 @@ export class ActionElement {
     this.#actionWrapper.className = `purchases-content action-content no-input`;
 
     this.#actionButton = document.createElement("button");
-    this.#actionButton.classname = "focusable";
+    this.#actionButton.className = "focusable";
     this.#actionButton.innerHTML = `<i class="fas fa-times "></i>`;
     this.#setButtonAblity();
 
@@ -208,12 +208,21 @@ export class AmountElement {
   #amountWrapper;
   #amountElement;
 
+  #maxAmountValue = 0;
+
+  #isTransactionCompleted;
+
   constructor(item) {
     this.item = item;
 
+    // set the value
     const firstAmount = item.data.amount;
 
+    // initialize
     this.#createAmountElement(firstAmount);
+    this.#checkTransactionStatus();
+
+    // listener
     this.#listenAmount();
   }
 
@@ -225,7 +234,6 @@ export class AmountElement {
     this.#amountElement.type = "number";
     this.#amountElement.value = firstAmount;
     this.#amountElement.min = 1;
-    this.#amountElement.max = 10;
 
     this.#amountWrapper.appendChild(this.#amountElement);
   }
@@ -240,8 +248,23 @@ export class AmountElement {
         amount = 1;
       }
 
+      amount = parseInt(amount);
+
+      // set amount below max if completed
+      if (this.#isTransactionCompleted && amount > this.#maxAmountValue) {
+        this.#amountElement.value = this.#maxAmountValue;
+        amount = this.#maxAmountValue;
+      }
+
       this.item.setSeveralItemData({ amount });
     });
+  }
+
+  #checkTransactionStatus() {
+    this.#isTransactionCompleted = this.item.transactionStatus.isCompleted;
+    if (this.#isTransactionCompleted) {
+      this.setMaxAmount();
+    }
   }
 
   get element() {
@@ -253,5 +276,15 @@ export class AmountElement {
     // set amount input value
     // function called from itemUi
     this.#amountElement.value = amount;
+  }
+
+  setMaxAmount() {
+    console.log(this.item.data);
+    this.#isTransactionCompleted = true;
+    // set max amount if transaction is completed
+    this.#maxAmountValue = this.item.data.maxAmount;
+    this.#amountElement.max = this.#maxAmountValue;
+
+    console.log(this.#maxAmountValue);
   }
 }

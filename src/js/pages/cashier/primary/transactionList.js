@@ -213,25 +213,22 @@ class Transaction {
   }
 
   #loadTransaction() {
-    // restore items
-    this.#transactionInfo.itemList.restoreItemList();
-
-    // add new empty element
-    this.transactionInfo.itemList.createNewItem();
-
     // set transaction status  to 1 (working)
     this.#transactionInfo.status = 1;
+
+    // restore items
+    this.#transactionInfo.itemList.restoreItemList();
   }
 
   #restoreTransaction() {
+    // set transaction status  to 3 (completed)
+    this.#transactionInfo.status = 3;
+
     // restore items
     this.#transactionInfo.itemList.restoreItemList();
 
     // restore the totalPrice
     this.transactionInfo.itemList.refreshTotalPrice();
-
-    // set transaction status  to 3 (completed)
-    this.#transactionInfo.status = 3;
   }
 
   #addLog(code) {
@@ -239,11 +236,11 @@ class Transaction {
   }
 
   saveTransaction() {
-    // remove last empty item
-    this.transactionInfo.itemList.removeLastEmptyItem();
-
     // change current transaction's status to 2 (saved)
     this.#transactionInfo.status = 2;
+
+    // remove last empty item
+    this.transactionInfo.itemList.removeLastEmptyItem();
 
     // add TransactionLog: saved (2)
     this.#addLog(2);
@@ -252,24 +249,24 @@ class Transaction {
   completeTransaction() {
     this.transactionInfo.itemList.removeLastEmptyItem();
 
-    // set current item to completed
-    this.itemList.setToTransactionCompletedState();
-
     // change current transaction's status to 3 (completed)
     this.#transactionInfo.status = 3;
+
+    // set current item to completed
+    this.itemList.setToTransactionCompletedState();
 
     // add TransactionLog: completed (3)
     this.#addLog(3);
   }
 
   cancelTransaction() {
-    const isTransactionCompleted = this.#transactionInfo.status === 3;
+    const isTransactionCompleted = this.completed;
 
     // change status to 4 (cancelled) or 5 (cancelled after completed)
-    this.#transactionInfo.status = isTransactionCompleted ? 4 : 5;
+    this.#transactionInfo.status = isTransactionCompleted ? 5 : 4;
 
     // log with code 4 (cancelled) or 5 (cancelled after completed)
-    this.#addLog(isTransactionCompleted ? 4 : 5);
+    this.#addLog(isTransactionCompleted ? 5 : 4);
   }
 
   reopenTransaction() {

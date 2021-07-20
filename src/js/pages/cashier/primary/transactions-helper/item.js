@@ -15,15 +15,11 @@ export class Item {
 
   #data;
   #ui;
-  #transactionStatus;
+  transactionStatus;
 
   constructor(itemList, listElement, data = { ...EMPTY_ITEM }) {
     this.itemList = itemList;
-    this.#transactionStatus = {
-      isWorking: this.itemList.transaction.working,
-      isSaved: this.itemList.transaction.saved,
-      isCompleted: this.itemList.transaction.completed,
-    };
+    this.#gatherTransactionStatus();
 
     // gathering data
     this.#gatherData(data);
@@ -32,6 +28,14 @@ export class Item {
     this.#ui = new ItemUI(this, listElement, { ...this.#data });
 
     this.#restoreOrStartUsual();
+  }
+
+  #gatherTransactionStatus() {
+    this.transactionStatus = {
+      isWorking: this.itemList.transaction.working,
+      isSaved: this.itemList.transaction.saved,
+      isCompleted: this.itemList.transaction.completed,
+    };
   }
 
   // gather data if available
@@ -43,7 +47,7 @@ export class Item {
   }
 
   #restoreOrStartUsual() {
-    if (this.#transactionStatus.isWorking) {
+    if (this.transactionStatus.isWorking) {
       // setting timeout to fix item's index in itemList
       setTimeout(() => {
         this.itemList.refreshTotalPrice();
@@ -62,9 +66,41 @@ export class Item {
     }
   }
 
+  #checkData() {
+    // go create new item if enough info in previous item
+    if (this.#data.valid) {
+      this.#ui.childElements.barcodeElement.lock();
+      this.itemList.createNewItem();
+    } else {
+      this.#ui.childElements.barcodeElement.focus();
+    }
+  }
+
   #isItemEmpty() {
     // checking if the #data is the same as EMPTY_ITEM
     return JSON.stringify({ ...this.#data, ...EMPTY_ITEM }) === JSON.stringify(this.#data);
+  }
+
+  #setMaxAmount() {
+    console.log("setting max amount");
+    // setting maxAmount
+    const { amount } = this.#data;
+    this.#data = {
+      maxAmount: amount,
+      ...this.#data,
+    };
+
+    this.#ui.childElements.amountElement.setMaxAmount();
+  }
+
+  checkTransactionStatus() {
+    console.log("checking status");
+    // renew the transaction statusses
+    this.#gatherTransactionStatus();
+
+    if (this.transactionStatus.isCompleted) {
+      this.#setMaxAmount();
+    }
   }
 
   deleteThisItem() {
@@ -78,7 +114,7 @@ export class Item {
     if (this.#isItemEmpty()) {
       this.#itemLog.push(new ItemLog(42));
     } else {
-      this.#itemLog.push(new ItemLog(this.#transactionStatus.isCompleted ? 41 : 40));
+      this.#itemLog.push(new ItemLog(this.transactionStatus.isCompleted ? 41 : 40));
     }
   }
 
@@ -102,7 +138,7 @@ export class Item {
     const newDataProperty = { ...this.#data, ...newData };
 
     // logging
-    const logCode = this.#transactionStatus.isCompleted ? 31 : 30;
+    const logCode = this.transactionStatus.isCompleted ? 31 : 30;
 
     this.#itemLog.push(
       new ItemLog(logCode, {
@@ -115,16 +151,6 @@ export class Item {
     this.#ui.itemContent = this.#data;
 
     this.itemList.refreshTotalPrice();
-  }
-
-  #checkData() {
-    // go create new item if enough info in previous item
-    if (this.#data.valid) {
-      this.#ui.childElements.barcodeElement.lock();
-      this.itemList.createNewItem();
-    } else {
-      this.#ui.childElements.barcodeElement.focus();
-    }
   }
 
   get data() {
@@ -170,11 +196,6 @@ export class Item {
       itemReference: this,
       hint: this.#data.barcode,
     });
-  }
-
-  itemTransactionCompleted() {
-    this.#transactionStatus.isCompleted = true;
-
   }
 }
 
@@ -238,7 +259,9 @@ class ItemUI {
       totalPriceElement,
     } = this.#itemContentElement;
 
-    actionElement.deletable = valid;
+    // set action to delete if valid
+    if (valid) actionElement.ableToDelete();
+
     barcodeElement.barcode = barcode;
     nameElement.text = name;
     quantityElement.text = quantity;
