@@ -46,6 +46,7 @@ class Home {
       height: 720,
       webPreferences: {
         nodeIntegration: true,
+        enableRemoteModule: true,
       },
     });
 
