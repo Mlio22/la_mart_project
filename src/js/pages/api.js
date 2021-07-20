@@ -1,3 +1,1 @@
-export class APIAccess {
-
-}
+export class APIAccess {}

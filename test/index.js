@@ -4,6 +4,9 @@ const chaiAsPromised = require("chai-as-promised");
 const electronPath = require("electron");
 const path = require("path");
 
+// example for loading mjs file (non type: module)
+// const { set_proper_price } = await import("../src/js/pages/etc/others.mjs");
+
 chai.should();
 chai.use(chaiAsPromised);
 
@@ -29,8 +32,9 @@ describe("Starting App", function () {
     }
   });
 
-  it("opens home window", function async() {
-    this.app.client.waitUntilWindowLoaded();
+  it("opens home window", async function () {
+    await this.app.client.waitUntilWindowLoaded();
+
     return this.app.client.getWindowCount().should.eventually.have.at.least(1);
   });
 });

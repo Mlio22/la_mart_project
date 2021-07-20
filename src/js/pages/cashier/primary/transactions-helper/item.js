@@ -1,5 +1,5 @@
 import { BarcodeElement, TextElement, ActionElement, AmountElement } from "./itemElement.js";
-import { set_proper_price } from "../../../etc/others.js";
+import { set_proper_price } from "../../../etc/others.mjs";
 import { ItemLog } from "../../../etc/Log.js";
 
 const EMPTY_ITEM = {
