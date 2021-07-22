@@ -1,0 +1,60 @@
+.submenu .check-balance {
+    margin: auto;
+    height: 300px;
+    width: 400px;
+}
+.submenu .check-balance .checkBalance-header {
+    text-align: center;
+    font-size: 28px;
+    padding-top: 20px;
+}
+.submenu .check-balance .checkBalance-content {
+    padding: 25px 25px;
+    margin-top: 20px;
+    font-size: 24px;
+}
+.submenu .check-balance .checkBalance-content > div:not(.divider) {
+    margin: 15px 0;
+    display: flex;
+}
+.submenu .check-balance .checkBalance-content > div:not(.divider) > div {
+    width: calc(50% - 20px);
+}
+.submenu .check-balance .checkBalance-content > div:not(.divider) > input {
+    width: 50%;
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    outline: none;
+    padding: 0 10px;
+}
+.submenu .check-balance .checkBalance-content .divider {
+    height: 1px;
+    background-color: #707070;
+    width: 100%;
+}
+.submenu .check-balance .checkBalance-actions {
+    padding: 0 40px;
+    display: flex;
+    width: calc(100% - 80px);
+}
+.submenu .check-balance .checkBalance-actions > button {
+    margin: auto;
+    text-align: center;
+    padding: 25px 30px;
+    background-color: #DCDCDC;
+    font-size: 20px;
+    border-radius: 10px;
+    transition: 0.1s all;
+    border: #c5c4c4 1px solid;
+}
+.submenu .check-balance .checkBalance-actions > button > i {
+    margin-right: 10px;
+}
+.submenu .check-balance .checkBalance-actions > button:hover:not(:disabled) {
+    box-shadow: inset 7px 7px 15px rgba(167, 166, 166, 0.3), inset -7px -7px 7px #c7c7c726, 0px 0px 4px rgba(167, 166, 166, 0.3);
+    cursor: pointer;
+}
+.submenu .check-balance .checkBalance-actions > button:hover:disabled {
+    cursor: not-allowed;
+}

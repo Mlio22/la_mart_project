@@ -3,6 +3,7 @@ import { Payment } from "./shortcut-objects/payment.js";
 import { Cancel } from "./shortcut-objects/cancel.js";
 import { OpenTransaction } from "./shortcut-objects/openTransaction.js";
 import { SearchItem } from "./shortcut-objects/searchItem.js";
+import { CheckBalance } from "./shortcut-objects/checkBalance.js";
 
 // functions
 import { newTransaction } from "./shortcut-functions/newTransaction.js";
@@ -60,6 +61,20 @@ const openTransactionHTML = `
         <div class="time">Waktu</div>
     </div>`;
 
+const checkBalanceHTML = `
+<div class="checkBalance-header">Saldo Kasir</div>
+<div class="checkBalance-content">
+    <div class="balance">
+        <div class="balance-header">Jumlah Uang:</div>
+        Rp.<input class="balance-content" readonly>
+    </div>
+</div>
+<div class="checkBalance-actions">
+    <button class="proceed">
+        <i class="fas fa-check"></i>Selesai
+    </button>
+</div>`;
+
 export const submenuButtons = {
   F1: {
     name: "help",
@@ -109,6 +124,8 @@ export const submenuButtons = {
   },
   F12: {
     name: "check-balance",
+    object: CheckBalance,
+    html: checkBalanceHTML,
     initialAvailabiilty: true,
   },
 };
