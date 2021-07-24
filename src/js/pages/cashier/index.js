@@ -11,6 +11,7 @@ class Cashier {
     this.#cashierWin = new BrowserWindow({
       webPreferences: {
         nodeIntegration: true,
+        enableRemoteModule: true,
       },
       minWidth: 1200,
       minHeight: 768,

@@ -1,40 +1,45 @@
 const Application = require("spectron").Application;
-const chai = require("chai");
-const chaiAsPromised = require("chai-as-promised");
 const electronPath = require("electron");
 const path = require("path");
+const expect = require("chai").expect;
+const itemSuite = require("./item");
+const { sleep } = require("./helper");
 
 // example for loading mjs file (non type: module)
 // const { set_proper_price } = await import("../src/js/pages/etc/others.mjs");
 
-chai.should();
-chai.use(chaiAsPromised);
+describe("Application launch", function () {
+  // test timeout
+  this.timeout(100000);
 
-describe("Starting App", function () {
-  this.timeout(10000);
+  const app = new Application({
+    path: electronPath,
+    args: [path.join(__dirname, "..")],
+  });
 
   // start-up
-  before("starting app", function () {
-    this.app = new Application({
-      path: electronPath,
-      args: [path.join(__dirname, "..")],
+  before("starting app", () => app.start());
+
+  // stop app at the end
+  after("stopping app", () => app.stop());
+
+  it("opens home page", async () => {});
+
+  describe("#cashier", () => {
+    before("opens cashier", async () => {
+      const cashierButton = await app.client.$(".menusWrapper__menu.open-cashier");
+      await cashierButton.click();
+
+      // focus to second window (cashier)
+      await app.client.windowByIndex(1);
     });
 
-    chaiAsPromised.transferPromiseness = this.app.transferPromiseness;
+    it("the total windows should be 2", async () => {
+      const totalWindow = await app.client.getWindowCount();
+      expect(totalWindow).to.be.equal(2);
+    });
 
-    return this.app.start();
-  });
-
-  // close app after all test cases passed
-  after(function () {
-    if (this.app && this.app.isRunning()) {
-      return this.app.stop();
-    }
-  });
-
-  it("opens home window", async function () {
-    await this.app.client.waitUntilWindowLoaded();
-
-    return this.app.client.getWindowCount().should.eventually.have.at.least(1);
+    // test for items
+    itemSuite(app);
   });
 });
