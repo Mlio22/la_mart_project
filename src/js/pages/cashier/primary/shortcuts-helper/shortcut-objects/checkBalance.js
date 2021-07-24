@@ -1,4 +1,4 @@
-import { set_proper_price } from "../../../../etc/others.js";
+import { set_proper_price } from "../../../../etc/others.mjs";
 import { Submenu } from "./SubmenuPrototype.js";
 
 export class CheckBalance extends Submenu {
@@ -13,8 +13,8 @@ export class CheckBalance extends Submenu {
     this.#completedTransactions = submenuWrapper.cashier.childs.transactionList.retrieveTransactionList(3);
 
     const getBalance = (sum, transaction) => sum + transaction.transactionInfo.cashInfo.totalPrice;
-    this.#cashierMoney = this.#completedTransactions.reduce(getBalance,0);
-    
+    this.#cashierMoney = this.#completedTransactions.reduce(getBalance, 0);
+
     this._initializeSubmenu();
   }
 
