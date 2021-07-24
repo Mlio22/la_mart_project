@@ -11,7 +11,7 @@ async function item(app) {
 
       // always check first element after refreshing
       // check first item content status
-      expect(barcodeInputs.length).to.be.equal(1);
+      await expectItemCount(1);
       expect(await actionButtons[0].getAttribute("disabled")).to.be.string("true");
     });
 
@@ -25,7 +25,7 @@ async function item(app) {
       totalPrices = await app.client.$$(".cashier .total-price-content");
     }
 
-    const addDirectly = async (barcode) => {
+    const addItemDirectly = async (barcode) => {
       // add item directly. the barcode must be precise, or it'll open searchItem
       await refreshElementGetters();
 
@@ -37,7 +37,7 @@ async function item(app) {
       await refreshElementGetters();
     };
 
-    const addThroughSearchItem = async (starterBarcode, searchItemIndex = 0) => {
+    const addItemThroughSearchItem = async (starterBarcode, searchItemIndex = 0) => {
       // add item through searchItem. must be not precise, otherwise it'll set directly and searchItem won't open
       await refreshElementGetters();
 
@@ -80,6 +80,20 @@ async function item(app) {
       expect(totalPrice).to.be.string(a_totalPrice);
     };
 
+    const expectSummaryPriceValue = async (a_summaryPriceValue) => {
+      // expect the summary price below the cashier page
+      const summaryPriceElement = await app.client.$(".cashier .total-price .total-price-content"),
+        summaryPriceValue = await summaryPriceElement.getText();
+
+      expect(summaryPriceValue).to.be.equal(`Rp. ${a_summaryPriceValue}`);
+    };
+
+    const expectItemCount = async (a_count) => {
+      const itemCount = await app.client.$$(".cashier tr.purchases-contents");
+
+      expect(itemCount.length).to.be.equal(a_count);
+    };
+
     const deleteItemByIndex = async (itemIndex = 0) => {
       await refreshElementGetters();
 
@@ -93,21 +107,22 @@ async function item(app) {
       describe("add item directly", () => {
         it("add item (directly correct)", async () => {
           // add one item
-          await addDirectly("222");
+          await addItemDirectly("222");
 
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "1", "21.000"]);
           await expectItemValues(1, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("21.000");
         });
 
         it("add multiple items (directly correct)", async () => {
           // add 6 items, because AVAILABLE_ITEM has only 5 items, 1 of it must be duplicated
-          await addDirectly("222");
-          await addDirectly("221");
-          await addDirectly("121");
-          await addDirectly("222");
-          await addDirectly("132");
-          await addDirectly("231");
+          await addItemDirectly("222");
+          await addItemDirectly("221");
+          await addItemDirectly("121");
+          await addItemDirectly("222");
+          await addItemDirectly("132");
+          await addItemDirectly("231");
 
           // get totalAmount it that transaction
           let totalAmount = 0;
@@ -118,7 +133,7 @@ async function item(app) {
 
           // expect 6 + 1 of total amount, because 6 items added, and 1 is empty item (idle)
           expect(totalAmount).to.be.equal(6 + 1);
-          expect(barcodeInputs.length).to.be.equal(6);
+          await expectItemCount(6);
 
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "2", "42.000"]);
           await expectItemValues(1, [null, "221", "C", "2.000", "Sachet", "1", "2.000"]);
@@ -126,214 +141,238 @@ async function item(app) {
           await expectItemValues(3, [null, "132", "B", "10.000", "Box", "1", "10.000"]);
           await expectItemValues(4, [null, "231", "D", "10.500", "Pcs", "1", "10.500"]);
           await expectItemValues(5, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("264.500");
         });
       });
 
       describe("add through search item", () => {
         it("add item", async () => {
-          //   enter 22 to first barcode, the first item on searchItem index will be selected automatically, check addThroughSearchItem for details
-          await addThroughSearchItem("22");
+          //   enter 22 to first barcode, the first item on searchItem index will be selected automatically, check addItemThroughSearchItem for details
+          await addItemThroughSearchItem("22");
 
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           await expectItemValues(0, [null, "221", "C", "2.000", "Sachet", "1", "2.000"]);
           await expectItemValues(1, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("2.000");
         });
 
         it("add different items", async () => {
           // add first item throught searchItem
-          await addThroughSearchItem("22");
+          await addItemThroughSearchItem("22");
 
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           expect(await actionButtons[0].getAttribute("disabled")).to.be.null;
 
           // add second item
-          await addThroughSearchItem("22", 1);
+          await addItemThroughSearchItem("22", 1);
 
           await refreshElementGetters();
 
-          expect(barcodeInputs.length).to.be.equal(3);
+          await expectItemCount(3);
           await expectItemValues(0, [null, "221", "C", "2.000", "Sachet", "1", "2.000"]);
           await expectItemValues(1, [null, "222", "C", "21.000", "Bungkus", "1", "21.000"]);
           await expectItemValues(2, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("23.000");
         });
 
         it("add duplicated items", async () => {
           // add first item throught searchItem
-          await addThroughSearchItem("22");
+          await addItemThroughSearchItem("22");
 
           await refreshElementGetters();
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           expect(await actionButtons[0].getAttribute("disabled")).to.be.null;
 
           // add second item (the same item as above)
-          await addThroughSearchItem("22");
+          await addItemThroughSearchItem("22");
 
           await refreshElementGetters();
 
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           await expectItemValues(0, [null, "221", "C", "2.000", "Sachet", "2", "4.000"]);
           await expectItemValues(1, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("4.000");
         });
       });
 
       describe("hybridly add item (through searchitem and directly)", () => {
         it("add one item directly and one item through searchItem (different items)", async () => {
-          await addDirectly("222");
+          await addItemDirectly("222");
 
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "1", "21.000"]);
           await expectItemValues(1, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("21.000");
 
-          await addThroughSearchItem("22");
+          await addItemThroughSearchItem("22");
 
-          expect(barcodeInputs.length).to.be.equal(3);
+          await expectItemCount(3);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "1", "21.000"]);
           await expectItemValues(1, [null, "221", "C", "2.000", "Sachet", "1", "2.000"]);
           await expectItemValues(2, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("23.000");
         });
 
         it("add one item directly and one item through search item (duplicate)", async () => {
-          await addDirectly("222");
+          await addItemDirectly("222");
 
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "1", "21.000"]);
           await expectItemValues(1, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("21.000");
 
-          await addThroughSearchItem("22", 1);
+          await addItemThroughSearchItem("22", 1);
 
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "2", "42.000"]);
           await expectItemValues(1, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("42.000");
         });
 
         it("add one item directly and one item through searchItem (different items) and add one item more from direct (diferent)", async () => {
-          await addDirectly("222");
+          await addItemDirectly("222");
 
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "1", "21.000"]);
           await expectItemValues(1, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("21.000");
 
-          await addThroughSearchItem("22");
+          await addItemThroughSearchItem("22");
 
-          expect(barcodeInputs.length).to.be.equal(3);
+          await expectItemCount(3);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "1", "21.000"]);
           await expectItemValues(1, [null, "221", "C", "2.000", "Sachet", "1", "2.000"]);
           await expectItemValues(2, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("23.000");
 
-          await addDirectly("121");
+          await addItemDirectly("121");
 
-          expect(barcodeInputs.length).to.be.equal(4);
+          await expectItemCount(4);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "1", "21.000"]);
           await expectItemValues(1, [null, "221", "C", "2.000", "Sachet", "1", "2.000"]);
           await expectItemValues(2, [null, "121", "A", "200.000", "Kotak", "1", "200.000"]);
           await expectItemValues(3, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("223.000");
         });
 
         it("add one item directly and one item through search item (duplicate) and add  one item more from direct (duplicate)", async () => {
-          await addDirectly("222");
+          await addItemDirectly("222");
 
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "1", "21.000"]);
           await expectItemValues(1, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("21.000");
 
-          await addThroughSearchItem("22", 1);
+          await addItemThroughSearchItem("22", 1);
 
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "2", "42.000"]);
           await expectItemValues(1, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("42.000");
 
-          await addDirectly("222");
+          await addItemDirectly("222");
 
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "3", "63.000"]);
           await expectItemValues(1, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("63.000");
         });
 
         it("add one item directly and one item through searchItem (different items) and add one item more from searchItem (diferent)", async () => {
-          await addDirectly("222");
+          await addItemDirectly("222");
 
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "1", "21.000"]);
           await expectItemValues(1, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("21.000");
 
-          await addThroughSearchItem("22");
+          await addItemThroughSearchItem("22");
 
-          expect(barcodeInputs.length).to.be.equal(3);
+          await expectItemCount(3);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "1", "21.000"]);
           await expectItemValues(1, [null, "221", "C", "2.000", "Sachet", "1", "2.000"]);
           await expectItemValues(2, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("23.000");
 
-          await addThroughSearchItem("12");
+          await addItemThroughSearchItem("12");
 
-          expect(barcodeInputs.length).to.be.equal(4);
+          await expectItemCount(4);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "1", "21.000"]);
           await expectItemValues(1, [null, "221", "C", "2.000", "Sachet", "1", "2.000"]);
           await expectItemValues(2, [null, "121", "A", "200.000", "Kotak", "1", "200.000"]);
           await expectItemValues(3, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("223.000");
         });
 
         it("add one item directly and one item through search item (duplicate) and add  one item more from searchItem (duplicate)", async () => {
-          await addDirectly("222");
+          await addItemDirectly("222");
 
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "1", "21.000"]);
           await expectItemValues(1, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("21.000");
 
-          await addThroughSearchItem("22", 1);
+          await addItemThroughSearchItem("22", 1);
 
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "2", "42.000"]);
           await expectItemValues(1, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("42.000");
 
-          await addThroughSearchItem("22", 1);
+          await addItemThroughSearchItem("22", 1);
 
-          expect(barcodeInputs.length).to.be.equal(2);
+          await expectItemCount(2);
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "3", "63.000"]);
           await expectItemValues(1, ["true", "", "", "0", "", "1", "0"]);
+          await expectSummaryPriceValue("63.000");
         });
       });
     });
 
     describe("deleting item", () => {
       it("deletes an item", async () => {
-        await addDirectly("222");
-        await addDirectly("221");
+        await addItemDirectly("222");
+        await addItemDirectly("221");
 
         // deletes first item
         await deleteItemByIndex();
 
         // checking
-        expect(barcodeInputs.length).to.be.equal(2);
+        await expectItemCount(2);
         await expectItemValues(0, [null, "221", "C", "2.000", "Sachet", "1", "2.000"]);
         await expectItemValues(1, ["true", "", "", "0", "", "1", "0"]);
+        await expectSummaryPriceValue("2.000");
       });
 
       it("deletes multiple item", async () => {
-        await addDirectly("222");
-        await addDirectly("221");
+        await addItemDirectly("222");
+        await addItemDirectly("221");
 
         await deleteItemByIndex(1);
         await deleteItemByIndex();
 
-        expect(barcodeInputs.length).to.be.equal(1);
+        await expectItemCount(1);
         await expectItemValues(0, ["true", "", "", "0", "", "1", "0"]);
+        await expectSummaryPriceValue("0");
       });
     });
 
     describe("modifying item", () => {
       describe("changing item amount", () => {
         it("should change amount by amount element", async () => {
-          await addDirectly("222");
+          await addItemDirectly("222");
 
           const amountElement = amountInputs[0];
           await amountElement.click(); // focus to that element
           await amountElement.keys("\ue013"); // arrow up
 
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "2", "42.000"]);
+          await expectSummaryPriceValue("42.000");
 
           await amountElement.keys("\ue015"); // arrow down
 
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "1", "21.000"]);
+          await expectSummaryPriceValue("21.000");
         });
 
         it("should change amount by arrow button in barcode input. before barcode input", async () => {
@@ -344,9 +383,10 @@ async function item(app) {
           await expectItemValues(0, ["true", "", "", "0", "", "1", "0"]);
 
           await barcodeInputs[0].keys("\ue013"); // arrow up
-          await addDirectly("222");
+          await addItemDirectly("222");
 
           await expectItemValues(0, [null, "222", "C", "21.000", "Bungkus", "2", "42.000"]);
+          await expectSummaryPriceValue("42.000");
         });
       });
     });
