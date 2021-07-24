@@ -65,6 +65,10 @@ export class ItemList {
       const duplicatedItem = this.#items[duplicatedItemIndex];
 
       const { amount } = itemReference.data;
+
+      // reset referenced item data
+      itemReference.resetItemData();
+
       duplicatedItem.increaseAmount(amount);
 
       return true;
@@ -172,6 +176,7 @@ export class ItemList {
     this.#items.forEach((item) => {
       const { valid, price, amount } = item.data;
       if (valid) {
+        console.error(valid, price, amount);
         currentTotalPrice += price * amount;
       }
     });

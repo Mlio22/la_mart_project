@@ -153,6 +153,10 @@ export class Item {
     this.itemList.refreshTotalPrice();
   }
 
+  resetItemData() {
+    this.#data = { amount: 1, ...EMPTY_ITEM };
+  }
+
   get data() {
     return this.#data;
   }
@@ -161,7 +165,7 @@ export class Item {
     return this.#ui;
   }
 
-  set data({ data, code = null }) {
+  set data({ data = EMPTY_ITEM, code = null }) {
     // set data absolutely, from e.g. search-item
     // so the data will be always valid
     // function called from search-item
@@ -178,7 +182,7 @@ export class Item {
 
     if (isDuplicate) {
       // reset to empty item
-      this.#data = { ...EMPTY_ITEM };
+      this.resetItemData();
     } else {
       this.#data.valid = true;
     }
