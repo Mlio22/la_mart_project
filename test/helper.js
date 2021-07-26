@@ -107,6 +107,11 @@ const deleteItemByIndex = async (app, itemIndex = 0) => {
   await itemActionButton.click();
 };
 
+const refreshShortcutButtonGetter = async (app) => {
+  const shortcutButtons = await app.client.$$(".cashier .shortcuts .shortcut");
+  return shortcutButtons;
+};
+
 module.exports = {
   sleep,
   checkShortcutAvailability,
@@ -117,4 +122,5 @@ module.exports = {
   expectItemValues,
   expectSummaryPriceValue,
   deleteItemByIndex,
+  refreshShortcutButtonGetter,
 };
