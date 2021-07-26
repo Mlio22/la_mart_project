@@ -21,8 +21,7 @@ function item(app) {
         itemElements;
     };
 
-    beforeEach("refreshing", async () => {
-      app.client.refresh();
+    beforeEach("refreshing element getter", async () => {
       await refreshElementGettersInItem();
 
       // always check first element after refreshing

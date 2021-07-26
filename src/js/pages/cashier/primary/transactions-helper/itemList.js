@@ -176,7 +176,6 @@ export class ItemList {
     this.#items.forEach((item) => {
       const { valid, price, amount } = item.data;
       if (valid) {
-        console.error(valid, price, amount);
         currentTotalPrice += price * amount;
       }
     });

@@ -5,6 +5,21 @@ const sleep = async (time) => {
   return new Promise((r) => setTimeout(r, time));
 };
 
+const checkShortcutAvailability = async (app, { mustAvailable = [], mustNotAvailable = [] }) => {
+  // check for shortcut availability that must be available or must not
+  const shortcuts = await app.client.$$(".cashier .shortcuts .shortcut");
+
+  for (const idx of mustAvailable) {
+    const className = await shortcuts[idx].getAttribute("class");
+    expect(className).to.be.string("shortcut");
+  }
+
+  for (const idx of mustNotAvailable) {
+    const className = await shortcuts[idx].getAttribute("class");
+    expect(className).to.be.string("shortcut disabled");
+  }
+};
+
 async function refreshElementGetters(app) {
   const actionButtons = await app.client.$$(".cashier .action-content button"),
     barcodeInputs = await app.client.$$(".cashier .barcode-content input"),
@@ -94,6 +109,7 @@ const deleteItemByIndex = async (app, itemIndex = 0) => {
 
 module.exports = {
   sleep,
+  checkShortcutAvailability,
   refreshElementGetters,
   addItemDirectly,
   addItemThroughSearchItem,

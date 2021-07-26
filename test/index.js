@@ -3,6 +3,7 @@ const electronPath = require("electron");
 const path = require("path");
 const expect = require("chai").expect;
 const itemSuite = require("./item");
+const shortcutSuite = require("./shortcut");
 const { sleep } = require("./helper");
 
 // example for loading mjs file (non type: module)
@@ -34,12 +35,16 @@ describe("Application launch", function () {
       await app.client.windowByIndex(1);
     });
 
+    beforeEach("refreshing", async () => {
+      app.client.refresh();
+    });
+
     it("the total windows should be 2", async () => {
       const totalWindow = await app.client.getWindowCount();
       expect(totalWindow).to.be.equal(2);
     });
 
-    // test for items
     itemSuite(app);
+    shortcutSuite(app);
   });
 });
