@@ -60,7 +60,6 @@ export class Item {
 
     // for loading previous transaction and restoring completed transaction
     else {
-      //! don't refresh and check data if item is being restored
       // add ItemLog: Item Restored (11)
       this.#itemLog.push(new ItemLog(11));
     }

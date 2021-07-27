@@ -105,6 +105,11 @@ export class ItemList {
   restoreItemList() {
     // recreate all items UI
     this.#items = this.#items.map((item) => new Item(this, this.itemElement, item.data));
+
+    // add new item if loading saved transaction
+    if (this.transaction.loading) {
+      this.createNewItem();
+    }
   }
 
   focusToLatestBarcode() {

@@ -31,8 +31,14 @@ export class TransactionLog extends CashierLog {
         2: "saved",
         3: "completed",
         4: "cancelled",
-        5: "cancelled after completed",
-        6: "re-opened",
+
+        // re-opening
+        51: "re-opening (saved)",
+        52: "re-opening (completed)",
+
+        //  after completed
+        6: "edited after completed",
+        7: "cancelled after completed",
       };
 
     super(logType, code, codeList, changes);

@@ -1,5 +1,4 @@
-import { ItemList } from "./transactions-helper/itemList.js";
-import { TransactionLog } from "../../etc/Log.js";
+import { Transaction } from "./transactions-helper/transaction.js";
 
 const EMPTY_TRANSACTION_HTML = `
     <tr class="purchases-headers">
@@ -136,7 +135,8 @@ export class TransactionList {
     //* only used 2, 3
 
     return this.#transactionList.filter((transaction) => {
-      const transactionStatus = transaction.status;
+      const transactionStatus = transaction.statusCode;
+      console.log(transactionStatus);
 
       return status === transactionStatus && this.#currentTransaction !== transaction;
     });
@@ -163,7 +163,7 @@ export class TransactionList {
 
     const savedOrCompletedTransactionIndex = this.#transactionList.findIndex((transaction) => {
       const notThisTransaction = transaction !== this.#currentTransaction,
-        status = transaction.status;
+        status = transaction.statusCode;
       return notThisTransaction && (status === 2 || status === 3);
     });
 
@@ -187,161 +187,5 @@ export class TransactionList {
 
     // focus to latest barcode
     this.#currentTransaction.itemList.focusToLatestBarcode();
-  }
-}
-
-let idCounter = 1;
-
-class Transaction {
-  // transaction properties
-  #transactionLog = [new TransactionLog(1)];
-
-  #transactionInfo = {
-    id: idCounter++, // create get id function
-    status: 1,
-    cashInfo: {
-      customer: 0,
-      totalPrice: 0,
-    },
-    itemList: null,
-  };
-
-  constructor(transactionList, starterItem) {
-    this.transactionList = transactionList;
-
-    this.#transactionInfo.itemList = new ItemList(this, starterItem);
-  }
-
-  #loadTransaction() {
-    // set transaction status  to 1 (working)
-    this.#transactionInfo.status = 1;
-
-    // restore items
-    this.#transactionInfo.itemList.restoreItemList();
-  }
-
-  #restoreTransaction() {
-    // set transaction status  to 3 (completed)
-    this.#transactionInfo.status = 3;
-
-    // restore items
-    this.#transactionInfo.itemList.restoreItemList();
-
-    // restore the totalPrice
-    this.transactionInfo.itemList.refreshTotalPrice();
-  }
-
-  #addLog(code) {
-    this.#transactionLog.push(new TransactionLog(code));
-  }
-
-  saveTransaction() {
-    // change current transaction's status to 2 (saved)
-    this.#transactionInfo.status = 2;
-
-    // remove last empty item
-    this.transactionInfo.itemList.removeLastEmptyItem();
-
-    // add TransactionLog: saved (2)
-    this.#addLog(2);
-  }
-
-  completeTransaction() {
-    this.transactionInfo.itemList.removeLastEmptyItem();
-
-    // change current transaction's status to 3 (completed)
-    this.#transactionInfo.status = 3;
-
-    // set current item to completed
-    this.itemList.setToTransactionCompletedState();
-
-    // add TransactionLog: completed (3)
-    this.#addLog(3);
-  }
-
-  cancelTransaction() {
-    const isTransactionCompleted = this.completed;
-
-    // change status to 4 (cancelled) or 5 (cancelled after completed)
-    this.#transactionInfo.status = isTransactionCompleted ? 5 : 4;
-
-    // log with code 4 (cancelled) or 5 (cancelled after completed)
-    this.#addLog(isTransactionCompleted ? 5 : 4);
-  }
-
-  reopenTransaction() {
-    // load or restore the transaction
-    if (this.saved) {
-      this.#loadTransaction();
-    } else if (this.completed) {
-      this.#restoreTransaction();
-    }
-
-    // add TransactionLog : re-opened (6)
-    this.#addLog(6);
-  }
-
-  get transactionInfo() {
-    return { ...this.#transactionInfo };
-  }
-
-  get id() {
-    return this.#transactionInfo.id;
-  }
-
-  get status() {
-    return this.#transactionInfo.status;
-  }
-
-  get cashInfo() {
-    return this.#transactionInfo.cashInfo;
-  }
-
-  get itemList() {
-    /* warning: this can affect directly to the itemlist object. 
-      use transactionInfo getter if you want to get only the value of itemList
-      use this only if you need the reference and wanted to change it directly
-    */
-    return this.#transactionInfo.itemList;
-  }
-
-  get transactionLog() {
-    return this.#transactionLog;
-  }
-
-  get saveable() {
-    // return if a transaction can be saved
-    const { itemList, status } = this.#transactionInfo;
-    return itemList.items.length > 1 && status !== 3;
-  }
-
-  get working() {
-    return this.#transactionInfo.status === 1;
-  }
-
-  get saved() {
-    return this.#transactionInfo.status === 2;
-  }
-
-  get completed() {
-    return this.#transactionInfo.status === 3;
-  }
-
-  get cancelled() {
-    // return true if transaction is cancelled (either it's already completed or not)
-    const status = this.#transactionInfo.status;
-    return status === 4 || status === 5;
-  }
-
-  get restoring() {
-    return this.#transactionInfo.status === 6;
-  }
-
-  set status(status) {
-    this.#transactionInfo.status = status;
-  }
-
-  set cashInfo(cashInfo) {
-    this.#transactionInfo.cashInfo = { ...this.#transactionInfo.cashInfo, ...cashInfo };
   }
 }
