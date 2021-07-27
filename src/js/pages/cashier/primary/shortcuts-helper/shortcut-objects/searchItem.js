@@ -45,6 +45,9 @@ function item_searcher(hint, params = ["name", "barcode"], filteredItems = EXAMP
   // set the hint to lowercase
   hint = hint.toLowerCase();
 
+  // return none if hint is none
+  if (hint === "") return [];
+
   filteredItems.forEach((item) => {
     let previousMatch = false;
 
