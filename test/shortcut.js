@@ -1,9 +1,13 @@
 const { sleep, checkShortcutAvailability } = require("./helper");
-const expect = require("chai").expect;
 
 const searchItemSuite = require("./shortcuts/f2"),
   paymentSuite = require("./shortcuts/f4"),
-  saveTransaction = require("./shortcuts/f6");
+  saveTransactionSuite = require("./shortcuts/f6"),
+  openTransactionSuite = require("./shortcuts/f7"),
+  cancelTransactionSuite = require("./shortcuts/f9"),
+  closeCashierSuite = require("./shortcuts/f10"),
+  newPageSuite = require("./shortcuts/f11"),
+  checkBalanceSuite = require("./shortcuts/f12");
 
 function shortcut(app) {
   describe("#shortcuts", () => {
@@ -13,7 +17,12 @@ function shortcut(app) {
 
     searchItemSuite(app);
     paymentSuite(app);
-    saveTransaction(app);
+    saveTransactionSuite(app);
+    openTransactionSuite(app);
+    cancelTransactionSuite(app);
+    closeCashierSuite(app);
+    newPageSuite(app);
+    checkBalanceSuite(app);
 
     describe.skip("#F5", () => {});
   });

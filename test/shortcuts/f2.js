@@ -36,7 +36,6 @@ function searchItem(app) {
         };
 
         it("should show zero result if input is '' ", async () => {
-          console.log(shortcutButton === shortcutButtons);
           await expectResults(0);
         });
 
