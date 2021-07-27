@@ -125,7 +125,7 @@ export class TransactionList {
     this.createTransaction();
   }
 
-  retrieveTransactionList(status = 2) {
+  retrieveTransactionList(status = 2, excludeCurrentTransaction = false) {
     // Status list:
     // 1 : working
     // 2 : saved
@@ -136,9 +136,14 @@ export class TransactionList {
 
     return this.#transactionList.filter((transaction) => {
       const transactionStatus = transaction.statusCode;
-      console.log(transactionStatus);
 
-      return status === transactionStatus && this.#currentTransaction !== transaction;
+      const result = status === transactionStatus;
+
+      if (excludeCurrentTransaction) {
+        result = result && this.#currentTransaction !== transaction;
+      }
+
+      return result;
     });
   }
 

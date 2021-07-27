@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const { refreshShortcutButtonGetter, addItemDirectly } = require("../helper");
+const { refreshShortcutButtonGetter, addItemDirectly, sleep } = require("../helper");
 
 function checkBalance(app) {
   describe("#F12", () => {
@@ -13,6 +13,10 @@ function checkBalance(app) {
         balanceValue = await balanceElement.getValue();
 
       expect(balanceValue).to.be.equal(a_value);
+
+      // close the check submenu cashier
+      const closeCheckCashierButton = await app.client.$(".submenu .check-balance .checkBalance-actions .proceed");
+      await closeCheckCashierButton.click();
     };
 
     const addItemAndAction = async (action = "save", barcodes = []) => {
@@ -46,12 +50,12 @@ function checkBalance(app) {
       await addItemAndAction("complete", ["222", "121"]); // total: 221.000
       await expectCashierBalance("221.000");
       // clear transaction
-      await shortcutButtons[10];
+      await shortcutButtons[10].click();
 
       await addItemAndAction("complete", ["222", "132"]); // total: 32.000
       await expectCashierBalance("252.000");
       // clear transaction
-      await shortcutButtons[10];
+      await shortcutButtons[10].click();
 
       await addItemAndAction("save", ["231", "221"]); //total : 12.500
       await expectCashierBalance("252.000");
