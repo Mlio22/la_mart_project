@@ -1,3 +1,11 @@
+// added function to reverse a string
+function reverseString(string) {
+  let stringArray = string.split("");
+  stringArray = stringArray.reverse();
+
+  return stringArray.join("");
+}
+
 // set ordinary number strings to proper price string
 export const set_proper_price = function (value) {
   // if the input was not a string
@@ -11,14 +19,6 @@ export const set_proper_price = function (value) {
 
     return this;
   };
-
-  // added function to reverse a string
-  function reverseString(string) {
-    let stringArray = string.split("");
-    stringArray = stringArray.reverse();
-
-    return stringArray.join("");
-  }
 
   // turn number to string
   let stringValue = value.toString();
