@@ -115,6 +115,8 @@ export class Item {
     } else {
       this.#itemLog.push(new ItemLog(this.transactionStatus.isCompleted ? 41 : 40));
     }
+
+    this.itemList.focusToLatestBarcode();
   }
 
   increaseAmount(amount = 1) {
