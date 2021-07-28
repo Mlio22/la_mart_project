@@ -279,7 +279,6 @@ export class AmountElement {
   }
 
   setMaxAmount() {
-    console.log(this.item.data);
     this.#isTransactionCompleted = true;
     // set max amount if transaction is completed
     this.#maxAmountValue = this.item.data.maxAmount;

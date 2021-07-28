@@ -33,8 +33,8 @@ export class Item {
   #gatherTransactionStatus() {
     this.transactionStatus = {
       isWorking: this.itemList.transaction.working,
-      isSaved: this.itemList.transaction.saved,
-      isCompleted: this.itemList.transaction.completed,
+      isSaved: this.itemList.transaction.saved || this.itemList.transaction.loading,
+      isCompleted: this.itemList.transaction.completed || this.itemList.transaction.restoring,
     };
   }
 
