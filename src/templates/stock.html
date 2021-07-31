@@ -2,79 +2,38 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barang dan Stok</title>
-    <link rel="stylesheet" href="../css/dist/stock.css">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barang dan Stok</title>
+  <link rel="stylesheet" href="../css/dist/stock.css">
+  <link rel="stylesheet" href="../font-awesome/css/all.min.css">
 </head>
 
 <body>
-    <div class="stock">
-        <div class="stock-headers">
-            <div class="actions header"></div>
-            <div class="codes header">Kode Barang</div>
-            <div class="names header">Nama Barang</div>
-            <div class="quantities header">satuan</div>
-            <div class="buy-prices header">Harga Beli</div>
-            <div class="sell-prices header">Harga Jual</div>
-            <div class="first-stock header">Stok awal</div>
-            <div class="stock-in header">Stok Masuk</div>
-            <div class="stock-out header">Stok Keluar</div>
-        </div>
+  <div class="stock">
+    <div class="pop-up"></div>
 
-        <div class="stock-contents first-stock-event">
-            <div class="actions content"></div>
-            <div class="codes content">
-                <input name="stock-code" type="text">
-            </div>
-            <div class="names content">
-                <input name="stock-name" type="text">
-            </div>
-            <div class="quantities content">Rtg</div>
-            <div class="buy-prices content">
-                <input name="stock-buy-price" type="text">
-            </div>
-            <div class="sell-prices content">
-                <input name="stock-sell-price" type="text">
-            </div>
-            <div class="first-stock content">
-                <input name="first-stock" type="text">
-            </div>
-            <div class="stock-in content">
-                <input name="stock-in" type="text" disabled>
-            </div>
-            <div class="stock-out content">
-                <input name="stock-out" type="text" disabled>
-            </div>
-        </div>
-        <div class="stock-contents change-status-event">
-            <div class="actions content"></div>
-            <div class="codes content">
-                <input name="stock-code" type="text">
-            </div>
-            <div class="names content">
-                <input name="stock-name" type="text">
-            </div>
-            <div class="quantities content">Rtg</div>
-            <div class="buy-prices content">
-                <input name="stock-buy-price" type="text">
-            </div>
-            <div class="sell-prices content">
-                <input name="stock-sell-price" type="text">
-            </div>
-            <div class="first-stock content">
-                <input name="first-stock" type="text">
-            </div>
-            <div class="stock-in content">
-                <input name="stock-in" type="text">
-            </div>
-            <div class="stock-out content">
-                <input name="stock-out" type="text">
-            </div>
-        </div>
-
+    <div class="stock-items">
+      <div class="stock-headers">
+        <div class="actions header"></div>
+        <div class="codes header">Kode Barang</div>
+        <div class="names header">Nama Barang</div>
+        <div class="quantities header">Satuan</div>
+        <div class="buy-prices header">Harga Beli</div>
+        <div class="sell-prices header">Harga Jual</div>
+        <div class="first-stock header">Stok awal</div>
+        <div class="stock-in header">Stok Masuk</div>
+        <div class="stock-out header">Stok Keluar</div>
+      </div>
     </div>
+
+    <div class="down-bar">
+      <div class="notification"></div>
+      <div class="save-and-close"></div>
+    </div>
+
+    <script type="module" src="../js/pages/stock/main.js"></script>
 </body>
 
 </html>

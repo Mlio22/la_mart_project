@@ -2,148 +2,149 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Cashier</title>
-    <link rel="stylesheet" href="../css/dist/cashier.css">
-    <link rel="stylesheet" href="../css/dist/payment.css">
-    <link rel="stylesheet" href="../css/dist/check-balance.css">
-    <link rel="stylesheet" href="../css/dist/cancel.css">
-    <link rel="stylesheet" href="../css/dist/search-item.css">
-    <link rel="stylesheet" href="../css/dist/open-transaction.css">
-    <link rel="stylesheet" href="../font-awesome/css/all.min.css">
+  <meta charset="UTF-8">
+  <title>Cashier</title>
+  <link rel="stylesheet" href="../css/dist/cashier.css">
+  <link rel="stylesheet" href="../css/dist/payment.css">
+  <link rel="stylesheet" href="../css/dist/check-balance.css">
+  <link rel="stylesheet" href="../css/dist/cancel.css">
+  <link rel="stylesheet" href="../css/dist/search-item.css">
+  <link rel="stylesheet" href="../css/dist/open-transaction.css">
+  <link rel="stylesheet" href="../font-awesome/css/all.min.css">
 </head>
 
 <body>
-    
-    <div class="cashier" tabindex="0">
-        <div class="submenuCover hidden">
-            <div class="submenu"></div>
-        </div>
 
-        <div class="left-bar">
-            <div class="purchases-wrapper">
-                <table class="purchases">
-                    <tr class="purchases-headers">
-                        <th class="purchases-header action-header">&nbsp;</th>
-                        <th class="purchases-header barcode-header">Barcode</th>
-                        <th class="purchases-header name-header">Nama Barang</th>
-                        <th class="purchases-header type-header">Satuan</th>
-                        <th class="purchases-header price-header">Harga</th>
-                        <th class="purchases-header amount-header">Jumlah</th>
-                        <th class="purchases-header total-price-header">Harga Total</th>
-                    </tr>
-                </table>
-            </div>
-            <div class="left-bottom-bar">
-                <div class="notifications-bar">
-                    <div class="notification">
-                        <p class="notification-text"><i class="notification-icon fas fa-exclamation-triangle"></i>Data telah disimpan</p>
-                    </div>
-                </div>
-
-                <div class="total-price">
-                    <div class="total-price-header">Harga Total:</div>
-                    <div class="total-price-content"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="right-bar">
-            <div class="payment">
-               <div class="payment-header">
-                   <p class="header-title">Pembayaran</p>
-                   <p class="header-id">ID: <span class="id-content">0101010</span></p>
-               </div>
-                <div class="payment-content">
-                    <div class="customer-money-bar">
-                        <div class="customer-money-bar-header">
-                            Uang:
-                        </div>
-                        <div class="customer-money-bar-content">
-                            
-                        </div>
-                    </div>
-                    <div class="price-money-bar">
-                        <div class="price-money-bar-header">
-                            Total Belanja:
-                        </div>
-                        <div class="price-money-bar-content">
-                            
-                        </div>
-                    </div>
-                    <div class="divider"></div>
-                    <div class="change-money-bar">
-                        <div class="change-money-bar-header">
-                            Kembalian:
-                        </div>
-                        <div class="change-money-bar-content">
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="shortcuts">
-                <div class="shortcut focusable help" title="Bantuan">
-                    <i class="fas fa-question-circle shortcut-icon"></i>
-                    <br><span class="shortcut-text">Bantuan</span>
-                    <br><span class="shortcut-key">(F1)</span> 
-                </div>
-                <div class="shortcut focusable search-item" title="Cari Harga">
-                    <i class="fas fa-search-dollar shortcut-icon"></i>
-                    <br><span class="shortcut-text">Cari Harga</span>
-                    <br><span class="shortcut-key">(F2)</span> 
-                </div>
-                <div class="shortcut focusable disabled">
-                    <i class="fas fa-times shortcut-icon"></i>
-                </div>
-                <div class="shortcut focusable payment" title="Bayar">
-                    <i class="fas fa-money-bill shortcut-icon"></i>
-                    <br><span class="shortcut-text">Bayar</span>
-                    <br><span class="shortcut-key">(F4)</span> 
-                </div>
-                <div class="shortcut focusable print-bill" title="Cetak Struk">
-                    <i class="fas fa-receipt shortcut-icon"></i>
-                    <br><span class="shortcut-text">Cetak</span>
-                    <br><span class="shortcut-key">(F5)</span> 
-                </div>
-                <div class="shortcut focusable save-transaction" title="Simpan Transaksi">
-                    <i class="fas fa-file-download shortcut-icon"></i>
-                    <br><span class="shortcut-text">Simpan</span>
-                    <br><span class="shortcut-key">(F6)</span> 
-                </div>
-                <div class="shortcut focusable open-transaction" title="Buka Transaksi">
-                    <i class="fas fa-file-upload shortcut-icon"></i>
-                    <br><span class="shortcut-text">Buka</span>
-                    <br><span class="shortcut-key">(F7)</span> 
-                </div>
-                <div class="shortcut focusable disabled">
-                    <i class="fas fa-times shortcut-icon"></i>
-                </div>
-                <div class="shortcut focusable cancel-transaction" title="Batalkan Transaksi">
-                    <i class="fas fa-times shortcut-icon"></i>
-                    <br><span class="shortcut-text">Batalkan</span>
-                    <br><span class="shortcut-key">(F9)</span> 
-                </div>
-                <div class="shortcut focusable close-cashier" title="Keluar">
-                    <i class="fas fa-sign-out-alt shortcut-icon"></i>
-                    <br><span class="shortcut-text">Keluar</span>
-                    <br><span class="shortcut-key">(F10)</span> 
-                </div>
-                <div class="shortcut focusable new-transaction" title="Transaksi Baru">
-                    <i class="fas fa-file-alt shortcut-icon"></i>
-                    <br><span class="shortcut-text"> Baru</span>
-                    <br><span class="shortcut-key">(F11)</span> 
-                </div>
-                <div class="shortcut focusable check-balance" title="Cek Saldo">
-                    <i class="fas fa-cash-register shortcut-icon"></i>
-                    <br><span class="shortcut-text"> Cek saldo</span>
-                    <br><span class="shortcut-key">(F12)</span> 
-                </div>
-            </div>
-        </div>
+  <div class="cashier" tabindex="0">
+    <div class="submenuCover hidden">
+      <div class="submenu"></div>
     </div>
 
-    <script type="module" src="../js/pages/cashier/main.js"></script>
+    <div class="left-bar">
+      <div class="purchases-wrapper">
+        <table class="purchases">
+          <tr class="purchases-headers">
+            <th class="purchases-header action-header">&nbsp;</th>
+            <th class="purchases-header barcode-header">Barcode</th>
+            <th class="purchases-header name-header">Nama Barang</th>
+            <th class="purchases-header type-header">Satuan</th>
+            <th class="purchases-header price-header">Harga</th>
+            <th class="purchases-header amount-header">Jumlah</th>
+            <th class="purchases-header total-price-header">Harga Total</th>
+          </tr>
+        </table>
+      </div>
+      <div class="left-bottom-bar">
+        <div class="notifications-bar">
+          <div class="notification">
+            <p class="notification-text"><i class="notification-icon fas fa-exclamation-triangle"></i>Data
+              telah disimpan</p>
+          </div>
+        </div>
+
+        <div class="total-price">
+          <div class="total-price-header">Harga Total:</div>
+          <div class="total-price-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-bar">
+      <div class="payment">
+        <div class="payment-header">
+          <p class="header-title">Pembayaran</p>
+          <p class="header-id">ID: <span class="id-content">0101010</span></p>
+        </div>
+        <div class="payment-content">
+          <div class="customer-money-bar">
+            <div class="customer-money-bar-header">
+              Uang:
+            </div>
+            <div class="customer-money-bar-content">
+
+            </div>
+          </div>
+          <div class="price-money-bar">
+            <div class="price-money-bar-header">
+              Total Belanja:
+            </div>
+            <div class="price-money-bar-content">
+
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="change-money-bar">
+            <div class="change-money-bar-header">
+              Kembalian:
+            </div>
+            <div class="change-money-bar-content">
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="shortcuts">
+        <div class="shortcut focusable help" title="Bantuan">
+          <i class="fas fa-question-circle shortcut-icon"></i>
+          <br><span class="shortcut-text">Bantuan</span>
+          <br><span class="shortcut-key">(F1)</span>
+        </div>
+        <div class="shortcut focusable search-item" title="Cari Harga">
+          <i class="fas fa-search-dollar shortcut-icon"></i>
+          <br><span class="shortcut-text">Cari Harga</span>
+          <br><span class="shortcut-key">(F2)</span>
+        </div>
+        <div class="shortcut focusable disabled">
+          <i class="fas fa-times shortcut-icon"></i>
+        </div>
+        <div class="shortcut focusable payment" title="Bayar">
+          <i class="fas fa-money-bill shortcut-icon"></i>
+          <br><span class="shortcut-text">Bayar</span>
+          <br><span class="shortcut-key">(F4)</span>
+        </div>
+        <div class="shortcut focusable print-bill" title="Cetak Struk">
+          <i class="fas fa-receipt shortcut-icon"></i>
+          <br><span class="shortcut-text">Cetak</span>
+          <br><span class="shortcut-key">(F5)</span>
+        </div>
+        <div class="shortcut focusable save-transaction" title="Simpan Transaksi">
+          <i class="fas fa-file-download shortcut-icon"></i>
+          <br><span class="shortcut-text">Simpan</span>
+          <br><span class="shortcut-key">(F6)</span>
+        </div>
+        <div class="shortcut focusable open-transaction" title="Buka Transaksi">
+          <i class="fas fa-file-upload shortcut-icon"></i>
+          <br><span class="shortcut-text">Buka</span>
+          <br><span class="shortcut-key">(F7)</span>
+        </div>
+        <div class="shortcut focusable disabled">
+          <i class="fas fa-times shortcut-icon"></i>
+        </div>
+        <div class="shortcut focusable cancel-transaction" title="Batalkan Transaksi">
+          <i class="fas fa-times shortcut-icon"></i>
+          <br><span class="shortcut-text">Batalkan</span>
+          <br><span class="shortcut-key">(F9)</span>
+        </div>
+        <div class="shortcut focusable close-cashier" title="Keluar">
+          <i class="fas fa-sign-out-alt shortcut-icon"></i>
+          <br><span class="shortcut-text">Keluar</span>
+          <br><span class="shortcut-key">(F10)</span>
+        </div>
+        <div class="shortcut focusable new-transaction" title="Transaksi Baru">
+          <i class="fas fa-file-alt shortcut-icon"></i>
+          <br><span class="shortcut-text"> Baru</span>
+          <br><span class="shortcut-key">(F11)</span>
+        </div>
+        <div class="shortcut focusable check-balance" title="Cek Saldo">
+          <i class="fas fa-cash-register shortcut-icon"></i>
+          <br><span class="shortcut-text"> Cek saldo</span>
+          <br><span class="shortcut-key">(F12)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/pages/cashier/main.js"></script>
 </body>
 
 </html>

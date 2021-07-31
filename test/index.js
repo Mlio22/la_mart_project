@@ -44,7 +44,31 @@ describe("Application launch", function () {
       expect(totalWindow).to.be.equal(2);
     });
 
+    after("closes cashier page", async () => {
+      // closes cashier via shortcut
+      const shortcuts = await app.client.$$(".cashier .shortcuts .shortcut");
+      await shortcuts[9].click();
+
+      await app.client.windowByIndex(0);
+    });
+
     itemSuite(app);
     shortcutSuite(app);
+  });
+
+  describe("#stock", () => {
+    before("opens stock page", async () => {
+      const stockButton = await app.client.$(".menusWrapper__menu.open-stock");
+      await stockButton.click();
+
+      // focus to second window (cashier)
+      await app.client.windowByIndex(1);
+    });
+
+    after("closes cashier page", async () => {
+      // closes cashier via shortcut
+      await app.client.closeWindow();
+      await app.client.windowByIndex(0);
+    });
   });
 });
