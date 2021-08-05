@@ -122,6 +122,9 @@ class ValueElement {
 }
 
 class BarcodeElement extends ValueElement {
+  // states
+  #isBlurred = false;
+
   constructor(item, className, inputName) {
     super(item, className, inputName);
     this._createUI();
@@ -157,7 +160,21 @@ class BarcodeElement extends ValueElement {
     });
 
     this._inputElement.addEventListener("blur", ({ target: { value } }) => {
-      this._item.getItemFromDB(value);
+      this.#isBlurred = true;
+      this._item.checkBarcodeChange(value);
+    });
+
+    this._inputElement.addEventListener("change", ({ target: { value } }) => {
+      // check if the element is blurred first
+      setTimeout(() => {
+        if (this.#isBlurred) {
+          this.#isBlurred = false;
+        } else {
+          this._item.checkBarcodeChange(value);
+        }
+
+        this.#isBlurred = false;
+      }, 100);
     });
 
     this._valueElement.addEventListener("click", () => {
@@ -240,8 +257,6 @@ class NameElement extends ValueElement {
   }
 
   set value(value) {
-    // lock the input after value added
-    this.lock();
     super.value = value;
   }
 
@@ -302,9 +317,16 @@ class NumberElement extends ValueElement {
     this._inputElement.min = 0;
   }
 
+  _setListeners() {
+    this._inputElement.addEventListener("keydown", ({ key }) => {
+      // goto next item if entered
+      if (key === "Enter") {
+        this._item.itemList.focusToNextItem(this._inputElement);
+      }
+    });
+  }
+
   set value(value) {
-    // lock input if value is set
-    this.lock();
     super.value = value;
   }
 

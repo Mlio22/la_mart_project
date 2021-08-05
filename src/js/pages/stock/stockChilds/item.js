@@ -37,14 +37,25 @@ export class Item {
     this.itemList = itemList;
     this.childElements = {};
 
-    // states
-    this.isItemDataSet = false;
-    this.isKnownItem = false;
+    this.barcodeBefore = ""; //needed in checkBarcodeChange()
 
-    this.createItemUi();
+    // states
+    this.isKnownItem = false; // is item new or not
+
+    // isNewBarcodeChanged used for new items
+    // if a new item added with a new barcode, then the barcode changes with other new barcode
+    // this will trigger this to true
+    this.isNewBarcodeChanged = false;
+
+    // isItemDataSet is property to determine that an item's data has been set
+    // this including new item or already known item
+    // if isItemDataSet, then lock the barcode, name, quantity
+    this.isItemDataSet = false;
+
+    this.#createItemUi();
   }
 
-  createItemUi() {
+  #createItemUi() {
     this.itemElement = document.createElement("div");
     this.itemElement.className = "stock-contents";
 
@@ -65,56 +76,48 @@ export class Item {
     this.childElements.barcode.focus();
   }
 
-  checkItemOnList(itemData) {
-    const newBarcode = itemData.barcode,
-      isItemUnique = this.itemList.checkUniqueItem(this, newBarcode);
+  checkBarcodeChange(barcode) {
+    if (barcode === this.barcodeBefore) return;
+    this.barcodeBefore = barcode;
 
-    return isItemUnique;
-  }
+    // set to try to delete item if barcode is empty and item wasn't new item (mepty item)
+    if (barcode === "" && !this.empty) {
+      this.delete();
+    }
 
-  getItemFromDB(barcode) {
-    this.setItemToDefaultState();
-
+    // if barcode changes but new item
     const result = findItem(barcode);
-
     if (typeof result === "object") {
-      this.addKnownItem(result);
+      this.#knownItem(result);
     } else {
-      this.checkNotKnownItem(result);
+      this.#unknownItem(result);
     }
   }
 
-  addKnownItem(itemData) {
-    const itemOnList = this.checkItemOnList(itemData);
+  #knownItem(itemData) {
+    // check if item is duplicated or not
+    const itemOnList = this.itemList.getDuplicatedItem(this);
 
     if (itemOnList) {
-      // set the current barcode to empty string
-      this.childElements.barcode.value = "";
+      // delete this item
+      this.delete();
 
       // focus to duplicated item stock
       itemOnList.focus();
 
-      // add item is already available notification
+      //todo: add item is already available notification
     } else {
+      this.isKnownItem = true;
+      this.isNewBarcodeChanged = false;
       // set item values
-      this.setItemValues(itemData);
-    }
+      this.#setItemValues(itemData);
 
-    return;
-  }
-
-  checkNotKnownItem(isMatchedPartially) {
-    if (isMatchedPartially) {
-      // open search item
-    } else {
-      this.isKnownItem = false;
-      this.addNewItemData();
+      // focus to stock in
+      this.childElements.stockIn.focus();
     }
   }
 
-  setItemValues(itemData) {
-    this.isKnownItem = true;
-
+  #setItemValues(itemData) {
     const { barcode, name, quantity, buyPrice, sellPrice, stock } = itemData;
     this.childElements.action.able();
     this.childElements.barcode.value = barcode;
@@ -126,24 +129,92 @@ export class Item {
     this.childElements.stockIn.unlock();
     this.childElements.stockOut.unlock();
 
+    // set values to stock-in/out to 0
+    this.childElements.stockIn.value = 0;
+    this.childElements.stockOut.value = 0;
+
     if (!this.isItemDataSet) {
       this.isItemDataSet = true;
 
       // add new item
-      this.itemList.addItem();
+      this.itemList.checkItemList();
     }
   }
 
-  addNewItemData() {
+  #unknownItem(isMatchedPartially) {
+    if (isMatchedPartially) {
+      // open search item
+    } else {
+      // check for duplicated item
+      const itemOnList = this.itemList.getDuplicatedItem(this);
+
+      if (itemOnList) {
+        this.delete();
+        itemOnList.focus();
+      } else {
+        this.isKnownItem = false;
+        this.#setInputStatesForNewItem();
+
+        // if new barcode has been changed before, let the other input values
+        // otherwise, set setNewItemStarterValues() for starter input values
+        if (this.isNewBarcodeChanged) {
+          // focus to name
+          this.childElements.name.focus();
+        } else {
+          this.isNewBarcodeChanged = true;
+          this.#setNewItemStarterValues();
+
+          // add new item
+          this.itemList.checkItemList();
+        }
+
+        this.childElements.name.focus();
+      }
+    }
+  }
+
+  #setInputStatesForNewItem() {
     this.childElements.action.able();
     this.childElements.name.unlock();
     this.childElements.quantity.unlock();
     this.childElements.buyPrice.unlock();
     this.childElements.sellPrice.unlock();
     this.childElements.firstStock.unlock();
+  }
 
-    // focus to name
-    this.childElements.name.focus();
+  #setNewItemStarterValues() {
+    // set first stock to 1
+    this.childElements.firstStock.value = 1;
+  }
+
+  setItemToDefaultState() {
+    this.#clearElementInputs();
+    this.#setElementDefaultState();
+  }
+
+  #clearElementInputs() {
+    // clear the input values
+    this.childElements.barcode.value = "";
+    this.childElements.name.value = "";
+    this.childElements.quantity.value = "";
+    this.childElements.buyPrice.value = "";
+    this.childElements.sellPrice.value = "";
+    this.childElements.firstStock.value = "";
+    this.childElements.stockIn.value = "";
+    this.childElements.stockOut.value = "";
+  }
+
+  #setElementDefaultState() {
+    // set the inputs state
+    this.childElements.action.disable();
+    this.childElements.barcode.unlock();
+    this.childElements.name.lock();
+    this.childElements.quantity.lock();
+    this.childElements.buyPrice.lock();
+    this.childElements.sellPrice.lock();
+    this.childElements.firstStock.lock();
+    this.childElements.stockIn.lock();
+    this.childElements.stockOut.lock();
   }
 
   delete() {
@@ -170,16 +241,10 @@ export class Item {
     }
   }
 
-  setItemToDefaultState() {
-    this.childElements.action.disable();
-    this.childElements.barcode.unlock();
-    this.childElements.name.lock();
-    this.childElements.quantity.lock();
-    this.childElements.buyPrice.lock();
-    this.childElements.sellPrice.lock();
-    this.childElements.firstStock.lock();
-    this.childElements.stockIn.lock();
-    this.childElements.stockOut.lock();
+  get empty() {
+    // if item data not set (known item) nor barcode not changed (unknown item)
+    // then it is an empty item
+    return !this.isItemDataSet && !this.isNewBarcodeChanged;
   }
 
   get barcode() {
