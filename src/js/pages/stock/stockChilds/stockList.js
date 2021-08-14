@@ -26,18 +26,6 @@ export class StockList {
 
   addItem() {
     this.#stockList.push(new Item(this));
-    console.log(this.#stockList);
-  }
-
-  checkUniqueItem(currentItem, newBarcode) {
-    for (const index in this.#stockList) {
-      const item = this.#stockList[index];
-
-      if (item === currentItem) continue;
-      if (item.barcode === newBarcode) return item;
-    }
-
-    return false;
   }
 
   removeItem(item) {
@@ -46,11 +34,52 @@ export class StockList {
     // remove the element
     this.#stockList.splice(index, 1);
 
-    // latest for latest element
-    this.focusToLatestItem();
+    this.checkItemList();
+  }
+
+  checkItemList() {
+    const len = this.#stockList.length,
+      isLastItemEmpty = this.#stockList[len - 1].empty;
+
+    // check the last item is empty or not
+    // last item must be always empty
+    // if all item is not empty create new one
+
+    if (isLastItemEmpty) {
+      this.focusToLatestItem();
+    } else {
+      this.addItem();
+    }
+  }
+
+  checkItemListFor(action, item = null) {
+    if (action === "add") {
+      const emptyItemIndex = this.#stockList.findIndex((item) => item.empty);
+
+      if (emptyItemIndex) {
+        this.#stockList[emptyItemIndex].focus();
+      } else {
+        this.addItem();
+      }
+    }
+
+    if (action === "delete") {
+    }
+  }
+
+  getDuplicatedItem(currentItem) {
+    for (const index in this.#stockList) {
+      const item = this.#stockList[index];
+
+      if (item === currentItem) continue;
+      if (item.barcode === currentItem.barcode) return item;
+    }
+
+    return false;
   }
 
   focusToLatestItem() {
+    // todo: focus to certain item. e.g. next item, prev item, *number* item
     const len = this.#stockList.length;
 
     this.#stockList[len - 1].focus();
