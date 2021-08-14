@@ -1,4 +1,10 @@
-import { ActionElement, BarcodeElement, NameElement, PriceElement, NumberElement } from "./itemElements.js";
+import {
+  ActionElement,
+  BarcodeElement,
+  NameElement,
+  PriceElement,
+  NumberElement,
+} from "./itemElements.js";
 const ITEMS = [
   {
     barcode: "221",
@@ -64,7 +70,11 @@ export class Item {
     this.childElements.name = new NameElement(this, "names content", "stock-name");
     this.childElements.quantity = new NameElement(this, "quantities content", "stock-quantity");
     this.childElements.buyPrice = new PriceElement(this, "buy-prices content", "stock-buy-price");
-    this.childElements.sellPrice = new PriceElement(this, "sell-prices content", "stock-sell-price");
+    this.childElements.sellPrice = new PriceElement(
+      this,
+      "sell-prices content",
+      "stock-sell-price"
+    );
     this.childElements.firstStock = new NumberElement(this, "first-stock content", "first-stock");
     this.childElements.stockIn = new NumberElement(this, "stock-in content", "stock-in");
     this.childElements.stockOut = new NumberElement(this, "stock-out content", "stock-out");
@@ -183,8 +193,9 @@ export class Item {
   }
 
   #setNewItemStarterValues() {
-    // set first stock to 1
     this.childElements.firstStock.value = 1;
+    this.childElements.buyPrice.value = 0;
+    this.childElements.sellPrice.value = 0;
   }
 
   setItemToDefaultState() {
