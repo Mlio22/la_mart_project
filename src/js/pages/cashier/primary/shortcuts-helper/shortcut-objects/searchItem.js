@@ -62,6 +62,63 @@ const API_NAMES = {
   stock: EXAMPLE_ITEMS_FOR_STOCK,
 };
 
+const SEARCH_ITEM_RESULTS = {
+  cashier: {
+    html: `
+        <div class="search-item-result-header">
+          <p class="item-barcode">Kode Barang</p>
+          <p class="item-name">Nama Barang</p>
+          <p class="item-type">Satuan</p>
+          <p class="item-price">Harga</p>
+        </div>`,
+    setFunction: function (item) {
+      const { barcode, name, quantity, price } = item;
+
+      const resultElement = document.createElement("div");
+      resultElement.tabIndex = "-1";
+      resultElement.className = "search-item-result-content";
+
+      resultElement.innerHTML = `
+      <p class="item-barcode">${barcode}</p>
+      <p class="item-name">${name}</p>
+      <p class="item-type">${quantity}</p>
+      <p class="item-price">${price}</p>
+    `;
+
+      return resultElement;
+    },
+  },
+  stock: {
+    html: `
+        <div class="search-item-result-header">
+          <p class="item-barcode">Kode Barang</p>
+          <p class="item-name">Nama Barang</p>
+          <p class="item-type">Satuan</p>
+          <p class="item-price">Harga Masuk</p>
+          <p class="item-price">Harga Jual</p>
+          <p class="item-type">Stock</p>
+        </div>`,
+    setFunction: function (item) {
+      const { barcode, name, quantity, buyPrice, sellPrice, stock } = item;
+
+      const resultElement = document.createElement("div");
+      resultElement.tabIndex = "-1";
+      resultElement.className = "search-item-result-content";
+
+      resultElement.innerHTML = `
+      <p class="item-barcode">${barcode}</p>
+      <p class="item-name">${name}</p>
+      <p class="item-type">${quantity}</p>
+      <p class="item-price">${buyPrice}</p>
+      <p class="item-price">${sellPrice}</p>
+      <p class="item-type">${stock}</p>
+    `;
+
+      return resultElement;
+    },
+  },
+};
+
 function item_searcher(hint, params = ["name", "barcode"], filteredItems, full_match = false) {
   // filteredItem is an array of filteredItems from search-item that need be researched again to prevent over-searching the API
   const matchedItems = [];
@@ -97,9 +154,9 @@ export class SearchItem extends Submenu {
   #filteredItems = [];
   #selectedItem = null;
 
-  #itemReference = null;
-  #hint = null;
-  #api = null;
+  #itemReference;
+  #hint;
+  #type;
 
   #searchItemHeader;
   #searchItemResult;
@@ -112,7 +169,7 @@ export class SearchItem extends Submenu {
     // extraction from params
     this.#itemReference = params.itemReference ?? null;
     this.#hint = params.hint ?? "";
-    this.#api = params.api ?? "cashier";
+    this.#type = params.type;
 
     this.#firstSearchItemOrStartSearchItem();
   }
@@ -162,11 +219,11 @@ export class SearchItem extends Submenu {
     const matchedItemsWithBarcode = item_searcher(
       this.#hint,
       ["barcode"],
-      API_NAMES[this.#api],
+      API_NAMES[this.#type],
       true
     );
 
-    const matchedItemsWithBoth = item_searcher(this.#hint, undefined, API_NAMES[this.#api], false);
+    const matchedItemsWithBoth = item_searcher(this.#hint, undefined, API_NAMES[this.#type], false);
 
     if (matchedItemsWithBarcode.length === 1) {
       // immediately set selected item and close the search-item if item (barcode) is already found
@@ -197,7 +254,7 @@ export class SearchItem extends Submenu {
       // set child UI and classes
 
       this.#searchItemHeader = new SearchItemHeader(this, this.#hint);
-      this.#searchItemResult = new SearchItemResults(this);
+      this.#searchItemResult = new SearchItemResults(this, this.#type);
 
       // set the html
       this._initializeSubmenu();
@@ -216,7 +273,7 @@ export class SearchItem extends Submenu {
     const matchedItemsWithBoth = item_searcher(
       this.#hint,
       undefined,
-      alreadyFilteredItems ? this.#filteredItems : API_NAMES[this.#api],
+      alreadyFilteredItems ? this.#filteredItems : API_NAMES[this.#type],
       false
     );
 
@@ -336,8 +393,11 @@ class SearchItemResults {
   #matchedItemList;
   #matchedItemElements;
   #focusedItemIndex;
-  constructor(searchItem) {
+  #result;
+
+  constructor(searchItem, type) {
     this.#searchItem = searchItem;
+    this.#result = SEARCH_ITEM_RESULTS[type];
 
     this.#createSearchItemResultsElement();
   }
@@ -384,13 +444,7 @@ class SearchItemResults {
 
   // set results header for initial
   #setInitalElement() {
-    this.#resultsElement.innerHTML = `
-        <div class="search-item-result-header">
-          <p class="item-barcode">Kode Barang</p>
-          <p class="item-name">Nama Barang</p>
-          <p class="item-type">Satuan</p>
-          <p class="item-price">Harga</p>
-        </div>`;
+    this.#resultsElement.innerHTML = this.#result["html"];
   }
 
   #setResultsElements() {
@@ -398,18 +452,7 @@ class SearchItemResults {
     this.#matchedItemElements = [];
 
     this.#matchedItemList.forEach((matchedItem) => {
-      const { barcode, name, quantity, price } = matchedItem;
-
-      const resultElement = document.createElement("div");
-      resultElement.tabIndex = "-1";
-      resultElement.className = "search-item-result-content";
-
-      resultElement.innerHTML = `
-      <p class="item-barcode">${barcode}</p>
-      <p class="item-name">${name}</p>
-      <p class="item-type">${quantity}</p>
-      <p class="item-price">${price}</p>
-    `;
+      const resultElement = this.#result.setFunction(matchedItem);
 
       // set listener to result item
       // when onclick, it'll be selected item from the list

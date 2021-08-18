@@ -81,21 +81,11 @@ export class Item {
       this.delete();
     }
 
-    console.log(this.itemList.stock.stockChild.submenu.openedSubmenu);
-
     this.itemList.stock.stockChild.submenu.openSubmenu("F2", {
       itemReference: this,
       hint: this.barcodeBefore,
-      api: "stock",
+      type: "stock",
     });
-
-    // if barcode changes but new item
-    // const result = findItem(barcode);
-    // if (typeof result === "object") {
-    //   this.knownItem(result);
-    // } else {
-    //   this.unknownItem(result);
-    // }
   }
 
   knownItem(itemData) {
