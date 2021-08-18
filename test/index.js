@@ -4,6 +4,7 @@ const path = require("path");
 const expect = require("chai").expect;
 const itemSuite = require("./item");
 const shortcutSuite = require("./shortcut");
+const StockSuite = require("./stock");
 const { sleep } = require("./helper");
 
 // example for loading mjs file (non type: module)
@@ -26,35 +27,35 @@ describe("Application launch", function () {
 
   it("opens home page", async () => {});
 
-  describe("#cashier", () => {
-    before("opens cashier", async () => {
-      const cashierButton = await app.client.$(".menusWrapper__menu.open-cashier");
-      await cashierButton.click();
+  // describe("#cashier", () => {
+  //   before("opens cashier", async () => {
+  //     const cashierButton = await app.client.$(".menusWrapper__menu.open-cashier");
+  //     await cashierButton.click();
 
-      // focus to second window (cashier)
-      await app.client.windowByIndex(1);
-    });
+  //     // focus to second window (cashier)
+  //     await app.client.windowByIndex(1);
+  //   });
 
-    beforeEach("refreshing", async () => {
-      app.client.refresh();
-    });
+  // beforeEach("refreshing", async () => {
+  //   app.client.refresh();
+  // });
 
-    it("the total windows should be 2", async () => {
-      const totalWindow = await app.client.getWindowCount();
-      expect(totalWindow).to.be.equal(2);
-    });
+  //   it("the total windows should be 2", async () => {
+  //     const totalWindow = await app.client.getWindowCount();
+  //     expect(totalWindow).to.be.equal(2);
+  //   });
 
-    after("closes cashier page", async () => {
-      // closes cashier via shortcut
-      const shortcuts = await app.client.$$(".cashier .shortcuts .shortcut");
-      await shortcuts[9].click();
+  //   after("closes cashier page", async () => {
+  //     // closes cashier via shortcut
+  //     const shortcuts = await app.client.$$(".cashier .shortcuts .shortcut");
+  //     await shortcuts[9].click();
 
-      await app.client.windowByIndex(0);
-    });
+  //     await app.client.windowByIndex(0);
+  //   });
 
-    itemSuite(app);
-    shortcutSuite(app);
-  });
+  //   // itemSuite(app);
+  //   // shortcutSuite(app);
+  // });
 
   describe("#stock", () => {
     before("opens stock page", async () => {
@@ -64,6 +65,12 @@ describe("Application launch", function () {
       // focus to second window (cashier)
       await app.client.windowByIndex(1);
     });
+
+    beforeEach("refreshing", async () => {
+      app.client.refresh();
+    });
+
+    StockSuite(app);
 
     after("closes cashier page", async () => {
       // closes cashier via shortcut

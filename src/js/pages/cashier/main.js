@@ -46,6 +46,10 @@ class CashierUI {
     return this.cashierElement;
   }
 
+  get name() {
+    return "cashier";
+  }
+
   focus() {
     this.cashierElement.focus();
   }

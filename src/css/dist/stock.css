@@ -4,14 +4,15 @@
   border-spacing: 0;
   font-family: "Goudy Old Style";
   user-select: none;
-  background-color: #f6f6f6;
   font-size: 18px;
 }
 
 .stock {
   position: relative;
-  overflow-y: scroll;
+}
+.stock > .stock-items {
   height: 90vh;
+  overflow-y: scroll;
   border-bottom: 2px solid #b0b0b0;
 }
 .stock > .stock-items > div {
@@ -100,6 +101,10 @@
 .stock > .stock-items input.locked {
   background-color: #e4e4e4;
   user-select: none;
+}
+.stock > .down-bar {
+  height: 9vh;
+  width: 100%;
 }
 
 input[type=number].remove-arrow::-webkit-outer-spin-button,

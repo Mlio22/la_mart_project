@@ -200,6 +200,7 @@ export class Item {
     this.itemList.transaction.transactionList.cashier.childs.submenu.openSubmenu("F2", {
       itemReference: this,
       hint: this.#data.barcode,
+      api: "cashier",
     });
   }
 }

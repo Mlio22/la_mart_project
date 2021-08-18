@@ -52,21 +52,6 @@ export class StockList {
     }
   }
 
-  checkItemListFor(action, item = null) {
-    if (action === "add") {
-      const emptyItemIndex = this.#stockList.findIndex((item) => item.empty);
-
-      if (emptyItemIndex) {
-        this.#stockList[emptyItemIndex].focus();
-      } else {
-        this.addItem();
-      }
-    }
-
-    if (action === "delete") {
-    }
-  }
-
   getDuplicatedItem(currentItem) {
     for (const index in this.#stockList) {
       const item = this.#stockList[index];

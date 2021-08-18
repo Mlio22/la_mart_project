@@ -1,4 +1,5 @@
 import { StockList } from "./stockChilds/stockList.js";
+import { SubmenuWrapper } from "../cashier/primary/submenuWrapper.js";
 import { Notification } from "./stockChilds/notification.js";
 
 class StockPage {
@@ -7,9 +8,17 @@ class StockPage {
     this.stockChild = {};
 
     // chidls: submenu, notification, and stock
-    // this.#stockChild.subemnu = new Submenu(this);
+    this.stockChild.submenu = new SubmenuWrapper(this);
     // this.#stockChild.notification = new Notification(this);
     this.stockChild.stockList = new StockList(this);
+  }
+
+  get element() {
+    return this.stockElement;
+  }
+
+  get name() {
+    return "stock";
   }
 }
 

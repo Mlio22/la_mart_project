@@ -38,7 +38,31 @@ const EXAMPLE_ITEMS_FROM_API = [
   },
 ];
 
-function item_searcher(hint, params = ["name", "barcode"], filteredItems = EXAMPLE_ITEMS_FROM_API, full_match = false) {
+const EXAMPLE_ITEMS_FOR_STOCK = [
+  {
+    barcode: "221",
+    name: "sambal ABC",
+    quantity: "Botol",
+    buyPrice: 20000,
+    sellPrice: 21500,
+    stock: 10,
+  },
+  {
+    barcode: "222",
+    name: "Sambal DEF",
+    quantity: "Sachet",
+    buyPrice: 2000,
+    sellPrice: 2100,
+    stock: 30,
+  },
+];
+
+const API_NAMES = {
+  cashier: EXAMPLE_ITEMS_FROM_API,
+  stock: EXAMPLE_ITEMS_FOR_STOCK,
+};
+
+function item_searcher(hint, params = ["name", "barcode"], filteredItems, full_match = false) {
   // filteredItem is an array of filteredItems from search-item that need be researched again to prevent over-searching the API
   const matchedItems = [];
 
@@ -75,6 +99,7 @@ export class SearchItem extends Submenu {
 
   #itemReference = null;
   #hint = null;
+  #api = null;
 
   #searchItemHeader;
   #searchItemResult;
@@ -87,6 +112,7 @@ export class SearchItem extends Submenu {
     // extraction from params
     this.#itemReference = params.itemReference ?? null;
     this.#hint = params.hint ?? "";
+    this.#api = params.api ?? "cashier";
 
     this.#firstSearchItemOrStartSearchItem();
   }
@@ -133,7 +159,15 @@ export class SearchItem extends Submenu {
     // if matches only to one item then choose item directly and close the search-item
     // the barcode item must be same to the hint
 
-    const matchedItemsWithBarcode = item_searcher(this.#hint, ["barcode"], undefined, true);
+    const matchedItemsWithBarcode = item_searcher(
+      this.#hint,
+      ["barcode"],
+      API_NAMES[this.#api],
+      true
+    );
+
+    const matchedItemsWithBoth = item_searcher(this.#hint, undefined, API_NAMES[this.#api], false);
+
     if (matchedItemsWithBarcode.length === 1) {
       // immediately set selected item and close the search-item if item (barcode) is already found
       setTimeout(() => {
@@ -145,6 +179,17 @@ export class SearchItem extends Submenu {
         // which will block other submenu creation when it called
         this.#isAutoCompleteSearch = true;
         this.selectedItem = matchedItemsWithBarcode[0];
+      }, 10);
+    } else if (matchedItemsWithBoth.length === 0) {
+      // immediately set selected item and close the search-item if any item doesnt match the hint
+      setTimeout(() => {
+        // set timeout so SearchItem established completely first
+        // because the process below contains Submenu.hideSubmenu()
+
+        // if Submenu.hideSubmenu() is called before SearchItem established,
+        // then the Submenu.#openedSubmenu won't be null, it'll be a SearchItem instance
+        // which will block other submenu creation when it called
+        this.selectedItem = null;
       }, 10);
     } else {
       // proceed to continue searching if matched item is more than one
@@ -171,7 +216,8 @@ export class SearchItem extends Submenu {
     const matchedItemsWithBoth = item_searcher(
       this.#hint,
       undefined,
-      alreadyFilteredItems ? this.#filteredItems : undefined
+      alreadyFilteredItems ? this.#filteredItems : API_NAMES[this.#api],
+      false
     );
 
     // set the results
@@ -183,13 +229,29 @@ export class SearchItem extends Submenu {
     if (this.#itemReference !== null) {
       // if itemReference params exists,
       // change that reference's item using item's method
-      this.#itemReference.data = { data: this.#selectedItem, code: this.#isAutoCompleteSearch ? 21 : 20 };
+      this.#itemReference.data = {
+        data: this.#selectedItem,
+        code: this.#isAutoCompleteSearch ? 21 : 20,
+      };
     } else {
       // if itemReference doesn't exist (e.g. search-item accessed from shortcut)
       // create new item data on itemList
-      this._submenu.cashier.childs.transactionList.currentTransaction.itemList.createNewItem(this.#selectedItem, {
-        isFromShortcut: true,
-      });
+      this._submenu.window.childs.transactionList.currentTransaction.itemList.createNewItem(
+        this.#selectedItem,
+        {
+          isFromShortcut: true,
+        }
+      );
+    }
+  }
+
+  #addToStockItemList() {
+    if (this.#itemReference !== null) {
+      if (this.#selectedItem !== null) {
+        this.#itemReference.knownItem(this.#selectedItem);
+      } else {
+        this.#itemReference.unknownItem();
+      }
     }
   }
 
@@ -213,7 +275,14 @@ export class SearchItem extends Submenu {
   set selectedItem(selectedItem) {
     // set the selected item and automatically add to current ItemList
     this.#selectedItem = selectedItem;
-    this.#addToSelectedItemToItemList();
+
+    if (this._submenu.window.name === "cashier") {
+      this.#addToSelectedItemToItemList();
+    } else {
+      if (this._submenu.window.name === "stock") {
+        this.#addToStockItemList();
+      }
+    }
 
     // when item is selected, close the search-item
     this._submenu.hideSubmenu();

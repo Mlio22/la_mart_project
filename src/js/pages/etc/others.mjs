@@ -7,7 +7,7 @@ function reverseString(string) {
 }
 
 // set ordinary number strings to proper price string
-export const set_proper_price = function (value) {
+export const set_proper_price = function (value = "") {
   // if the input was not a string
   value = value.toString();
 

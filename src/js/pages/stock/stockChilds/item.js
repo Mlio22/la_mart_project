@@ -24,20 +24,6 @@ const ITEMS = [
   },
 ];
 
-const findItem = (searchBarcode) => {
-  let isPartiallyMatch = false;
-
-  for (const item of ITEMS) {
-    if (item.barcode === searchBarcode) {
-      return item;
-    } else if (item.barcode.includes(searchBarcode)) {
-      isPartiallyMatch = true;
-    }
-  }
-
-  return isPartiallyMatch;
-};
-
 export class Item {
   constructor(itemList) {
     this.itemList = itemList;
@@ -95,16 +81,24 @@ export class Item {
       this.delete();
     }
 
+    console.log(this.itemList.stock.stockChild.submenu.openedSubmenu);
+
+    this.itemList.stock.stockChild.submenu.openSubmenu("F2", {
+      itemReference: this,
+      hint: this.barcodeBefore,
+      api: "stock",
+    });
+
     // if barcode changes but new item
-    const result = findItem(barcode);
-    if (typeof result === "object") {
-      this.#knownItem(result);
-    } else {
-      this.#unknownItem(result);
-    }
+    // const result = findItem(barcode);
+    // if (typeof result === "object") {
+    //   this.knownItem(result);
+    // } else {
+    //   this.unknownItem(result);
+    // }
   }
 
-  #knownItem(itemData) {
+  knownItem(itemData) {
     // check if item is duplicated or not
     const itemOnList = this.itemList.getDuplicatedItem(this);
 
@@ -151,35 +145,31 @@ export class Item {
     }
   }
 
-  #unknownItem(isMatchedPartially) {
-    if (isMatchedPartially) {
-      // open search item
+  unknownItem() {
+    // check for duplicated item
+    const itemOnList = this.itemList.getDuplicatedItem(this);
+
+    if (itemOnList) {
+      this.delete();
+      itemOnList.focus();
     } else {
-      // check for duplicated item
-      const itemOnList = this.itemList.getDuplicatedItem(this);
+      this.isKnownItem = false;
+      this.#setInputStatesForNewItem();
 
-      if (itemOnList) {
-        this.delete();
-        itemOnList.focus();
-      } else {
-        this.isKnownItem = false;
-        this.#setInputStatesForNewItem();
-
-        // if new barcode has been changed before, let the other input values
-        // otherwise, set setNewItemStarterValues() for starter input values
-        if (this.isNewBarcodeChanged) {
-          // focus to name
-          this.childElements.name.focus();
-        } else {
-          this.isNewBarcodeChanged = true;
-          this.#setNewItemStarterValues();
-
-          // add new item
-          this.itemList.checkItemList();
-        }
-
+      // if new barcode has been changed before, let the other input values
+      // otherwise, set setNewItemStarterValues() for starter input values
+      if (this.isNewBarcodeChanged) {
+        // focus to name
         this.childElements.name.focus();
+      } else {
+        this.isNewBarcodeChanged = true;
+        this.#setNewItemStarterValues();
+
+        // add new item
+        this.itemList.checkItemList();
       }
+
+      this.childElements.name.focus();
     }
   }
 
