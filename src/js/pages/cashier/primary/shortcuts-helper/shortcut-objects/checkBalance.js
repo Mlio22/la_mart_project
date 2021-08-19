@@ -10,7 +10,8 @@ export class CheckBalance extends Submenu {
   constructor(submenuWrapper, submenuProperties) {
     super(submenuWrapper, submenuProperties);
 
-    this.#completedTransactions = submenuWrapper.cashier.childs.transactionList.retrieveTransactionList(3);
+    this.#completedTransactions =
+      submenuWrapper.window.childs.transactionList.retrieveTransactionList(3);
 
     const getBalance = (sum, transaction) => sum + transaction.transactionInfo.cashInfo.totalPrice;
     this.#cashierMoney = this.#completedTransactions.reduce(getBalance, 0);

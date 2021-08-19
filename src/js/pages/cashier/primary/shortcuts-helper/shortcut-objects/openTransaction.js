@@ -135,9 +135,8 @@ class ResultTransactions {
 
   getTransactionList(sliderIndex = 0) {
     // sliderIndex + 2 equal as transaction's status
-    this.#currentFilteredTransactions = this.#submenu.cashier.childs.transactionList.retrieveTransactionList(
-      sliderIndex + 2
-    );
+    this.#currentFilteredTransactions =
+      this.#submenu.window.childs.transactionList.retrieveTransactionList(sliderIndex + 2);
 
     this.#showResults();
   }
@@ -209,7 +208,9 @@ class ResultTransactions {
       //* result selection (mouse - double click)
       let beforeTimeoutDouble = false;
       resultElement.addEventListener("click", (e) => {
-        this.focusIndex = this.#resultElements.findIndex(({ itemsElement }) => itemsElement === resultElement);
+        this.focusIndex = this.#resultElements.findIndex(
+          ({ itemsElement }) => itemsElement === resultElement
+        );
 
         if (
           e.target !== collapseButtonWrapper &&
@@ -241,14 +242,17 @@ class ResultTransactions {
 
   #selectTransactionAndClose() {
     // item selected;
-    this.#submenu.cashier.childs.transactionList.loadTransaction(
+    this.#submenu.window.childs.transactionList.loadTransaction(
       this.#currentFilteredTransactions[this.#focusIndex].transactionInfo.id
     );
 
-    this.#submenu.cashier.childs.submenu.hideSubmenu();
+    this.#submenu.window.childs.submenu.hideSubmenu();
   }
 
-  #arrowCollapseOrNot(collapseTarget = "close", itemsElement = this.#resultElements[this.#focusIndex].itemsElement) {
+  #arrowCollapseOrNot(
+    collapseTarget = "close",
+    itemsElement = this.#resultElements[this.#focusIndex].itemsElement
+  ) {
     //* collapse parameter values:
     // "close": about to close the collapse
     // "open": about to open the collapse
