@@ -105,8 +105,6 @@ export class SearchItem extends Submenu {
   #searchItemHeader;
   #searchItemResult;
 
-  #isAutoCompleteSearch = false;
-
   constructor(submenuWrapper, submenuProperties, params = {}) {
     super(submenuWrapper, submenuProperties);
 
@@ -115,7 +113,7 @@ export class SearchItem extends Submenu {
     this.#hint = params.hint ?? "";
     this.#type = params.type;
 
-    this.#firstSearchItemOrStartSearchItem();
+    this.#init();
   }
 
   // create element for search-item
@@ -155,61 +153,21 @@ export class SearchItem extends Submenu {
     });
   }
 
-  #firstSearchItemOrStartSearchItem() {
-    // search the DB from hint (first barcode)
-    // if matches only to one item then choose item directly and close the search-item
-    // the barcode item must be same to the hint
+  #init() {
+    // set child UI and classes
 
-    const matchedItemsWithBarcode = item_searcher(
-      this.#hint,
-      ["barcode"],
-      API_NAMES[this.#type],
-      true
-    );
+    this.#searchItemHeader = new SearchItemHeader(this, this.#hint);
+    this.#searchItemResult = new SearchItemResults(this, this.#type);
 
-    const matchedItemsWithBoth = item_searcher(this.#hint, undefined, API_NAMES[this.#type], false);
+    // set the html
+    this._initializeSubmenu();
 
-    if (matchedItemsWithBarcode.length === 1) {
-      // immediately set selected item and close the search-item if item (barcode) is already found
-      setTimeout(() => {
-        // set timeout so SearchItem established completely first
-        // because the process below contains Submenu.hideSubmenu()
+    // focus to hint
+    this.#searchItemHeader.focusToHint();
 
-        // if Submenu.hideSubmenu() is called before SearchItem established,
-        // then the Submenu.#openedSubmenu won't be null, it'll be a SearchItem instance
-        // which will block other submenu creation when it called
-        this.#isAutoCompleteSearch = true;
-        this.selectedItem = matchedItemsWithBarcode[0];
-      }, 10);
-    } else if (matchedItemsWithBoth.length === 0) {
-      // immediately set selected item and close the search-item if any item doesnt match the hint
-      setTimeout(() => {
-        // set timeout so SearchItem established completely first
-        // because the process below contains Submenu.hideSubmenu()
-
-        // if Submenu.hideSubmenu() is called before SearchItem established,
-        // then the Submenu.#openedSubmenu won't be null, it'll be a SearchItem instance
-        // which will block other submenu creation when it called
-        this.selectedItem = null;
-      }, 10);
-    } else {
-      // proceed to continue searching if matched item is more than one
-      // or no item found in first search
-      // set child UI and classes
-
-      this.#searchItemHeader = new SearchItemHeader(this, this.#hint);
-      this.#searchItemResult = new SearchItemResults(this, this.#type);
-
-      // set the html
-      this._initializeSubmenu();
-
-      // focus to hint
-      this.#searchItemHeader.focusToHint();
-
-      // search the item if hint is not empty string
-      if (this.#hint !== "") {
-        this.#searchItemMatchBoth();
-      }
+    // search the item if hint is not empty string
+    if (this.#hint !== "") {
+      this.#searchItemMatchBoth();
     }
   }
 
@@ -232,7 +190,7 @@ export class SearchItem extends Submenu {
       // change that reference's item using item's method
       this.#itemReference.data = {
         data: this.#selectedItem,
-        code: this.#isAutoCompleteSearch ? 21 : 20,
+        code: 20,
       };
     } else {
       // if itemReference doesn't exist (e.g. search-item accessed from shortcut)
@@ -287,6 +245,31 @@ export class SearchItem extends Submenu {
 
     // when item is selected, close the search-item
     this._submenu.hideSubmenu();
+  }
+
+  static exactMatch(hint, type) {
+    // return itemData if hint matches exactly with a barcode on DB
+    // return false if not match exact
+
+    const matchExactBarcode = item_searcher(hint, ["barcode"], API_NAMES[type], true),
+      isMatchExact = matchExactBarcode.length === 1;
+
+    if (isMatchExact) {
+      const matchExact = matchExactBarcode[0];
+      return matchExact;
+    }
+
+    return false;
+  }
+
+  static anyMatch(hint, type) {
+    // return true if hint matches any barcode or name on DB (doesnt match exact with any barcode)
+    // return false if hint doesn't match any barcode or name
+
+    const matchAny = item_searcher(hint, ["barcode", "name"], API_NAMES[type], false),
+      isMatchAny = matchAny.length > 0;
+
+    return isMatchAny;
   }
 }
 

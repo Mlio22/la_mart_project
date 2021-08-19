@@ -1,6 +1,7 @@
 import { BarcodeElement, TextElement, ActionElement, AmountElement } from "./itemElement.js";
 import { set_proper_price } from "../../../etc/others.mjs";
 import { ItemLog } from "../../../etc/Log.js";
+import { SearchItem } from "../shortcuts-helper/shortcut-objects/searchItem.js";
 
 const EMPTY_ITEM = {
   barcode: "",
@@ -197,11 +198,20 @@ export class Item {
   }
 
   openSearchFromItem() {
-    this.itemList.transaction.transactionList.cashier.childs.submenu.openSubmenu("F2", {
-      itemReference: this,
-      hint: this.#data.barcode,
-      type: "cashier",
-    });
+    // exact match search attempt
+    const exactMatch = SearchItem.exactMatch(this.#data.barcode, "cashier");
+    if (exactMatch) {
+      this.data = { data: exactMatch, code: 21 };
+    }
+
+    // search anyways
+    else {
+      this.itemList.transaction.transactionList.cashier.childs.submenu.openSubmenu("F2", {
+        itemReference: this,
+        hint: this.#data.barcode,
+        type: "cashier",
+      });
+    }
   }
 }
 

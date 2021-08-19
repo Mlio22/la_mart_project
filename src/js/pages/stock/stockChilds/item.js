@@ -5,6 +5,7 @@ import {
   PriceElement,
   NumberElement,
 } from "./itemElements.js";
+import { SearchItem } from "../../cashier/primary/shortcuts-helper/shortcut-objects/searchItem.js";
 
 export class Item {
   constructor(itemList) {
@@ -64,12 +65,27 @@ export class Item {
       this.delete();
     }
 
-    // open search item
-    this.itemList.stock.stockChild.submenu.openSubmenu("F2", {
-      itemReference: this,
-      hint: this.barcodeBefore,
-      type: "stock",
-    });
+    // exact match search attempt
+    const exactMatch = SearchItem.exactMatch(this.barcodeBefore, "stock");
+    if (exactMatch) {
+      this.knownItem(exactMatch);
+    }
+
+    // any match search
+    else {
+      const isMatchAny = SearchItem.anyMatch(this.barcodeBefore, "stock");
+
+      if (isMatchAny) {
+        // open search item
+        this.itemList.stock.stockChild.submenu.openSubmenu("F2", {
+          itemReference: this,
+          hint: this.barcodeBefore,
+          type: "stock",
+        });
+      } else {
+        this.unknownItem();
+      }
+    }
   }
 
   knownItem(itemData) {
