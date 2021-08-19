@@ -1,67 +1,6 @@
 import { Submenu } from "./SubmenuPrototype.js";
+import { APIs } from "../../../../api.js";
 // todo: output pada search item adalah Promise
-
-const EXAMPLE_ITEMS_FROM_API = [
-  {
-    barcode: "121",
-    name: "A",
-    quantity: "Kotak",
-    price: 200000,
-    valid: true,
-  },
-  {
-    barcode: "132",
-    name: "B",
-    quantity: "Box",
-    price: 10000,
-    valid: true,
-  },
-  {
-    barcode: "221",
-    name: "C",
-    quantity: "Sachet",
-    price: 2000,
-    valid: true,
-  },
-  {
-    barcode: "222",
-    name: "C",
-    quantity: "Bungkus",
-    price: 21000,
-    valid: true,
-  },
-  {
-    barcode: "231",
-    name: "D",
-    quantity: "Pcs",
-    price: 10500,
-    valid: true,
-  },
-];
-
-const EXAMPLE_ITEMS_FOR_STOCK = [
-  {
-    barcode: "221",
-    name: "sambal ABC",
-    quantity: "Botol",
-    buyPrice: 20000,
-    sellPrice: 21500,
-    stock: 10,
-  },
-  {
-    barcode: "222",
-    name: "Sambal DEF",
-    quantity: "Sachet",
-    buyPrice: 2000,
-    sellPrice: 2100,
-    stock: 30,
-  },
-];
-
-const API_NAMES = {
-  cashier: EXAMPLE_ITEMS_FROM_API,
-  stock: EXAMPLE_ITEMS_FOR_STOCK,
-};
 
 function item_searcher(hint, params = ["name", "barcode"], filteredItems, full_match = false) {
   // filteredItem is an array of filteredItems from search-item that need be researched again to prevent over-searching the API
@@ -175,7 +114,7 @@ export class SearchItem extends Submenu {
     const matchedItemsWithBoth = item_searcher(
       this.#hint,
       undefined,
-      alreadyFilteredItems ? this.#filteredItems : API_NAMES[this.#type],
+      alreadyFilteredItems ? this.#filteredItems : APIs[this.#type],
       false
     );
 
@@ -251,7 +190,7 @@ export class SearchItem extends Submenu {
     // return itemData if hint matches exactly with a barcode on DB
     // return false if not match exact
 
-    const matchExactBarcode = item_searcher(hint, ["barcode"], API_NAMES[type], true),
+    const matchExactBarcode = item_searcher(hint, ["barcode"], APIs[type], true),
       isMatchExact = matchExactBarcode.length === 1;
 
     if (isMatchExact) {
@@ -266,7 +205,7 @@ export class SearchItem extends Submenu {
     // return true if hint matches any barcode or name on DB (doesnt match exact with any barcode)
     // return false if hint doesn't match any barcode or name
 
-    const matchAny = item_searcher(hint, ["barcode", "name"], API_NAMES[type], false),
+    const matchAny = item_searcher(hint, ["barcode", "name"], APIs[type], false),
       isMatchAny = matchAny.length > 0;
 
     return isMatchAny;
