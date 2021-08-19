@@ -50,7 +50,7 @@ export class SearchItem extends Submenu {
     // extraction from params
     this.#itemReference = params.itemReference ?? null;
     this.#hint = params.hint ?? "";
-    this.#type = params.type;
+    this.#type = params.type ?? "cashier";
 
     this.#init();
   }
