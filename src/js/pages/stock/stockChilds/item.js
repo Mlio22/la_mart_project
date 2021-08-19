@@ -5,24 +5,6 @@ import {
   PriceElement,
   NumberElement,
 } from "./itemElements.js";
-const ITEMS = [
-  {
-    barcode: "221",
-    name: "sambal ABC",
-    quantity: "Botol",
-    buyPrice: 20000,
-    sellPrice: 21500,
-    stock: 10,
-  },
-  {
-    barcode: "222",
-    name: "Sambal DEF",
-    quantity: "Sachet",
-    buyPrice: 2000,
-    sellPrice: 2100,
-    stock: 30,
-  },
-];
 
 export class Item {
   constructor(itemList) {
@@ -76,11 +58,13 @@ export class Item {
     if (barcode === this.barcodeBefore) return;
     this.barcodeBefore = barcode;
 
-    // set to try to delete item if barcode is empty and item wasn't new item (mepty item)
+    // set to try to delete item if barcode is empty
+    // and item wasn't new item (mepty item)
     if (barcode === "" && !this.empty) {
       this.delete();
     }
 
+    // open search item
     this.itemList.stock.stockChild.submenu.openSubmenu("F2", {
       itemReference: this,
       hint: this.barcodeBefore,
@@ -89,6 +73,9 @@ export class Item {
   }
 
   knownItem(itemData) {
+    // set item values
+    this.#setItemValues(itemData);
+
     // check if item is duplicated or not
     const itemOnList = this.itemList.getDuplicatedItem(this);
 
@@ -103,8 +90,6 @@ export class Item {
     } else {
       this.isKnownItem = true;
       this.isNewBarcodeChanged = false;
-      // set item values
-      this.#setItemValues(itemData);
 
       // focus to stock in
       this.childElements.stockIn.focus();

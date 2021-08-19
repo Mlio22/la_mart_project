@@ -1,4 +1,5 @@
 import { Submenu } from "./SubmenuPrototype.js";
+// todo: output pada search item adalah Promise
 
 const EXAMPLE_ITEMS_FROM_API = [
   {
@@ -60,63 +61,6 @@ const EXAMPLE_ITEMS_FOR_STOCK = [
 const API_NAMES = {
   cashier: EXAMPLE_ITEMS_FROM_API,
   stock: EXAMPLE_ITEMS_FOR_STOCK,
-};
-
-const SEARCH_ITEM_RESULTS = {
-  cashier: {
-    html: `
-        <div class="search-item-result-header">
-          <p class="item-barcode">Kode Barang</p>
-          <p class="item-name">Nama Barang</p>
-          <p class="item-type">Satuan</p>
-          <p class="item-price">Harga</p>
-        </div>`,
-    setFunction: function (item) {
-      const { barcode, name, quantity, price } = item;
-
-      const resultElement = document.createElement("div");
-      resultElement.tabIndex = "-1";
-      resultElement.className = "search-item-result-content";
-
-      resultElement.innerHTML = `
-      <p class="item-barcode">${barcode}</p>
-      <p class="item-name">${name}</p>
-      <p class="item-type">${quantity}</p>
-      <p class="item-price">${price}</p>
-    `;
-
-      return resultElement;
-    },
-  },
-  stock: {
-    html: `
-        <div class="search-item-result-header">
-          <p class="item-barcode">Kode Barang</p>
-          <p class="item-name">Nama Barang</p>
-          <p class="item-type">Satuan</p>
-          <p class="item-price">Harga Masuk</p>
-          <p class="item-price">Harga Jual</p>
-          <p class="item-type">Stock</p>
-        </div>`,
-    setFunction: function (item) {
-      const { barcode, name, quantity, buyPrice, sellPrice, stock } = item;
-
-      const resultElement = document.createElement("div");
-      resultElement.tabIndex = "-1";
-      resultElement.className = "search-item-result-content";
-
-      resultElement.innerHTML = `
-      <p class="item-barcode">${barcode}</p>
-      <p class="item-name">${name}</p>
-      <p class="item-type">${quantity}</p>
-      <p class="item-price">${buyPrice}</p>
-      <p class="item-price">${sellPrice}</p>
-      <p class="item-type">${stock}</p>
-    `;
-
-      return resultElement;
-    },
-  },
 };
 
 function item_searcher(hint, params = ["name", "barcode"], filteredItems, full_match = false) {
@@ -386,6 +330,63 @@ class SearchItemHeader {
     this.#hintElement.focus();
   }
 }
+
+const SEARCH_ITEM_RESULTS = {
+  cashier: {
+    html: `
+        <div class="search-item-result-header">
+          <p class="item-barcode">Kode Barang</p>
+          <p class="item-name">Nama Barang</p>
+          <p class="item-type">Satuan</p>
+          <p class="item-price">Harga</p>
+        </div>`,
+    setFunction: function (item) {
+      const { barcode, name, quantity, price } = item;
+
+      const resultElement = document.createElement("div");
+      resultElement.tabIndex = "-1";
+      resultElement.className = "search-item-result-content";
+
+      resultElement.innerHTML = `
+      <p class="item-barcode">${barcode}</p>
+      <p class="item-name">${name}</p>
+      <p class="item-type">${quantity}</p>
+      <p class="item-price">${price}</p>
+    `;
+
+      return resultElement;
+    },
+  },
+  stock: {
+    html: `
+        <div class="search-item-result-header">
+          <p class="item-barcode">Kode Barang</p>
+          <p class="item-name">Nama Barang</p>
+          <p class="item-type">Satuan</p>
+          <p class="item-price">Harga Masuk</p>
+          <p class="item-price">Harga Jual</p>
+          <p class="item-type">Stock</p>
+        </div>`,
+    setFunction: function (item) {
+      const { barcode, name, quantity, buyPrice, sellPrice, stock } = item;
+
+      const resultElement = document.createElement("div");
+      resultElement.tabIndex = "-1";
+      resultElement.className = "search-item-result-content";
+
+      resultElement.innerHTML = `
+      <p class="item-barcode">${barcode}</p>
+      <p class="item-name">${name}</p>
+      <p class="item-type">${quantity}</p>
+      <p class="item-price">${buyPrice}</p>
+      <p class="item-price">${sellPrice}</p>
+      <p class="item-type">${stock}</p>
+    `;
+
+      return resultElement;
+    },
+  },
+};
 
 class SearchItemResults {
   #searchItem;
