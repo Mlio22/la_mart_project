@@ -9,13 +9,11 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       deskripsi_alasan_perubahan_stok: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(20),
+        allowNull: false,
+        unique: true,
       },
       createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-      },
-      updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
       },

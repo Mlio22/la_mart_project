@@ -11,25 +11,26 @@ module.exports = {
       id_barang: {
         type: Sequelize.INTEGER,
         references: { model: "detail_barang", key: "id" },
+        allowNull: false,
       },
       id_transaksi_keseluruhan: {
         type: Sequelize.INTEGER,
         references: { model: "transaksi_keseluruhan", key: "id" },
+        allowNull: false,
       },
       jumlah: {
         type: Sequelize.INTEGER,
+        allowNull: false,
       },
       total_harga: {
         type: Sequelize.INTEGER,
+        allowNull: false,
       },
       keuntungan: {
         type: Sequelize.INTEGER,
+        allowNull: false,
       },
       createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-      },
-      updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
       },

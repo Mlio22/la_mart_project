@@ -10,17 +10,15 @@ module.exports = {
       },
       total_pendapatan: {
         type: Sequelize.INTEGER,
+        allowNull: false,
       },
       total_keuntungan: {
         type: Sequelize.INTEGER,
-      },
-      createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
       },
-      updatedAt: {
+      tanggal: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
     });
   },

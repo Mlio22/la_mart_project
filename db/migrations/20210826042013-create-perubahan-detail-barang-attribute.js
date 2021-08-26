@@ -9,15 +9,9 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       deskripsi_attribute: {
-        type: Sequelize.STRING,
-      },
-      createdAt: {
+        type: Sequelize.STRING(20),
         allowNull: false,
-        type: Sequelize.DATE,
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
+        unique: true,
       },
     });
   },

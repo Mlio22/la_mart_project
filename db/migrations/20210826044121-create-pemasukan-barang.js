@@ -11,15 +11,13 @@ module.exports = {
       id_stok_barang: {
         type: Sequelize.INTEGER,
         references: { model: "stok_barang", key: "id" },
+        allowNull: false,
       },
       jumlah: {
         type: Sequelize.INTEGER,
+        allowNull: false,
       },
       createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-      },
-      updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
       },
