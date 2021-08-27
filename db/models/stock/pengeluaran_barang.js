@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class pengeluaran_barang extends Model {
     /**
@@ -12,14 +10,28 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
-  };
-  pengeluaran_barang.init({
-    id_stok_barang: DataTypes.INTEGER,
-    id_alasan_pengeluaran: DataTypes.INTEGER,
-    jumlah: DataTypes.INTEGER
-  }, {
-    sequelize,
-    modelName: 'pengeluaran_barang',
-  });
+  }
+  pengeluaran_barang.init(
+    {
+      id_stok_barang: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      id_alasan_pengeluaran: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      jumlah: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+    },
+    {
+      sequelize,
+      updatedAt: false,
+      modelName: "pengeluaran_barang",
+      tableName: "pengeluaran_barang",
+    }
+  );
   return pengeluaran_barang;
 };

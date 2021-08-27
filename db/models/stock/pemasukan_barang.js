@@ -13,12 +13,20 @@ module.exports = (sequelize, DataTypes) => {
   }
   pemasukan_barang.init(
     {
-      id_stok_barang: DataTypes.INTEGER,
-      jumlah: DataTypes.INTEGER,
+      id_stok_barang: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      jumlah: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
     {
       sequelize,
+      updatedAt: false,
       modelName: "pemasukan_barang",
+      tableName: "pemasukan_barang",
     }
   );
   return pemasukan_barang;

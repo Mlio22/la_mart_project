@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class alasan_perubahan_jumlah_stok extends Model {
     /**
@@ -12,12 +10,20 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
-  };
-  alasan_perubahan_jumlah_stok.init({
-    deskripsi_alasan_perubahan_stok: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'alasan_perubahan_jumlah_stok',
-  });
+  }
+  alasan_perubahan_jumlah_stok.init(
+    {
+      deskripsi_alasan_perubahan_stok: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
+      },
+    },
+    {
+      sequelize,
+      timestamps: false,
+      modelName: "alasan_perubahan_jumlah_stok",
+      tableName: "alasan_perubahan_jumlah_stok",
+    }
+  );
   return alasan_perubahan_jumlah_stok;
 };
