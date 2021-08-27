@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class perubahan_jumlah_stok_barang extends Model {
+  class PemasukanBarang extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,21 +11,13 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  perubahan_jumlah_stok_barang.init(
+  PemasukanBarang.init(
     {
       id_stok_barang: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      id_alasan_perubahan_stok_barang: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      jumlah_awal: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      jumlah_akhir: {
+      jumlah: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
@@ -33,9 +25,9 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       updatedAt: false,
-      modelName: "perubahan_jumlah_stok_barang",
-      tableName: "perubahan_jumlah_stok_barang",
+      modelName: "pemasukan_barang",
+      tableName: "pemasukan_barang",
     }
   );
-  return perubahan_jumlah_stok_barang;
+  return PemasukanBarang;
 };
