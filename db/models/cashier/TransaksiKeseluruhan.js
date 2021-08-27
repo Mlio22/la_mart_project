@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       updatedAt: false,
-      modelName: "transaksi_keseluruhan",
+      modelName: "TransaksiKeseluruhan",
       tableName: "transaksi_keseluruhan",
     }
   );

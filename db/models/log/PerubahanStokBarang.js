@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       updatedAt: false,
-      modelName: "perubahan_jumlah_stok_barang",
+      modelName: "PerubahanStokBarang",
       tableName: "perubahan_jumlah_stok_barang",
     }
   );
