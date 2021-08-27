@@ -13,10 +13,6 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-      },
     });
   },
   down: async (queryInterface, Sequelize) => {
