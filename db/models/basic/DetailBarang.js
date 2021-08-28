@@ -22,6 +22,14 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
       },
+      harga_beli: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      harga_jual: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       satuan_barang: {
         type: DataTypes.STRING(20),
         allowNull: false,

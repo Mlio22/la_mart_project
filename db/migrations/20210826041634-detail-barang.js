@@ -22,6 +22,14 @@ module.exports = {
         type: Sequelize.STRING(15),
         allowNull: false,
       },
+      harga_beli: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      harga_jual: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
