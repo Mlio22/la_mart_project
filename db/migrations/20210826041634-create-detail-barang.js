@@ -18,6 +18,10 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
+      satuan_barang: {
+        type: Sequelize.STRING(15),
+        allowNull: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
