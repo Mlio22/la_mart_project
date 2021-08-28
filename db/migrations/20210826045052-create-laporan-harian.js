@@ -19,6 +19,7 @@ module.exports = {
       tanggal: {
         allowNull: false,
         type: Sequelize.DATEONLY,
+        defaultValue: Sequelize.fn("now"),
       },
     });
   },

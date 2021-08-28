@@ -1,6 +1,7 @@
 "use strict";
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    console.log(Sequelize);
     await queryInterface.createTable("transaksi_keseluruhan", {
       id: {
         allowNull: false,
@@ -32,6 +33,7 @@ module.exports = {
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.fn("now"),
       },
     });
   },
