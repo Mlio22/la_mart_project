@@ -15,7 +15,7 @@ module.exports = {
       },
       id_attribute_perubahan: {
         type: Sequelize.INTEGER,
-        references: { model: "perubahan_detail_barang_attribute", key: "id" },
+        references: { model: "detail_barang_attribute", key: "id" },
         allowNull: false,
       },
       content_before: {

@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       updatedAt: false,
       modelName: "PerubahanStokBarang",
-      tableName: "perubahan_jumlah_stok_barang",
+      tableName: "perubahan_stok_barang",
     }
   );
   return PerubahanStokBarang;
