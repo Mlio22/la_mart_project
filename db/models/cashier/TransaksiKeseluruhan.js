@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       id_status_transaksi: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        defaultValue: 1,
       },
       total_harus_dibayar: {
         type: DataTypes.INTEGER,
@@ -41,5 +41,6 @@ module.exports = (sequelize, DataTypes) => {
       tableName: "transaksi_keseluruhan",
     }
   );
+
   return TransaksiKeseluruhan;
 };

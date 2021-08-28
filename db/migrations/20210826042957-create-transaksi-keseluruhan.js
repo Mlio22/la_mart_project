@@ -11,7 +11,7 @@ module.exports = {
       id_status_transaksi: {
         type: Sequelize.INTEGER,
         references: { model: "status_transaksi", key: "id" },
-        allowNull: false,
+        defaultValue: 1,
       },
       total_harus_dibayar: {
         type: Sequelize.INTEGER,
