@@ -5,10 +5,10 @@ export class SubmenuWrapper {
   #submenuCoverElement;
   #submenuWrapperElement;
 
-  constructor(cashier) {
-    this.cashier = cashier;
+  constructor(window) {
+    this.window = window;
 
-    this.#submenuCoverElement = cashier.element.querySelector(".submenuCover");
+    this.#submenuCoverElement = window.element.querySelector(".submenuCover");
     this.#submenuWrapperElement = this.#submenuCoverElement.querySelector(".submenu");
 
     this.#listenEvent();
@@ -26,7 +26,11 @@ export class SubmenuWrapper {
     this.#submenuWrapperElement.innerHTML = "";
 
     // focus to latest item
-    this.cashier.childs.transactionList.currentTransaction.transactionInfo.itemList.focusToLatestBarcode();
+    if (this.window.name === "cashier") {
+      this.window.childs.transactionList.currentTransaction.transactionInfo.itemList.focusToLatestBarcode();
+    } else if (this.window.name === "stock") {
+      return this.window;
+    }
   }
 
   //   opening a shortcut
@@ -60,7 +64,7 @@ export class SubmenuWrapper {
     });
 
     // escape button listener
-    this.cashier.element.addEventListener("keydown", ({ key }) => {
+    this.window.element.addEventListener("keydown", ({ key }) => {
       if (this.#openedSubmenu && key === "Escape") {
         this.hideSubmenu();
       }
@@ -69,5 +73,9 @@ export class SubmenuWrapper {
 
   get element() {
     return this.#submenuWrapperElement;
+  }
+
+  get openedSubmenu() {
+    return this.#openedSubmenu;
   }
 }

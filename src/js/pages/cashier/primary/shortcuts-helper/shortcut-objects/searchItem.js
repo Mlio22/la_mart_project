@@ -1,44 +1,8 @@
 import { Submenu } from "./SubmenuPrototype.js";
+import { APIs } from "../../../../api.js";
+// todo: output pada search item adalah Promise
 
-const EXAMPLE_ITEMS_FROM_API = [
-  {
-    barcode: "121",
-    name: "A",
-    quantity: "Kotak",
-    price: 200000,
-    valid: true,
-  },
-  {
-    barcode: "132",
-    name: "B",
-    quantity: "Box",
-    price: 10000,
-    valid: true,
-  },
-  {
-    barcode: "221",
-    name: "C",
-    quantity: "Sachet",
-    price: 2000,
-    valid: true,
-  },
-  {
-    barcode: "222",
-    name: "C",
-    quantity: "Bungkus",
-    price: 21000,
-    valid: true,
-  },
-  {
-    barcode: "231",
-    name: "D",
-    quantity: "Pcs",
-    price: 10500,
-    valid: true,
-  },
-];
-
-function item_searcher(hint, params = ["name", "barcode"], filteredItems = EXAMPLE_ITEMS_FROM_API, full_match = false) {
+function item_searcher(hint, params = ["name", "barcode"], filteredItems, full_match = false) {
   // filteredItem is an array of filteredItems from search-item that need be researched again to prevent over-searching the API
   const matchedItems = [];
 
@@ -73,13 +37,12 @@ export class SearchItem extends Submenu {
   #filteredItems = [];
   #selectedItem = null;
 
-  #itemReference = null;
-  #hint = null;
+  #itemReference;
+  #hint;
+  #type;
 
   #searchItemHeader;
   #searchItemResult;
-
-  #isAutoCompleteSearch = false;
 
   constructor(submenuWrapper, submenuProperties, params = {}) {
     super(submenuWrapper, submenuProperties);
@@ -87,8 +50,9 @@ export class SearchItem extends Submenu {
     // extraction from params
     this.#itemReference = params.itemReference ?? null;
     this.#hint = params.hint ?? "";
+    this.#type = params.type ?? "cashier";
 
-    this.#firstSearchItemOrStartSearchItem();
+    this.#init();
   }
 
   // create element for search-item
@@ -128,42 +92,21 @@ export class SearchItem extends Submenu {
     });
   }
 
-  #firstSearchItemOrStartSearchItem() {
-    // search the DB from hint (first barcode)
-    // if matches only to one item then choose item directly and close the search-item
-    // the barcode item must be same to the hint
+  #init() {
+    // set child UI and classes
 
-    const matchedItemsWithBarcode = item_searcher(this.#hint, ["barcode"], undefined, true);
-    if (matchedItemsWithBarcode.length === 1) {
-      // immediately set selected item and close the search-item if item (barcode) is already found
-      setTimeout(() => {
-        // set timeout so SearchItem established completely first
-        // because the process below contains Submenu.hideSubmenu()
+    this.#searchItemHeader = new SearchItemHeader(this, this.#hint);
+    this.#searchItemResult = new SearchItemResults(this, this.#type);
 
-        // if Submenu.hideSubmenu() is called before SearchItem established,
-        // then the Submenu.#openedSubmenu won't be null, it'll be a SearchItem instance
-        // which will block other submenu creation when it called
-        this.#isAutoCompleteSearch = true;
-        this.selectedItem = matchedItemsWithBarcode[0];
-      }, 10);
-    } else {
-      // proceed to continue searching if matched item is more than one
-      // or no item found in first search
-      // set child UI and classes
+    // set the html
+    this._initializeSubmenu();
 
-      this.#searchItemHeader = new SearchItemHeader(this, this.#hint);
-      this.#searchItemResult = new SearchItemResults(this);
+    // focus to hint
+    this.#searchItemHeader.focusToHint();
 
-      // set the html
-      this._initializeSubmenu();
-
-      // focus to hint
-      this.#searchItemHeader.focusToHint();
-
-      // search the item if hint is not empty string
-      if (this.#hint !== "") {
-        this.#searchItemMatchBoth();
-      }
+    // search the item if hint is not empty string
+    if (this.#hint !== "") {
+      this.#searchItemMatchBoth();
     }
   }
 
@@ -171,7 +114,8 @@ export class SearchItem extends Submenu {
     const matchedItemsWithBoth = item_searcher(
       this.#hint,
       undefined,
-      alreadyFilteredItems ? this.#filteredItems : undefined
+      alreadyFilteredItems ? this.#filteredItems : APIs[this.#type],
+      false
     );
 
     // set the results
@@ -183,13 +127,29 @@ export class SearchItem extends Submenu {
     if (this.#itemReference !== null) {
       // if itemReference params exists,
       // change that reference's item using item's method
-      this.#itemReference.data = { data: this.#selectedItem, code: this.#isAutoCompleteSearch ? 21 : 20 };
+      this.#itemReference.data = {
+        data: this.#selectedItem,
+        code: 20,
+      };
     } else {
       // if itemReference doesn't exist (e.g. search-item accessed from shortcut)
       // create new item data on itemList
-      this._submenu.cashier.childs.transactionList.currentTransaction.itemList.createNewItem(this.#selectedItem, {
-        isFromShortcut: true,
-      });
+      this._submenu.window.childs.transactionList.currentTransaction.itemList.createNewItem(
+        this.#selectedItem,
+        {
+          isFromShortcut: true,
+        }
+      );
+    }
+  }
+
+  #addToStockItemList() {
+    if (this.#itemReference !== null) {
+      if (this.#selectedItem !== null) {
+        this.#itemReference.knownItem(this.#selectedItem);
+      } else {
+        this.#itemReference.unknownItem();
+      }
     }
   }
 
@@ -213,10 +173,42 @@ export class SearchItem extends Submenu {
   set selectedItem(selectedItem) {
     // set the selected item and automatically add to current ItemList
     this.#selectedItem = selectedItem;
-    this.#addToSelectedItemToItemList();
+
+    if (this._submenu.window.name === "cashier") {
+      this.#addToSelectedItemToItemList();
+    } else {
+      if (this._submenu.window.name === "stock") {
+        this.#addToStockItemList();
+      }
+    }
 
     // when item is selected, close the search-item
     this._submenu.hideSubmenu();
+  }
+
+  static exactMatch(hint, type) {
+    // return itemData if hint matches exactly with a barcode on DB
+    // return false if not match exact
+
+    const matchExactBarcode = item_searcher(hint, ["barcode"], APIs[type], true),
+      isMatchExact = matchExactBarcode.length === 1;
+
+    if (isMatchExact) {
+      const matchExact = matchExactBarcode[0];
+      return matchExact;
+    }
+
+    return false;
+  }
+
+  static anyMatch(hint, type) {
+    // return true if hint matches any barcode or name on DB (doesnt match exact with any barcode)
+    // return false if hint doesn't match any barcode or name
+
+    const matchAny = item_searcher(hint, ["barcode", "name"], APIs[type], false),
+      isMatchAny = matchAny.length > 0;
+
+    return isMatchAny;
   }
 }
 
@@ -261,14 +253,74 @@ class SearchItemHeader {
   }
 }
 
+const SEARCH_ITEM_RESULTS = {
+  cashier: {
+    html: `
+        <div class="search-item-result-header">
+          <p class="item-barcode">Kode Barang</p>
+          <p class="item-name">Nama Barang</p>
+          <p class="item-type">Satuan</p>
+          <p class="item-price">Harga</p>
+        </div>`,
+    setFunction: function (item) {
+      const { barcode, name, quantity, price } = item;
+
+      const resultElement = document.createElement("div");
+      resultElement.tabIndex = "-1";
+      resultElement.className = "search-item-result-content";
+
+      resultElement.innerHTML = `
+      <p class="item-barcode">${barcode}</p>
+      <p class="item-name">${name}</p>
+      <p class="item-type">${quantity}</p>
+      <p class="item-price">${price}</p>
+    `;
+
+      return resultElement;
+    },
+  },
+  stock: {
+    html: `
+        <div class="search-item-result-header">
+          <p class="item-barcode">Kode Barang</p>
+          <p class="item-name">Nama Barang</p>
+          <p class="item-type">Satuan</p>
+          <p class="item-price">Harga Masuk</p>
+          <p class="item-price">Harga Jual</p>
+          <p class="item-type">Stock</p>
+        </div>`,
+    setFunction: function (item) {
+      const { barcode, name, quantity, buyPrice, sellPrice, stock } = item;
+
+      const resultElement = document.createElement("div");
+      resultElement.tabIndex = "-1";
+      resultElement.className = "search-item-result-content";
+
+      resultElement.innerHTML = `
+      <p class="item-barcode">${barcode}</p>
+      <p class="item-name">${name}</p>
+      <p class="item-type">${quantity}</p>
+      <p class="item-price">${buyPrice}</p>
+      <p class="item-price">${sellPrice}</p>
+      <p class="item-type">${stock}</p>
+    `;
+
+      return resultElement;
+    },
+  },
+};
+
 class SearchItemResults {
   #searchItem;
   #resultsElement;
   #matchedItemList;
   #matchedItemElements;
   #focusedItemIndex;
-  constructor(searchItem) {
+  #result;
+
+  constructor(searchItem, type) {
     this.#searchItem = searchItem;
+    this.#result = SEARCH_ITEM_RESULTS[type];
 
     this.#createSearchItemResultsElement();
   }
@@ -315,13 +367,7 @@ class SearchItemResults {
 
   // set results header for initial
   #setInitalElement() {
-    this.#resultsElement.innerHTML = `
-        <div class="search-item-result-header">
-          <p class="item-barcode">Kode Barang</p>
-          <p class="item-name">Nama Barang</p>
-          <p class="item-type">Satuan</p>
-          <p class="item-price">Harga</p>
-        </div>`;
+    this.#resultsElement.innerHTML = this.#result["html"];
   }
 
   #setResultsElements() {
@@ -329,18 +375,7 @@ class SearchItemResults {
     this.#matchedItemElements = [];
 
     this.#matchedItemList.forEach((matchedItem) => {
-      const { barcode, name, quantity, price } = matchedItem;
-
-      const resultElement = document.createElement("div");
-      resultElement.tabIndex = "-1";
-      resultElement.className = "search-item-result-content";
-
-      resultElement.innerHTML = `
-      <p class="item-barcode">${barcode}</p>
-      <p class="item-name">${name}</p>
-      <p class="item-type">${quantity}</p>
-      <p class="item-price">${price}</p>
-    `;
+      const resultElement = this.#result.setFunction(matchedItem);
 
       // set listener to result item
       // when onclick, it'll be selected item from the list
