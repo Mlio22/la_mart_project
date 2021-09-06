@@ -126,6 +126,35 @@
   > .down-bar {
     height: 9vh;
     width: 100%;
+    display: flex;
+
+    > .notification {
+      flex: 80%;
+    }
+
+    > .save-and-close {
+      margin: auto;
+      flex: 10%;
+      text-align: right;
+
+      button {
+        margin-right: 2vw;
+        text-align: center;
+        padding: 15px 20px;
+        background-color: #dcdcdc;
+        font-size: 20px;
+        border-radius: 10px;
+        transition: 0.1s all;
+        border: #c5c4c4 1px solid;
+        cursor: pointer;
+
+        &:hover {
+          box-shadow: inset 7px 7px 15px rgba(167, 166, 166, 0.3), inset -7px -7px 7px #c7c7c726,
+            0px 0px 4px rgba(167, 166, 166, 0.3);
+          cursor: pointer;
+        }
+      }
+    }
   }
 }
 

@@ -140,16 +140,21 @@ class BarcodeElement extends ValueElement {
       doubleClickTimeoutFn,
       doubleEnterTimeoutFn;
 
-    this._inputElement.addEventListener("keydown", ({ key }) => {
+    this._inputElement.addEventListener("keydown", ({ key, target: { value } }) => {
       // detects double enter and opens the searchitem
 
       if (key === "Enter") {
+        if (value !== "") {
+          this._item.checkBarcodeChange(value);
+          return;
+        }
+
         if (isEnteredBeforeTimeout) {
           // remove timeout
           clearTimeout(doubleEnterTimeoutFn);
 
           isEnteredBeforeTimeout = false;
-          // todo: open search item
+          this._item.openSearchItemWithEmpty();
         } else {
           isEnteredBeforeTimeout = true;
           doubleEnterTimeoutFn = setTimeout(() => {

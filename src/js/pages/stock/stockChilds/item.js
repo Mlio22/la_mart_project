@@ -55,6 +55,14 @@ export class Item {
     this.childElements.barcode.focus();
   }
 
+  openSearchItemWithEmpty() {
+    this.itemList.stock.stockChild.submenu.openSubmenu("F2", {
+      itemReference: this,
+      hint: this.barcodeBefore,
+      type: "stock",
+    });
+  }
+
   checkBarcodeChange(barcode) {
     if (barcode === this.barcodeBefore) return;
     this.barcodeBefore = barcode;

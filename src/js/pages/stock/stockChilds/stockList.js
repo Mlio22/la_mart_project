@@ -69,4 +69,11 @@ export class StockList {
 
     this.#stockList[len - 1].focus();
   }
+
+  clearstock() {
+    // clear stock when save stock is clicked
+    for (let index = 0; index < this.#stockList.length - 1; index++) {
+      this.#stockList[index].delete();
+    }
+  }
 }
