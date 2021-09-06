@@ -1,56 +1,39 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../helpers/sequelize");
+const DetailBarang = require("./basic/DetailBarang");
+const DetailBarangAttribute = require("./basic/helper/DetailBarangAttribute");
+const DetaPerubahanDetailBarangilBarang = require("./basic/log/PerubahanDetailBarang");
+const LaporanHarian = require("./cashier/LaporanHarian");
+const LaporanSesi = require("./cashier/LaporanSesi");
+const TransaksiBarang = require("./cashier/TransaksiBarang");
+const TransaksiKeseluruhan = require("./cashier/TransaksiKeseluruhan");
+const StatusTransaksi = require("./cashier/helper/StatusTransaksi");
+const PerubahanStatusTransaksi = require("./cashier/log/PerubahanStatusTransaksi");
+const StokBarang = require("./stock/StokBarang");
+const AlasanPengeluaran = require("./stock/helper/AlasanPengeluaran");
+const AlasanPerubahanStok = require("./stock/helper/AlasanPerubahanStok");
+const PemasukanBarang = require("./stock/log/PemasukanBarang");
+const PengeluaranBarang = require("./stock/log/PengeluaranBarang");
+const DetaiPerubahanStokBaranglBarang = require("./stock/log/PerubahanStokBarang");
 
 db = {
   sequelize: sequelize,
   Sequelize: Sequelize,
+  DetailBarang,
+  DetailBarangAttribute,
+  DetaPerubahanDetailBarangilBarang,
+  LaporanHarian,
+  LaporanSesi,
+  TransaksiBarang,
+  TransaksiKeseluruhan,
+  StatusTransaksi,
+  PerubahanStatusTransaksi,
+  StokBarang,
+  AlasanPengeluaran,
+  AlasanPerubahanStok,
+  PemasukanBarang,
+  PengeluaranBarang,
+  DetaiPerubahanStokBaranglBarang,
 };
-
-async function getFiles(dir) {
-  const dirents = await readdir(dir, { withFileTypes: true });
-  const files = await Promise.all(
-    dirents.map((dirent) => {
-      const res = resolve(dir, dirent.name);
-      return dirent.isDirectory() ? getFiles(res) : res;
-    })
-  );
-  return Array.prototype.concat(...files);
-}
-
-const fs = require("fs");
-const { promisify } = require("util");
-const { resolve, join } = require("path");
-const readdir = promisify(fs.readdir);
-const stat = promisify(fs.stat);
-
-async function getFiles(dir) {
-  const subdirs = await readdir(dir);
-  const files = await Promise.all(
-    subdirs.map(async (subdir) => {
-      const res = resolve(dir, subdir);
-      return (await stat(res)).isDirectory() ? getFiles(res) : res;
-    })
-  );
-  return files.reduce((a, f) => a.concat(f), []);
-}
-
-// fetching folder
-const folders = fs
-  .readdirSync(join(__dirname, "..", "models"), { withFileTypes: true })
-  .filter((dirent) => dirent.isDirectory())
-  .map((dirent) => dirent.name);
-
-// fetching models
-folders.forEach((folder) => {
-  getFiles(join(__dirname, "..", "models", folder))
-    .then((files) => {
-      files.forEach((file) => {
-        console.log(file);
-        const model = require(file)(sequelize, Sequelize.DataTypes);
-        db[model.name] = model;
-      });
-    })
-    .catch((e) => console.error(e));
-});
 
 module.exports = db;

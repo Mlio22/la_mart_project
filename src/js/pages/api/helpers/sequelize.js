@@ -1,5 +1,5 @@
 // index.js
-const config = require("../../config/config_sequelize.json");
+const config = require("../../../../../config/config_sequelize.json");
 const { Sequelize } = require("sequelize");
 const mysql = require("mysql2");
 
