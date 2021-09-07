@@ -3,20 +3,50 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return Promise.all([
-      queryInterface.bulkInsert("transaksi_keseluruhan", [
+      queryInterface.bulkInsert("detail_barang", [
         {
-          total_harus_dibayar: 2000,
-          dibayar_oleh_konsumen: 2000,
-          kembalian: 0,
-          total_keuntungan: 100,
+          barcode_barang: "222",
+          nama_barang: "sambal abc",
+          satuan_barang: "Botol",
+          harga_beli: 20000,
+          harga_jual: 21000,
+        },
+        {
+          barcode_barang: "111",
+          nama_barang: "sambal def",
+          satuan_barang: "sashet",
+          harga_beli: 2000,
+          harga_jual: 2100,
+        },
+        {
+          barcode_barang: "333",
+          nama_barang: "sambal xyz",
+          satuan_barang: "drum",
+          harga_beli: 200000,
+          harga_jual: 210000,
+        },
+      ]),
+
+      queryInterface.bulkInsert("stok_barang", [
+        {
+          id_barang: 1,
+          jumlah: 20,
+        },
+        {
+          id_barang: 2,
+          jumlah: 10,
+        },
+        {
+          id_barang: 3,
+          jumlah: 1,
         },
       ]),
     ]);
   },
   down: (queryInterface, Sequelize) => {
     return Promise.all([
-      queryInterface.bulkDelete("transaksi_keseluruhan", 1, {}),
-      queryInterface.bulkDelete("laporan_harian", 1, {}),
+      queryInterface.bulkDelete("stok_barang", 1, {}),
+      queryInterface.bulkDelete("detail_barang", 1, {}),
     ]);
   },
 };
