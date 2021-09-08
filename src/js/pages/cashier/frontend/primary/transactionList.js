@@ -1,3 +1,4 @@
+import { CashierInvoker } from "../dbInvoker.js";
 import { Transaction } from "./transactions-helper/transaction.js";
 
 const EMPTY_TRANSACTION_HTML = `
@@ -43,6 +44,8 @@ export class TransactionList {
       F2: true,
       F11: false,
     });
+
+    CashierInvoker.createTransactionAll();
   }
 
   loadTransaction(transactionId) {
@@ -153,7 +156,9 @@ export class TransactionList {
   }
 
   #searchTransaction(transactionId) {
-    const transactionIndex = this.#transactionList.findIndex((transaction) => transaction.id === transactionId);
+    const transactionIndex = this.#transactionList.findIndex(
+      (transaction) => transaction.id === transactionId
+    );
 
     if (transactionIndex !== -1) {
       return this.#transactionList[transactionIndex];
