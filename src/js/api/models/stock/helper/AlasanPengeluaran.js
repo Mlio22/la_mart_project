@@ -1,5 +1,5 @@
 "use strict";
-const sequelize = require("../../helpers/sequelize");
+const sequelize = require("../../../helpers/sequelize");
 const { DataTypes, Model } = require("sequelize");
 class AlasanPengeluaran extends Model {
   /**

@@ -16,7 +16,7 @@ const PemasukanBarang = require("./stock/log/PemasukanBarang");
 const PengeluaranBarang = require("./stock/log/PengeluaranBarang");
 const DetaiPerubahanStokBaranglBarang = require("./stock/log/PerubahanStokBarang");
 
-db = {
+module.exports = {
   sequelize: sequelize,
   Sequelize: Sequelize,
   DetailBarang,
@@ -35,5 +35,3 @@ db = {
   PengeluaranBarang,
   DetaiPerubahanStokBaranglBarang,
 };
-
-module.exports = db;
