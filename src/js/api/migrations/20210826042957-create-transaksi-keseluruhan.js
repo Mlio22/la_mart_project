@@ -14,22 +14,6 @@ module.exports = {
         references: { model: "status_transaksi", key: "id" },
         defaultValue: 1,
       },
-      total_harus_dibayar: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      dibayar_oleh_konsumen: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      kembalian: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      total_keuntungan: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

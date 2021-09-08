@@ -13,9 +13,26 @@ class TransaksiKeseluruhan extends Model {
 }
 TransaksiKeseluruhan.init(
   {
-    id_status_transaksi: {
+    id_transaksi_keseluruhan: {
       type: DataTypes.INTEGER,
-      defaultValue: 1,
+      allowNull: false,
+      unique: true,
+    },
+    total_harus_dibayar: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    dibayar_oleh_konsumen: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    kembalian: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    total_keuntungan: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
   },
   {
