@@ -1,4 +1,5 @@
 const { ipcMain, BrowserWindow } = require("electron");
+const registerListeners = require("./backend/ipcListener");
 
 class Cashier {
   #cashierWin;
@@ -32,6 +33,8 @@ class Cashier {
     ipcMain.once("close-cashier", () => {
       this.#cashierWin.close();
     });
+
+    registerListeners();
   }
 
   get window() {

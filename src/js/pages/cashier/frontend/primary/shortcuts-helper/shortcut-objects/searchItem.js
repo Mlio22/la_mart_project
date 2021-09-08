@@ -1,4 +1,4 @@
-import { CashierEndpoint } from "../../../../../../api/endpoint.js";
+import { CashierInvoker } from "../../../dbInvoker.js";
 import { Submenu } from "./SubmenuPrototype.js";
 
 // todo: output pada search item adalah Promise
@@ -9,12 +9,15 @@ async function item_searcher({
   initialFilteredItems = null,
   detail: { hint = "", params = ["name", "barcode"], full_match = false },
 }) {
+  // return none if hint is none
+  if (hint === "") return [];
+
   // search first from DB if initialFilteredItem is none
   if (initialFilteredItems === null) {
     if (type === "cashier") {
-      // initialFilteredItems = await searchItemDB(hint, params, full_match);
+      initialFilteredItems = await CashierInvoker.searchItemDB({ hint, params, full_match });
     } else {
-      // initialFilteredItems = await searchItemDB(hint, params, full_match);
+      initialFilteredItems = await CashierInvoker.searchItemDB({ hint, params, full_match });
     }
   }
 
@@ -23,9 +26,6 @@ async function item_searcher({
 
   // set the hint to lowercase
   hint = hint.toLowerCase();
-
-  // return none if hint is none
-  if (hint === "") return [];
 
   initialFilteredItems.forEach((item) => {
     let previousMatch = false;
@@ -109,7 +109,6 @@ export class SearchItem extends Submenu {
 
   async #init() {
     // set child UI and classes
-
     this.#searchItemHeader = new SearchItemHeader(this, this.#hint);
     this.#searchItemResult = new SearchItemResults(this, this.#type);
 
@@ -211,7 +210,8 @@ export class SearchItem extends Submenu {
       initialFilteredItems: undefined,
       detail: { hint: hint, params: ["barcode"], full_match: true },
     });
-    isMatchExact = matchExactBarcode.length === 1;
+
+    const isMatchExact = matchExactBarcode.length === 1;
 
     if (isMatchExact) {
       const matchExact = matchExactBarcode[0];
@@ -287,7 +287,7 @@ const SEARCH_ITEM_RESULTS = {
           <p class="item-price">Harga</p>
         </div>`,
     setFunction: function (item) {
-      const { barcode, name, quantity, price } = item;
+      const { id, barcode, name, quantity, price } = item;
 
       const resultElement = document.createElement("div");
       resultElement.tabIndex = "-1";

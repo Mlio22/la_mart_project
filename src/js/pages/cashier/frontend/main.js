@@ -4,7 +4,6 @@ import { TotalPrice } from "./primary/totalPrice.js";
 import { ShortcutWrapper } from "./primary/shortcutWrapper.js";
 import { PaymentDetails } from "./primary/paymentDetails.js";
 import { SubmenuWrapper } from "./primary/submenuWrapper.js";
-const { ipcRenderer } = require("electron");
 
 class CashierUI {
   #cashierChild = {};

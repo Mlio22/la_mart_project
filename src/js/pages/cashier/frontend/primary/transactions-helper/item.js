@@ -197,9 +197,9 @@ export class Item {
     return this.itemList.checkDuplicateOnList(this);
   }
 
-  openSearchFromItem() {
+  async openSearchFromItem() {
     // exact match search attempt
-    const exactMatch = SearchItem.exactMatch(this.#data.barcode, "cashier");
+    const exactMatch = await SearchItem.exactMatch(this.#data.barcode, "cashier");
     if (exactMatch) {
       this.data = { data: exactMatch, code: 21 };
     }
