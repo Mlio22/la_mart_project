@@ -1,4 +1,4 @@
-import { set_proper_price } from "../../etc/others.mjs";
+import { set_proper_price } from "../../../../etc/others.mjs";
 
 export class PaymentDetails {
   // detail properties
@@ -52,7 +52,9 @@ export class PaymentDetails {
   #gatherElements() {
     this.#idSpan = this.#paymentDetailsElement.querySelector("span.id-content");
 
-    this.#customerMoneyContent = this.#paymentDetailsElement.querySelector(".customer-money-bar-content");
+    this.#customerMoneyContent = this.#paymentDetailsElement.querySelector(
+      ".customer-money-bar-content"
+    );
     this.#totalPriceContent = this.#paymentDetailsElement.querySelector(".price-money-bar-content");
     this.#changeContent = this.#paymentDetailsElement.querySelector(".change-money-bar-content");
   }

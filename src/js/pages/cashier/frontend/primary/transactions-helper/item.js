@@ -1,6 +1,6 @@
 import { BarcodeElement, TextElement, ActionElement, AmountElement } from "./itemElement.js";
-import { set_proper_price } from "../../../etc/others.mjs";
-import { ItemLog } from "../../../etc/Log.js";
+import { set_proper_price } from "../../../../../etc/others.mjs";
+import { ItemLog } from "../../../../../etc/Log.js";
 import { SearchItem } from "../shortcuts-helper/shortcut-objects/searchItem.js";
 
 const EMPTY_ITEM = {

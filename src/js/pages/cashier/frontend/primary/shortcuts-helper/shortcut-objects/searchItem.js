@@ -1,8 +1,23 @@
+import { CashierEndpoint } from "../../../../../../api/endpoint.js";
 import { Submenu } from "./SubmenuPrototype.js";
-import { APIs } from "../../../../api.js";
+
 // todo: output pada search item adalah Promise
 
-function item_searcher(hint, params = ["name", "barcode"], filteredItems, full_match = false) {
+// function item_searcher(hint, params = ["name", "barcode"], filteredItems, full_match = false) {
+async function item_searcher({
+  type = "cashier",
+  initialFilteredItems = null,
+  detail: { hint = "", params = ["name", "barcode"], full_match = false },
+}) {
+  // search first from DB if initialFilteredItem is none
+  if (initialFilteredItems === null) {
+    if (type === "cashier") {
+      // initialFilteredItems = await searchItemDB(hint, params, full_match);
+    } else {
+      // initialFilteredItems = await searchItemDB(hint, params, full_match);
+    }
+  }
+
   // filteredItem is an array of filteredItems from search-item that need be researched again to prevent over-searching the API
   const matchedItems = [];
 
@@ -12,7 +27,7 @@ function item_searcher(hint, params = ["name", "barcode"], filteredItems, full_m
   // return none if hint is none
   if (hint === "") return [];
 
-  filteredItems.forEach((item) => {
+  initialFilteredItems.forEach((item) => {
     let previousMatch = false;
 
     // if anyone of the parameter is match then return the item
@@ -92,7 +107,7 @@ export class SearchItem extends Submenu {
     });
   }
 
-  #init() {
+  async #init() {
     // set child UI and classes
 
     this.#searchItemHeader = new SearchItemHeader(this, this.#hint);
@@ -106,17 +121,18 @@ export class SearchItem extends Submenu {
 
     // search the item if hint is not empty string
     if (this.#hint !== "") {
-      this.#searchItemMatchBoth();
+      await this.#searchItemMatchBoth();
     }
   }
 
-  #searchItemMatchBoth(alreadyFilteredItems = null) {
-    const matchedItemsWithBoth = item_searcher(
-      this.#hint,
-      undefined,
-      alreadyFilteredItems ? this.#filteredItems : APIs[this.#type],
-      false
-    );
+  async #searchItemMatchBoth(alreadyFilteredItems = null) {
+    const matchedItemsWithBoth = await item_searcher({
+      type: this.#type,
+      detail: {
+        hint: this.#hint,
+        full_match: false,
+      },
+    });
 
     // set the results
     this.#filteredItems = matchedItemsWithBoth;
@@ -186,12 +202,16 @@ export class SearchItem extends Submenu {
     this._submenu.hideSubmenu();
   }
 
-  static exactMatch(hint, type) {
+  static async exactMatch(hint, type) {
     // return itemData if hint matches exactly with a barcode on DB
     // return false if not match exact
 
-    const matchExactBarcode = item_searcher(hint, ["barcode"], APIs[type], true),
-      isMatchExact = matchExactBarcode.length === 1;
+    const matchExactBarcode = await item_searcher({
+      type: type,
+      initialFilteredItems: undefined,
+      detail: { hint: hint, params: ["barcode"], full_match: true },
+    });
+    isMatchExact = matchExactBarcode.length === 1;
 
     if (isMatchExact) {
       const matchExact = matchExactBarcode[0];
@@ -201,11 +221,15 @@ export class SearchItem extends Submenu {
     return false;
   }
 
-  static anyMatch(hint, type) {
+  static async anyMatch(hint, type) {
     // return true if hint matches any barcode or name on DB (doesnt match exact with any barcode)
     // return false if hint doesn't match any barcode or name
 
-    const matchAny = item_searcher(hint, ["barcode", "name"], APIs[type], false),
+    const matchAny = await item_searcher({
+        type: type,
+        initialFilteredItems: undefined,
+        detail: { hint: hint, full_match: true },
+      }),
       isMatchAny = matchAny.length > 0;
 
     return isMatchAny;

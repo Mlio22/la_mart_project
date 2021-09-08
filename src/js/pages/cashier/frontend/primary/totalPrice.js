@@ -1,4 +1,4 @@
-import { set_proper_price } from "../../etc/others.mjs";
+import { set_proper_price } from "../../../../etc/others.mjs";
 
 export class TotalPrice {
   #currentTotalPrice = 0;
