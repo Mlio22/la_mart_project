@@ -2,7 +2,7 @@ const Sequelize = require("sequelize");
 const sequelize = require("../helpers/sequelize");
 const DetailBarang = require("./basic/DetailBarang");
 const DetailBarangAttribute = require("./basic/helper/DetailBarangAttribute");
-const DetaPerubahanDetailBarangilBarang = require("./basic/log/PerubahanDetailBarang");
+const EditDetailBarang = require("./basic/log/PerubahanDetailBarang");
 const LaporanHarian = require("./cashier/LaporanHarian");
 const LaporanSesi = require("./cashier/LaporanSesi");
 const TransaksiBarang = require("./cashier/TransaksiBarang");
@@ -21,7 +21,7 @@ module.exports = {
   Sequelize: Sequelize,
   DetailBarang,
   DetailBarangAttribute,
-  DetaPerubahanDetailBarangilBarang,
+  EditDetailBarang,
   LaporanHarian,
   LaporanSesi,
   TransaksiBarang,

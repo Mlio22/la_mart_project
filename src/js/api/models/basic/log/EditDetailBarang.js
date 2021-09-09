@@ -1,7 +1,8 @@
 "use strict";
+
 const sequelize = require("../../../helpers/sequelize");
 const { DataTypes, Model } = require("sequelize");
-class DetailBarangAttribute extends Model {
+class EditDetailBarang extends Model {
   /**
    * Helper method for defining associations.
    * This method is not a part of Sequelize lifecycle.
@@ -11,19 +12,27 @@ class DetailBarangAttribute extends Model {
     // define association here
   }
 }
-DetailBarangAttribute.init(
+EditDetailBarang.init(
   {
-    deskripsi_attribute: {
-      type: DataTypes.STRING(20),
+    id_barang: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    content_before: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    content_after: {
+      type: DataTypes.STRING(50),
       allowNull: false,
     },
   },
   {
     sequelize,
-    timestamps: false,
-    modelName: "DetailBarangAttribute",
-    tableName: "detail_barang_attribute",
+    updatedAt: false,
+    modelName: "EditDetailBarang",
+    tableName: "edit_detail_barang",
   }
 );
 
-module.exports = DetailBarangAttribute;
+module.exports = EditDetailBarang;

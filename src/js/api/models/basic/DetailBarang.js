@@ -39,7 +39,7 @@ DetailBarang.init(
   },
   {
     sequelize,
-    updatedAt: false,
+    paranoid: true,
     modelName: "DetailBarang",
     tableName: "detail_barang",
   }
