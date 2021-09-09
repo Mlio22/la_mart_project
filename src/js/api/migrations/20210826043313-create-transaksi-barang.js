@@ -11,7 +11,7 @@ module.exports = {
       id_barang: {
         type: Sequelize.INTEGER,
         references: { model: "detail_barang", key: "id" },
-        allowNull: false,
+        allowNull: true,
       },
       id_transaksi_keseluruhan: {
         type: Sequelize.INTEGER,
@@ -20,15 +20,7 @@ module.exports = {
       },
       jumlah: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      total_harga: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      keuntungan: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,

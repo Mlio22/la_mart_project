@@ -15,7 +15,7 @@ TransaksiBarang.init(
   {
     id_barang: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     id_transaksi_keseluruhan: {
       type: DataTypes.INTEGER,
@@ -23,15 +23,7 @@ TransaksiBarang.init(
     },
     jumlah: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    total_harga: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    keuntungan: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {
