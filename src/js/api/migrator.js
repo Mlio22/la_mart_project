@@ -6,7 +6,7 @@ const sequelize = require("./helpers/sequelize");
 // init umzug
 const umzug = new Umzug({
   migrations: {
-    glob: ["{seeders,migrations}/*.js", { cwd: __dirname }],
+    glob: ["{seeders,migrations/*}/*.js", { cwd: __dirname }],
     resolve: ({ name, path, context }) => {
       // adjust the migration parameters Umzug will
       // pass to migration methods, this is done because

@@ -1,7 +1,6 @@
 "use strict";
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    console.log(Sequelize);
     await queryInterface.createTable("pembayaran", {
       id_transaksi_keseluruhan: {
         type: Sequelize.INTEGER,

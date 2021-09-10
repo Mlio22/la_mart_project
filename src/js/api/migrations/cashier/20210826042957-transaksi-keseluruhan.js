@@ -69,8 +69,8 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("status_transaksi");
-    await queryInterface.dropTable("transaksi_keseluruhan");
     await queryInterface.dropTable("perubahan_status_transaksi");
+    await queryInterface.dropTable("transaksi_keseluruhan");
+    await queryInterface.dropTable("status_transaksi");
   },
 };
