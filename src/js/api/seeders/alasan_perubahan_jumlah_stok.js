@@ -7,6 +7,6 @@ module.exports = {
     ]);
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete("alasan_perubahan_stok", 1, {});
+    return queryInterface.bulkDelete("alasan_perubahan_stok", {});
   },
 };

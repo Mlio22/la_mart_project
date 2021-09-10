@@ -8,6 +8,6 @@ module.exports = {
     ]);
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete("alasan_pengeluaran", 1, {});
+    return queryInterface.bulkDelete("alasan_pengeluaran", {});
   },
 };

@@ -9,7 +9,12 @@ module.exports = {
       { deskripsi_status: "Dibatalkan" },
     ]);
   },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete("status_transaksi", 1, {});
+  down: async (queryInterface, Sequelize) => {
+    // delete records that using status_transaksi
+    await queryInterface.bulkDelete("perubahan_status_transaksi", {});
+    await queryInterface.bulkDelete("transaksi_keseluruhan", {});
+
+    // delete status_transaksi records
+    await queryInterface.bulkDelete("status_transaksi", {});
   },
 };
