@@ -41,8 +41,35 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
+
+    await queryInterface.createTable("edit_detail_barang", {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER,
+      },
+      id_barang: {
+        type: Sequelize.INTEGER,
+        references: { model: "detail_barang", key: "id" },
+        allowNull: false,
+      },
+      content_before: {
+        type: Sequelize.JSON,
+        allowNull: false,
+      },
+      content_after: {
+        type: Sequelize.JSON,
+        allowNull: false,
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+    });
   },
   down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable("edit_detail_barang");
     await queryInterface.dropTable("detail_barang");
   },
 };

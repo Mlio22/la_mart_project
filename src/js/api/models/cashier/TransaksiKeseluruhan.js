@@ -17,10 +17,13 @@ TransaksiKeseluruhan.init(
       type: DataTypes.INTEGER,
       defaultValue: 1,
     },
+    completedAt: {
+      type: DataTypes.DATE,
+    },
   },
   {
     sequelize,
-    updatedAt: false,
+    paranoid: true,
     modelName: "TransaksiKeseluruhan",
     tableName: "transaksi_keseluruhan",
   }
