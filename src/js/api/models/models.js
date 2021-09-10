@@ -1,14 +1,21 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../helpers/sequelize");
+// basic
 const DetailBarang = require("./basic/DetailBarang");
-const DetailBarangAttribute = require("./basic/helper/DetailBarangAttribute");
-const EditDetailBarang = require("./basic/log/PerubahanDetailBarang");
+const EditDetailBarang = require("./basic/log/EditDetailBarang");
+
+// cashier
 const LaporanHarian = require("./cashier/LaporanHarian");
 const LaporanSesi = require("./cashier/LaporanSesi");
 const TransaksiBarang = require("./cashier/TransaksiBarang");
 const TransaksiKeseluruhan = require("./cashier/TransaksiKeseluruhan");
 const StatusTransaksi = require("./cashier/helper/StatusTransaksi");
 const PerubahanStatusTransaksi = require("./cashier/log/PerubahanStatusTransaksi");
+const EditTransaksiBarang = require("./cashier/log/EditTransaksiBarang");
+const PerubahanStatusTransaksiBarang = require("./cashier/log/PerubahanStatusTransaksiBarang");
+const StatusBarang = require("./cashier/helper/StatusBarang");
+
+// stock
 const StokBarang = require("./stock/StokBarang");
 const AlasanPengeluaran = require("./stock/helper/AlasanPengeluaran");
 const AlasanPerubahanStok = require("./stock/helper/AlasanPerubahanStok");
@@ -20,7 +27,9 @@ module.exports = {
   sequelize: sequelize,
   Sequelize: Sequelize,
   DetailBarang,
-  DetailBarangAttribute,
+  EditTransaksiBarang,
+  PerubahanStatusTransaksiBarang,
+  StatusBarang,
   EditDetailBarang,
   LaporanHarian,
   LaporanSesi,
