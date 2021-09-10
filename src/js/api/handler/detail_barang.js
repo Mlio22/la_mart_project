@@ -43,7 +43,6 @@ async function searchItemDB({
 
   // return only datavalues data
   result = result.map((item) => item.dataValues);
-  console.log(result);
 
   return result;
 }

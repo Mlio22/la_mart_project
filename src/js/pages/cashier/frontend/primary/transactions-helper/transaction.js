@@ -1,5 +1,6 @@
 import { ItemList } from "./itemList.js";
 import { TransactionLog } from "../../../../../etc/Log.js";
+import { CashierInvoker } from "../../dbInvoker.js";
 
 function statusCodeToText(statusCode) {
   const statusses = {
@@ -29,7 +30,7 @@ export class Transaction {
   #transactionLog = [new TransactionLog(1)];
 
   #transactionInfo = {
-    id: idCounter++, // create get id function
+    id: null,
     statusCode: 1,
     statusText: "working",
     cashInfo: {
@@ -41,8 +42,15 @@ export class Transaction {
 
   constructor(transactionList, starterItem) {
     this.transactionList = transactionList;
+    this.#init().then(() => {
+      this.#transactionInfo.itemList = new ItemList(this, starterItem);
+    });
+  }
 
-    this.#transactionInfo.itemList = new ItemList(this, starterItem);
+  async #init() {
+    // get transaction id
+    const transactionId = await CashierInvoker.createTransactionAll();
+    this.#transactionInfo.id = transactionId;
   }
 
   #addLog(code) {

@@ -1,4 +1,3 @@
-import { CashierInvoker } from "../dbInvoker.js";
 import { Transaction } from "./transactions-helper/transaction.js";
 
 const EMPTY_TRANSACTION_HTML = `
@@ -44,8 +43,6 @@ export class TransactionList {
       F2: true,
       F11: false,
     });
-
-    CashierInvoker.createTransactionAll();
   }
 
   loadTransaction(transactionId) {

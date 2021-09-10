@@ -31,10 +31,9 @@ module.exports = {
         references: { model: "transaksi_keseluruhan", key: "id" },
         allowNull: false,
       },
-      id_status_transaksi: {
+      id_status_barang: {
         type: Sequelize.INTEGER,
         references: { model: "status_transaksi_barang", key: "id" },
-        allowNull: false,
         defaultValue: 1,
       },
       jumlah: {
