@@ -17,7 +17,9 @@ export class CashierInvoker {
     return ipcRenderer.invoke("new-transaction-all", param);
   }
 
-  static async createTransactionItem() {}
+  static async createTransactionItem(param) {
+    return ipcRenderer.invoke("new-transaction-item", param);
+  }
 
   static async createReportSession() {}
   static async createReportDaily() {}

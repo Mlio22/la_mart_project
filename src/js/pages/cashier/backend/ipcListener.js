@@ -1,6 +1,9 @@
 const { ipcMain } = require("electron");
 const { searchItemDB } = require("../../../api/handler/detail_barang");
-const { craateTransactionAll } = require("../../../api/handler/transactions");
+const {
+  craateTransactionAll,
+  createTransactionItem,
+} = require("../../../api/handler/transactions");
 
 module.exports = async function registerListeners() {
   ipcMain.handle("search-item-db", async (e, args) => {
@@ -9,5 +12,9 @@ module.exports = async function registerListeners() {
 
   ipcMain.handle("new-transaction-all", async (e, args) => {
     return await craateTransactionAll({ ...args });
+  });
+
+  ipcMain.handle("new-transaction-item", async (e, args) => {
+    return await createTransactionItem({ ...args });
   });
 };

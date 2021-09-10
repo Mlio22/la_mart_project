@@ -2,8 +2,10 @@ import { BarcodeElement, TextElement, ActionElement, AmountElement } from "./ite
 import { set_proper_price } from "../../../../../etc/others.mjs";
 import { ItemLog } from "../../../../../etc/Log.js";
 import { SearchItem } from "../shortcuts-helper/shortcut-objects/searchItem.js";
+import { CashierInvoker } from "../../dbInvoker.js";
 
 const EMPTY_ITEM = {
+  id: null,
   barcode: "",
   name: "",
   quantity: "",
@@ -12,15 +14,15 @@ const EMPTY_ITEM = {
 };
 
 export class Item {
+  #id;
   #itemLog = [];
 
   #data;
   #ui;
-  transactionStatus;
 
   constructor(itemList, listElement, data = { ...EMPTY_ITEM }) {
     this.itemList = itemList;
-    this.#gatherTransactionStatus();
+    this.#gatherTransactionInfo();
 
     // gathering data
     this.#gatherData(data);
@@ -31,12 +33,14 @@ export class Item {
     this.#restoreOrStartUsual();
   }
 
-  #gatherTransactionStatus() {
+  #gatherTransactionInfo() {
     this.transactionStatus = {
       isWorking: this.itemList.transaction.working,
       isSaved: this.itemList.transaction.saved || this.itemList.transaction.loading,
       isCompleted: this.itemList.transaction.completed || this.itemList.transaction.restoring,
     };
+
+    this.transactionId = this.itemList.transaction.id;
   }
 
   // gather data if available
@@ -49,6 +53,11 @@ export class Item {
 
   #restoreOrStartUsual() {
     if (this.transactionStatus.isWorking) {
+      this.#id = CashierInvoker.createTransactionItem({
+        transactionId: this.transactionId,
+        //todo: add itemId from searchItem
+      });
+
       // setting timeout to fix item's index in itemList
       setTimeout(() => {
         this.itemList.refreshTotalPrice();
@@ -81,8 +90,16 @@ export class Item {
     return JSON.stringify({ ...this.#data, ...EMPTY_ITEM }) === JSON.stringify(this.#data);
   }
 
+  checkTransactionStatus() {
+    // renew the transaction statusses
+    this.#gatherTransactionInfo();
+
+    if (this.transactionStatus.isCompleted) {
+      this.#setMaxAmount();
+    }
+  }
+
   #setMaxAmount() {
-    console.log("setting max amount");
     // setting maxAmount
     const { amount } = this.#data;
     this.#data = {
@@ -91,16 +108,6 @@ export class Item {
     };
 
     this.#ui.childElements.amountElement.setMaxAmount();
-  }
-
-  checkTransactionStatus() {
-    console.log("checking status");
-    // renew the transaction statusses
-    this.#gatherTransactionStatus();
-
-    if (this.transactionStatus.isCompleted) {
-      this.#setMaxAmount();
-    }
   }
 
   deleteThisItem() {
