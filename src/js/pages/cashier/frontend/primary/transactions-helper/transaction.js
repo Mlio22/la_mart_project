@@ -23,8 +23,6 @@ function statusCodeToText(statusCode) {
   return statusText;
 }
 
-let idCounter = 1;
-
 export class Transaction {
   // transaction properties
   #transactionLog = [new TransactionLog(1)];

@@ -10,23 +10,26 @@ async function craateTransactionAll() {
   return id;
 }
 
-async function createTransactionItem({ transactionId, itemId }) {
-  /**
-   * param:
-   * id_transaksi_keseluruhan
-   *
-   * item details: item id (if through searchItem)
-   *  */
-
-  const transactionDetail = {
-    id_transaksi_keseluruhan: transactionId,
-    id_barang: itemId, // if through searchItem
-  };
-
-  const transactionItem = await db.TransaksiBarang.create(transactionDetail),
+async function createTransactionItem({ transactionAllId, itemId, amount }) {
+  const transactionItem = await db.TransaksiBarang.create({
+      id_transaksi_keseluruhan: transactionAllId,
+      id_barang: itemId,
+      jumlah: amount,
+    }),
     id = transactionItem.dataValues.id;
 
   return id;
 }
 
-module.exports = { craateTransactionAll, createTransactionItem };
+async function editTransactionItem({ transactionItemId, itemId, amount }) {
+  const transactionItem = await db.TransaksiBarang.findOne({ where: { id: transactionItemId } });
+
+  if (!transactionItem) return;
+
+  await db.TransaksiBarang.update({
+    id_barang: itemId,
+    jumlah: amount,
+  });
+}
+
+module.exports = { craateTransactionAll, createTransactionItem, editTransactionItem };

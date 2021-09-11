@@ -14,7 +14,7 @@ const EMPTY_ITEM = {
 };
 
 export class Item {
-  #id;
+  #dbid = null;
   #itemLog = [];
 
   #data;
@@ -51,13 +51,8 @@ export class Item {
     };
   }
 
-  #restoreOrStartUsual() {
+  async #restoreOrStartUsual() {
     if (this.transactionStatus.isWorking) {
-      this.#id = CashierInvoker.createTransactionItem({
-        transactionId: this.transactionId,
-        //todo: add itemId from searchItem
-      });
-
       // setting timeout to fix item's index in itemList
       setTimeout(() => {
         this.itemList.refreshTotalPrice();
@@ -90,12 +85,27 @@ export class Item {
     return JSON.stringify({ ...this.#data, ...EMPTY_ITEM }) === JSON.stringify(this.#data);
   }
 
-  checkTransactionStatus() {
+  async checkTransactionStatus() {
     // renew the transaction statusses
     this.#gatherTransactionInfo();
 
     if (this.transactionStatus.isCompleted) {
       this.#setMaxAmount();
+
+      // store to db as new item if #dbid is null
+      // update it if has #dbid
+      let itemDetail = {
+        itemId: this.#data.id,
+        amount: this.#data.amount,
+      };
+      if (this.#dbid) {
+        await CashierInvoker.storeTransactionItem({ transactionItemId: this.#dbid, ...itemDetail });
+      } else {
+        this.#dbid = await CashierInvoker.storeTransactionItem({
+          transactionAllId: this.transactionId,
+          ...itemDetail,
+        });
+      }
     }
   }
 
@@ -177,6 +187,8 @@ export class Item {
   set data({ data = EMPTY_ITEM, code = null }) {
     // set data absolutely, from e.g. search-item
     // so the data will be always valid
+    // unless it's duplicate, it'll be resetted
+    // it only needs item id to log
     // function called from search-item
 
     // logging
@@ -187,7 +199,15 @@ export class Item {
       amount: previousAmount,
     });
 
-    const isDuplicate = this.checkDuplicateFromItem();
+    // check duplicate
+    this.checkDuplicateFromItem();
+
+    this.#ui.itemContent = this.#data;
+    this.#checkData();
+  }
+
+  checkDuplicateFromItem() {
+    const isDuplicate = this.itemList.checkDuplicateOnList(this);
 
     if (isDuplicate) {
       // reset to empty item
@@ -195,13 +215,6 @@ export class Item {
     } else {
       this.#data.valid = true;
     }
-
-    this.#ui.itemContent = this.#data;
-    this.#checkData();
-  }
-
-  checkDuplicateFromItem() {
-    return this.itemList.checkDuplicateOnList(this);
   }
 
   async openSearchFromItem() {

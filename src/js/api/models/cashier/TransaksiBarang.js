@@ -21,13 +21,12 @@ TransaksiBarang.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    id_status_barang: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 1,
-    },
     jumlah: {
       type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    isDisrupted: {
+      type: DataTypes.BOOLEAN,
       allowNull: true,
     },
     completedAt: {

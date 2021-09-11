@@ -3,6 +3,7 @@ const { searchItemDB } = require("../../../api/handler/detail_barang");
 const {
   craateTransactionAll,
   createTransactionItem,
+  editTransactionItem,
 } = require("../../../api/handler/transactions");
 
 module.exports = async function registerListeners() {
@@ -16,5 +17,9 @@ module.exports = async function registerListeners() {
 
   ipcMain.handle("new-transaction-item", async (e, args) => {
     return await createTransactionItem({ ...args });
+  });
+
+  ipcMain.handle("edit-transaction-item", async (e, args) => {
+    return await editTransactionItem({ ...args });
   });
 };

@@ -1,19 +1,6 @@
 "use strict";
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("status_transaksi_barang", {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER,
-      },
-      deskripsi_status: {
-        type: Sequelize.STRING(20),
-        allowNull: false,
-      },
-    });
-
     await queryInterface.createTable("transaksi_barang", {
       id: {
         allowNull: false,
@@ -31,13 +18,13 @@ module.exports = {
         references: { model: "transaksi_keseluruhan", key: "id" },
         allowNull: false,
       },
-      id_status_barang: {
-        type: Sequelize.INTEGER,
-        references: { model: "status_transaksi_barang", key: "id" },
-        defaultValue: 1,
-      },
       jumlah: {
         type: Sequelize.INTEGER,
+        allowNull: true,
+        defaultValue: 1,
+      },
+      isDisrupted: {
+        type: Sequelize.BOOLEAN,
         allowNull: true,
         defaultValue: 0,
       },
@@ -47,42 +34,15 @@ module.exports = {
         defaultValue: Sequelize.fn("now"),
       },
       updatedAt: {
+        allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.fn("now"),
       },
       completedAt: {
         type: Sequelize.DATE,
       },
       deletedAt: {
         type: Sequelize.DATE,
-      },
-    });
-
-    await queryInterface.createTable("perubahan_status_transaksi_barang", {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER,
-      },
-      id_transaksi_barang: {
-        type: Sequelize.INTEGER,
-        references: { model: "transaksi_barang", key: "id" },
-        allowNull: false,
-      },
-      id_status_transaksi_barang_before: {
-        type: Sequelize.INTEGER,
-        references: { model: "status_transaksi_barang", key: "id" },
-        allowNull: false,
-      },
-      id_status_transaksi_barang_after: {
-        type: Sequelize.INTEGER,
-        references: { model: "status_transaksi_barang", key: "id" },
-        allowNull: false,
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn("now"),
       },
     });
 

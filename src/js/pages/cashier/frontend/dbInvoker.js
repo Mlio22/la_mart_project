@@ -17,10 +17,30 @@ export class CashierInvoker {
     return ipcRenderer.invoke("new-transaction-all", param);
   }
 
-  static async createTransactionItem(param) {
-    return ipcRenderer.invoke("new-transaction-item", param);
+  static async storeTransactionItem({
+    transactionAllId = null,
+    transactionItemId = null,
+    itemId,
+    amount,
+    // todo: add log
+  }) {
+    const param = {
+      itemId,
+      amount,
+    };
+
+    // create new transaction item
+    if (transactionAllId) {
+      return ipcRenderer.invoke("new-transaction-item", { ...param, transactionAllId });
+    }
+
+    // update exist transaction item
+    if (transactionItemId) {
+      return ipcRenderer.invoke("edit-transaction-item", { ...param, transactionItemId });
+    }
   }
 
   static async createReportSession() {}
   static async createReportDaily() {}
+  static async createPayment() {}
 }

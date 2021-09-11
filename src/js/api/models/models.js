@@ -12,8 +12,6 @@ const TransaksiKeseluruhan = require("./cashier/TransaksiKeseluruhan");
 const StatusTransaksi = require("./cashier/helper/StatusTransaksi");
 const PerubahanStatusTransaksi = require("./cashier/log/PerubahanStatusTransaksi");
 const EditTransaksiBarang = require("./cashier/log/EditTransaksiBarang");
-const PerubahanStatusTransaksiBarang = require("./cashier/log/PerubahanStatusTransaksiBarang");
-const StatusBarang = require("./cashier/helper/StatusBarang");
 
 // stock
 const StokBarang = require("./stock/StokBarang");
@@ -28,8 +26,6 @@ module.exports = {
   Sequelize: Sequelize,
   DetailBarang,
   EditTransaksiBarang,
-  PerubahanStatusTransaksiBarang,
-  StatusBarang,
   EditDetailBarang,
   LaporanHarian,
   LaporanSesi,
