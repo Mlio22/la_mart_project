@@ -124,6 +124,12 @@ export class ItemList {
     this.#items.forEach((item) => item.checkTransactionStatus());
   }
 
+  async storeItemsToDB() {
+    this.#items.forEach(async (item) => {
+      await item.storeItemtoDB();
+    });
+  }
+
   #checkItemToAffectShortcut() {
     // if any item is enlisted in list
     // shortcut payment, save-transaction, cancel-transaction is available

@@ -39,8 +39,6 @@ export class Item {
       isSaved: this.itemList.transaction.saved || this.itemList.transaction.loading,
       isCompleted: this.itemList.transaction.completed || this.itemList.transaction.restoring,
     };
-
-    this.transactionId = this.itemList.transaction.id;
   }
 
   // gather data if available
@@ -91,21 +89,6 @@ export class Item {
 
     if (this.transactionStatus.isCompleted) {
       this.#setMaxAmount();
-
-      // store to db as new item if #dbid is null
-      // update it if has #dbid
-      let itemDetail = {
-        itemId: this.#data.id,
-        amount: this.#data.amount,
-      };
-      if (this.#dbid) {
-        await CashierInvoker.storeTransactionItem({ transactionItemId: this.#dbid, ...itemDetail });
-      } else {
-        this.#dbid = await CashierInvoker.storeTransactionItem({
-          transactionAllId: this.transactionId,
-          ...itemDetail,
-        });
-      }
     }
   }
 
@@ -230,6 +213,30 @@ export class Item {
         itemReference: this,
         hint: this.#data.barcode,
         type: "cashier",
+      });
+    }
+  }
+
+  async storeItemtoDB() {
+    // store to db as new item if #dbid is null
+    // update it if has #dbid
+    let itemDetail = {
+      itemId: this.#data.id,
+      amount: this.#data.amount,
+      log: this.#itemLog.map((log) => log.log),
+    };
+
+    if (this.#dbid) {
+      // update existing transactionItem in database
+      await CashierInvoker.storeTransactionItem({
+        transactionItemId: this.#dbid,
+        ...itemDetail,
+      });
+    } else {
+      // creating new transactionItem in database
+      this.#dbid = await CashierInvoker.storeTransactionItem({
+        transactionAllId: this.itemList.transaction.id,
+        ...itemDetail,
       });
     }
   }

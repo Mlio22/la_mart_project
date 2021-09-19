@@ -13,10 +13,6 @@ class TransaksiKeseluruhan extends Model {
 }
 TransaksiKeseluruhan.init(
   {
-    id_status_transaksi: {
-      type: DataTypes.INTEGER,
-      defaultValue: 1,
-    },
     log: {
       type: DataTypes.JSON,
       allowNull: false,

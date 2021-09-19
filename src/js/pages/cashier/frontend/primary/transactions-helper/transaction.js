@@ -40,15 +40,7 @@ export class Transaction {
 
   constructor(transactionList, starterItem) {
     this.transactionList = transactionList;
-    this.#init().then(() => {
-      this.#transactionInfo.itemList = new ItemList(this, starterItem);
-    });
-  }
-
-  async #init() {
-    // get transaction id
-    const transactionId = await CashierInvoker.createTransactionAll();
-    this.#transactionInfo.id = transactionId;
+    this.#transactionInfo.itemList = new ItemList(this, starterItem);
   }
 
   #addLog(code) {
@@ -108,6 +100,21 @@ export class Transaction {
 
     // add TransactionLog: completed (3)
     this.#addLog(3);
+
+    this.#storeTransactionToDB();
+  }
+
+  #storeTransactionToDB() {
+    // create logs
+    const logs = this.#transactionLog.map((log) => log.log);
+
+    // add to DB
+    CashierInvoker.createTransactionAll({ log: logs }).then(async (id) => {
+      this.#transactionInfo.id = id;
+
+      // add items to DB
+      await this.itemList.storeItemsToDB();
+    });
   }
 
   cancelTransaction() {
