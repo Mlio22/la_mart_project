@@ -125,7 +125,7 @@ export class SearchItem extends Submenu {
     }
   }
 
-  async #searchItemMatchBoth(alreadyFilteredItems = null) {
+  async #searchItemMatchBoth() {
     const matchedItemsWithBoth = await item_searcher({
       type: this.#type,
       initialFilteredItems: this.#filteredItems,
@@ -141,6 +141,7 @@ export class SearchItem extends Submenu {
   }
 
   #addToSelectedItemToItemList() {
+    this.#selectedItem.valid = true;
     if (this.#itemReference !== null) {
       // if itemReference params exists,
       // change that reference's item using item's method
