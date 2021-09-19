@@ -1,4 +1,5 @@
 export function newTransaction(submenuWrapper) {
+  console.log(submenuWrapper);
   // create new Transaction
-  submenuWrapper.cashier.childs.transactionList.createTransaction();
+  submenuWrapper.window.childs.transactionList.createTransaction();
 }
