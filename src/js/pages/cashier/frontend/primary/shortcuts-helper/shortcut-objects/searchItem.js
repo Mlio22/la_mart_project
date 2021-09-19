@@ -6,16 +6,17 @@ import { Submenu } from "./SubmenuPrototype.js";
 // function item_searcher(hint, params = ["name", "barcode"], filteredItems, full_match = false) {
 async function item_searcher({
   type = "cashier",
-  initialFilteredItems = null,
+  initialFilteredItems = [],
   detail: { hint = "", params = ["name", "barcode"], full_match = false },
 }) {
   // return none if hint is none
   if (hint === "") return [];
 
   // search first from DB if initialFilteredItem is none
-  if (initialFilteredItems === null) {
+  if (initialFilteredItems.length === 0) {
     if (type === "cashier") {
       initialFilteredItems = await CashierInvoker.searchItemDB({ hint, params, full_match });
+      console.log(initialFilteredItems);
     } else {
       initialFilteredItems = await CashierInvoker.searchItemDB({ hint, params, full_match });
     }
@@ -127,6 +128,7 @@ export class SearchItem extends Submenu {
   async #searchItemMatchBoth(alreadyFilteredItems = null) {
     const matchedItemsWithBoth = await item_searcher({
       type: this.#type,
+      initialFilteredItems: this.#filteredItems,
       detail: {
         hint: this.#hint,
         full_match: false,
