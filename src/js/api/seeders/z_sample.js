@@ -42,7 +42,8 @@ module.exports = {
     ]);
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkDelete("stok_barang", 1, {});
-    await queryInterface.bulkDelete("detail_barang", 1, {});
+    await queryInterface.bulkDelete("transaksi_barang", {});
+    await queryInterface.bulkDelete("stok_barang", {});
+    await queryInterface.bulkDelete("detail_barang", {});
   },
 };

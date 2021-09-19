@@ -28,6 +28,10 @@ module.exports = {
         allowNull: true,
         defaultValue: 0,
       },
+      log: {
+        allowNull: false,
+        type: Sequelize.JSON,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -45,36 +49,8 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
-
-    await queryInterface.createTable("edit_transaksi_barang", {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER,
-      },
-      id_transaksi_barang: {
-        type: Sequelize.INTEGER,
-        references: { model: "transaksi_barang", key: "id" },
-        allowNull: false,
-      },
-      content_before: {
-        type: Sequelize.JSON,
-      },
-      content_after: {
-        type: Sequelize.JSON,
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn("now"),
-      },
-    });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("edit_transaksi_barang");
-    await queryInterface.dropTable("perubahan_status_transaksi_barang");
     await queryInterface.dropTable("transaksi_barang");
-    await queryInterface.dropTable("status_transaksi_barang");
   },
 };

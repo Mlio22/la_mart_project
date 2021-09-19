@@ -25,6 +25,10 @@ TransaksiBarang.init(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+    log: {
+      type: DataTypes.JSON,
+      allowNull: false,
+    },
     isDisrupted: {
       type: DataTypes.BOOLEAN,
       allowNull: true,

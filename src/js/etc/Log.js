@@ -10,10 +10,6 @@ class CashierLog {
     console.log(`new ${logType} appears with code: ${code}, ${codeList[code]}`);
   }
 
-  addToDB() {
-    // todo: connect to DB
-  }
-
   get log() {
     return {
       code: this._code,

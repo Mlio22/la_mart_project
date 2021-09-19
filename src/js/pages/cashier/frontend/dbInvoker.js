@@ -22,11 +22,12 @@ export class CashierInvoker {
     transactionItemId = null,
     itemId,
     amount,
-    // todo: add log
+    log,
   }) {
     const param = {
       itemId,
       amount,
+      log,
     };
 
     // create new transaction item

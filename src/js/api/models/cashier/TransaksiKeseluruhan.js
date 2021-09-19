@@ -17,6 +17,10 @@ TransaksiKeseluruhan.init(
       type: DataTypes.INTEGER,
       defaultValue: 1,
     },
+    log: {
+      type: DataTypes.JSON,
+      allowNull: false,
+    },
     completedAt: {
       type: DataTypes.DATE,
     },
