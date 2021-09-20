@@ -1,3 +1,3 @@
 export function saveTransaction(submenu) {
-  submenu.cashier.childs.transactionList.saveCurrentTransaction({ createNewTransaction: true });
+  submenu.window.childs.transactionList.saveCurrentTransaction({ createNewTransaction: true });
 }

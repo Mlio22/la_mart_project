@@ -41,8 +41,8 @@ export class Submenu {
   _setSubmenu() {}
   _setListener() {}
 
-  get cashier() {
-    return this._submenu.cashier;
+  get window() {
+    return this._submenu.window;
   }
 
   get element() {
