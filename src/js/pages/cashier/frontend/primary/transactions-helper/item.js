@@ -198,6 +198,8 @@ export class Item {
     } else {
       this.#data.valid = true;
     }
+
+    return isDuplicate;
   }
 
   async openSearchFromItem() {
