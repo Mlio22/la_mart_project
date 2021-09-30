@@ -25,6 +25,9 @@ export class TransactionList {
   }
 
   createTransaction(starterItem) {
+    // check current transaction if any transaction Item is edited or deleted
+    if (this.#currentTransaction) this.#currentTransaction.closeTransaction();
+
     // reset purchases element
     this.#resetPurchasesElement();
 
@@ -62,6 +65,8 @@ export class TransactionList {
       this.cashier.childs.paymentDetails.showFromCurrentTransaction();
 
       // change other shortcut availability status
+      // todo: buat perintah khusus untuk setShortcutAvailabilty yang sering digunakan
+      // seperti shortcuts.transactionCompleted, dll
       this.cashier.childs.shortcuts.setShortcutAvailability({
         F2: false,
         F5: true,
@@ -69,9 +74,10 @@ export class TransactionList {
       });
     }
 
+    // reopen (load or restore) transaction
     this.#currentTransaction.reopenTransaction();
 
-    // check transactionList
+    // check transactionList to afferct the shortcut buttons
     this.#checkTransactionsList();
 
     // able to delete transaction (both completed or incompleted transactions)
@@ -112,7 +118,8 @@ export class TransactionList {
     // check transaction list
     this.#checkTransactionsList();
 
-    // focus to cashier, especially when transaction completed
+    // force focus to cashier when it forced to submenu before
+    // allowing to create new transaction when user type any charcater / insert any barcode
     this.cashier.focus();
   }
 
@@ -122,6 +129,7 @@ export class TransactionList {
     // check transactionList
     this.#checkTransactionsList();
 
+    // create new transaction
     this.createTransaction();
   }
 
@@ -169,9 +177,8 @@ export class TransactionList {
     // based on is there saved/completed transaction or not
 
     const savedOrCompletedTransactionIndex = this.#transactionList.findIndex((transaction) => {
-      const notThisTransaction = transaction !== this.#currentTransaction,
-        status = transaction.statusCode;
-      return notThisTransaction && (status === 2 || status === 3);
+      const status = transaction.statusCode;
+      return transaction !== this.#currentTransaction && (status === 2 || status === 3);
     });
 
     // set openTransaction shortcut availability based by any saved or completed transaction available
@@ -184,6 +191,7 @@ export class TransactionList {
     return this.#currentTransaction;
   }
 
+  // todo: kurang relevan, pindahkan ke tempat lain
   inputFromCashier() {
     // having cashier input when the cashier is focused
 

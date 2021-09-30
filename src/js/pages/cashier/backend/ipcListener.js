@@ -1,9 +1,12 @@
 const { ipcMain } = require("electron");
 const { searchItemDB } = require("../../../api/handler/detail_barang");
 const {
-  craateTransactionAll,
+  createTransactionAll,
   createTransactionItem,
+  editTransactionAll,
   editTransactionItem,
+  deleteTransactionAll,
+  deleteTransactionItem,
 } = require("../../../api/handler/transactions");
 
 module.exports = async function registerListeners() {
@@ -12,7 +15,15 @@ module.exports = async function registerListeners() {
   });
 
   ipcMain.handle("new-transaction-all", async (e, args) => {
-    return await craateTransactionAll({ ...args });
+    return await createTransactionAll({ ...args });
+  });
+
+  ipcMain.handle("edit-transaction-all", async (e, args) => {
+    return await editTransactionAll({ ...args });
+  });
+
+  ipcMain.handle("delete-transaction-all", async (e, args) => {
+    return await deleteTransactionAll({ ...args });
   });
 
   ipcMain.handle("new-transaction-item", async (e, args) => {
@@ -21,5 +32,9 @@ module.exports = async function registerListeners() {
 
   ipcMain.handle("edit-transaction-item", async (e, args) => {
     return await editTransactionItem({ ...args });
+  });
+
+  ipcMain.handle("delete-transaction-item", async (e, args) => {
+    return await deleteTransactionItem({ ...args });
   });
 };

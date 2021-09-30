@@ -104,7 +104,7 @@ export class ItemList {
 
   restoreItemList() {
     // recreate all items UI
-    this.#items = this.#items.map((item) => new Item(this, this.itemElement, item.data));
+    this.#items.forEach((item) => item.restoreItem());
 
     // add new item if loading saved transaction
     if (this.transaction.loading) {
@@ -182,9 +182,14 @@ export class ItemList {
     return this.#items;
   }
 
+  get itemCount() {
+    return this.#items.length;
+  }
+
   get totalPrice() {
     let currentTotalPrice = 0;
     this.#items.forEach((item) => {
+      console.log(item);
       const { valid, price, amount } = item.data;
       if (valid) {
         currentTotalPrice += price * amount;

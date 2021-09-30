@@ -17,13 +17,11 @@ TransaksiKeseluruhan.init(
       type: DataTypes.JSON,
       allowNull: false,
     },
-    completedAt: {
-      type: DataTypes.DATE,
-    },
   },
   {
     sequelize,
     paranoid: true,
+    updatedAt: false,
     modelName: "TransaksiKeseluruhan",
     tableName: "transaksi_keseluruhan",
   }

@@ -17,10 +17,7 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.fn("now"),
       },
-      updatedAt: {
-        type: Sequelize.DATE,
-      },
-      completedAt: {
+      deletedAt: {
         type: Sequelize.DATE,
       },
     });

@@ -1,47 +1,69 @@
 class CashierLog {
-  constructor(logType, code, codeList, changes = null) {
+  /**
+   *
+   * @param {string} logType
+   * @param {number} code
+   * @param {Object} codeList - lists of log codes and its description
+   */
+  constructor(logType, code, codeList) {
     this._logType = logType;
     this._code = code;
     this._codeList = codeList;
-    this._changes = changes;
 
+    // add timestamp
     this._date = Date.now();
 
     console.log(`new ${logType} appears with code: ${code}, ${codeList[code]}`);
   }
 
+  /**
+   * return log details
+   * @returns {Object} logDetail
+   * @returns {number} logDetail.code
+   * @returns {string} logDetail.description
+   * @returns {Date} logDetail.date
+   */
   get log() {
     return {
       code: this._code,
-      description: this._codeList[this._code],
+      description: this.description,
       date: this._date,
     };
   }
+
+  /**
+   * return log description based on _codelist
+   * @returns {String}
+   */
+  get description() {
+    return this._codeList[this._code];
+  }
 }
 
-export class TransactionLog extends CashierLog {
+class TransactionLog extends CashierLog {
   constructor(code, changes = null) {
     const logType = "Transaction Log",
       codeList = {
-        1: "creating / new",
+        // creating
+        11: "creating / new",
+        12: "re-opening (saved)",
+        13: "re-opening (completed)",
+
         2: "saved",
         3: "completed",
-        4: "cancelled",
 
-        // re-opening
-        51: "re-opening (saved)",
-        52: "re-opening (completed)",
+        // cancellation
+        41: "cancelled (before completed)",
+        41: "cancelled (after completed)",
 
-        //  after completed
-        6: "edited after completed",
-        7: "cancelled after completed",
+        5: "closed",
       };
 
     super(logType, code, codeList, changes);
   }
 }
 
-export class ItemLog extends CashierLog {
+class ItemLog extends CashierLog {
   constructor(code, changes = null) {
     const logType = "Item Log",
       codeList = {
@@ -68,3 +90,5 @@ export class ItemLog extends CashierLog {
     super(logType, code, codeList, changes);
   }
 }
+
+export default { TransactionLog, ItemLog };

@@ -3,6 +3,7 @@ import { set_proper_price } from "../../../../../etc/others.mjs";
 import { ItemLog } from "../../../../../etc/Log.js";
 import { SearchItem } from "../shortcuts-helper/shortcut-objects/searchItem.js";
 import { CashierInvoker } from "../../dbInvoker.js";
+import { deepEqual } from "../../../../../etc/others.mjs";
 
 const EMPTY_ITEM = {
   id: null,
@@ -16,28 +17,33 @@ const EMPTY_ITEM = {
 export class Item {
   #dbid = null;
   #itemLog = [];
+  #savedItemData = null; // saved item data in DB
+
+  #listElement = null;
 
   #data;
   #ui;
 
   constructor(itemList, listElement, data = { ...EMPTY_ITEM }) {
     this.itemList = itemList;
+    this.#listElement = listElement;
+
     this.#gatherTransactionInfo();
 
     // gathering data
     this.#gatherData(data);
 
     // add ui class property
-    this.#ui = new ItemUI(this, listElement, { ...this.#data });
+    this.#createUi();
 
-    this.#restoreOrStartUsual();
+    this.#init();
   }
 
   #gatherTransactionInfo() {
     this.transactionStatus = {
       isWorking: this.itemList.transaction.working,
-      isSaved: this.itemList.transaction.saved || this.itemList.transaction.loading,
-      isCompleted: this.itemList.transaction.completed || this.itemList.transaction.restoring,
+      isSaved: this.itemList.transaction.saved,
+      isCompleted: this.itemList.transaction.completed,
     };
   }
 
@@ -49,23 +55,28 @@ export class Item {
     };
   }
 
-  async #restoreOrStartUsual() {
-    if (this.transactionStatus.isWorking) {
-      // setting timeout to fix item's index in itemList
-      setTimeout(() => {
-        this.itemList.refreshTotalPrice();
-        this.#checkData();
+  #createUi() {
+    console.log("aakjshd");
+    // create / restore ui
+    this.#ui = new ItemUI(this, this.#listElement, { ...this.#data });
+  }
 
-        // add ItemLog: item initialized (blank) (10)
-        this.#itemLog.push(new ItemLog(10));
-      }, 50);
-    }
+  #init() {
+    // setting timeout to fix item's index in itemList
+    setTimeout(() => {
+      this.itemList.refreshTotalPrice();
+      this.#checkData();
 
-    // for loading previous transaction and restoring completed transaction
-    else {
-      // add ItemLog: Item Restored (11)
-      this.#itemLog.push(new ItemLog(11));
-    }
+      // add ItemLog: item initialized (blank) (10)
+      this.#itemLog.push(new ItemLog(10));
+    }, 50);
+  }
+
+  // for loading previous transaction and restoring completed transaction item
+  // called from itemList
+  restoreItem() {
+    this.#createUi();
+    this.#itemLog.push(new ItemLog(11));
   }
 
   #checkData() {
@@ -104,6 +115,7 @@ export class Item {
   }
 
   deleteThisItem() {
+    this.#data.amount = 0;
     this.itemList.removeItemFromList(this);
     this.#ui.removeUi();
 
@@ -115,6 +127,11 @@ export class Item {
       this.#itemLog.push(new ItemLog(42));
     } else {
       this.#itemLog.push(new ItemLog(this.transactionStatus.isCompleted ? 41 : 40));
+    }
+
+    // delete from db if exist in db
+    if (this.#dbid) {
+      this.#deleteItemDB();
     }
 
     this.itemList.focusToLatestBarcode();
@@ -229,18 +246,32 @@ export class Item {
     };
 
     if (this.#dbid) {
-      // update existing transactionItem in database
-      await CashierInvoker.storeTransactionItem({
-        transactionItemId: this.#dbid,
-        ...itemDetail,
-      });
+      if (!deepEqual(itemDetail, this.#savedItemData)) {
+        // update existing transactionItem in database
+        await CashierInvoker.storeTransactionItem({
+          transactionItemId: this.#dbid,
+          data: { ...itemDetail },
+        });
+      }
     } else {
       // creating new transactionItem in database
       this.#dbid = await CashierInvoker.storeTransactionItem({
         transactionAllId: this.itemList.transaction.id,
-        ...itemDetail,
+        data: { ...itemDetail },
       });
     }
+
+    // save stored data
+    this.#savedItemData = { ...itemDetail };
+  }
+
+  async #deleteItemDB() {
+    let itemDetail = {
+      transactionItemId: this.#dbid,
+      log: this.#itemLog.map((log) => log.log),
+    };
+
+    await CashierInvoker.deleteTransactionItem(itemDetail);
   }
 }
 
@@ -256,6 +287,7 @@ class ItemUI {
   }
 
   #createElement(data) {
+    console.log(this.listElement);
     // create tr element
     this.#itemElement = document.createElement("tr");
     this.#itemElement.className = "purchases-contents";
@@ -279,6 +311,7 @@ class ItemUI {
     });
 
     this.listElement.appendChild(this.#itemElement);
+    console.log(this.#itemElement);
   }
 
   removeUi() {

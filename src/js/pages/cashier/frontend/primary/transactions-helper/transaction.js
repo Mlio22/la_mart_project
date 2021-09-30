@@ -1,5 +1,6 @@
 import { ItemList } from "./itemList.js";
 import { TransactionLog } from "../../../../../etc/Log.js";
+import { deepEqual } from "../../../../../etc/others.mjs";
 import { CashierInvoker } from "../../dbInvoker.js";
 
 function statusCodeToText(statusCode) {
@@ -8,14 +9,6 @@ function statusCodeToText(statusCode) {
     2: "saved",
     3: "completed",
     4: "cancelled",
-
-    // re-opening
-    51: "re-opening (saved)",
-    52: "re-opening (completed)",
-
-    //  after completed
-    6: "edited after completed",
-    7: "cancelled after completed",
   };
 
   let statusText = statusses[statusCode] ?? "unknown";
@@ -25,7 +18,8 @@ function statusCodeToText(statusCode) {
 
 export class Transaction {
   // transaction properties
-  #transactionLog = [new TransactionLog(1)];
+  #transactionLog = [new TransactionLog(11)];
+  #savedLogs = null; // saved logs in DB
 
   #transactionInfo = {
     id: null,
@@ -48,9 +42,6 @@ export class Transaction {
   }
 
   #loadTransaction() {
-    // set transaction status to re-opening (saved)
-    this.statusCode = 51;
-
     // restore items
     this.#transactionInfo.itemList.restoreItemList();
 
@@ -58,24 +49,21 @@ export class Transaction {
     this.statusCode = 1;
 
     // add log: re-opening (saved)
-    this.#addLog(51);
+    this.#addLog(12);
   }
 
   #restoreTransaction() {
-    // set transaction status to re-opening (completed)
-    this.statusCode = 52;
-
     // restore items
     this.#transactionInfo.itemList.restoreItemList();
 
     // restore the totalPrice
-    this.transactionInfo.itemList.refreshTotalPrice();
+    this.#transactionInfo.itemList.refreshTotalPrice();
 
     // set transaction statusCode  to 3 (completed)
     this.statusCode = 3;
 
     // add log: re-opening (completed)
-    this.#addLog(52);
+    this.#addLog(13);
   }
 
   saveTransaction() {
@@ -104,27 +92,33 @@ export class Transaction {
     this.#storeTransactionToDB();
   }
 
-  #storeTransactionToDB() {
-    // create logs
-    const logs = this.#transactionLog.map((log) => log.log);
-
-    // add to DB
-    CashierInvoker.createTransactionAll({ log: logs }).then(async (id) => {
-      this.#transactionInfo.id = id;
-
-      // add items to DB
-      await this.itemList.storeItemsToDB();
-    });
-  }
-
   cancelTransaction() {
     const isTransactionCompleted = this.completed;
 
     // change statusCode to 4 (cancelled) or 7 (cancelled after completed)
-    this.#transactionInfo.statusCode = isTransactionCompleted ? 7 : 4;
+    this.#transactionInfo.statusCode = 4;
 
     // log with code 4 (cancelled) or 5 (cancelled after completed)
-    this.#addLog(isTransactionCompleted ? 7 : 4);
+    this.#addLog(isTransactionCompleted ? 42 : 41);
+
+    this.#cancelTransactionToDB();
+  }
+
+  closeTransaction() {
+    // store to database if completed
+    if (this.completed) {
+      // check if transaction edited or deleted after completed, before changed to a new transaction
+      const itemsCount = this.itemList.itemCount;
+
+      if (itemsCount > 0) {
+        // store edited transaction
+        this.#storeTransactionToDB();
+        this.#addLog(5);
+      } else {
+        // cancel transaction
+        this.cancelTransaction();
+      }
+    }
   }
 
   reopenTransaction() {
@@ -134,6 +128,44 @@ export class Transaction {
     } else if (this.completed) {
       this.#restoreTransaction();
     }
+  }
+
+  async #storeTransactionToDB() {
+    // create logs
+    const latestLogs = this.#transactionLog.map((log) => log.log);
+
+    // add to DB if id not exists
+    if (this.#transactionInfo.id === null) {
+      const id = await CashierInvoker.storeTransactionAll({ log: latestLogs });
+      this.#transactionInfo.id = id;
+    }
+
+    // update DB if a new log exists
+    else if (!deepEqual(this.#savedLogs, latestLogs)) {
+      await CashierInvoker.storeTransactionAll({
+        transactionAllId: this.#transactionInfo.id,
+        data: latestLogs,
+      });
+    }
+
+    // add items to DB
+    await this.itemList.storeItemsToDB();
+
+    // update local logs
+    this.#savedLogs = latestLogs;
+  }
+
+  #cancelTransactionToDB() {
+    // delete existing transactionAll
+    const transactionAllLogs = this.#transactionLog.map((log) => log.log);
+
+    // delete to DB
+    CashierInvoker.deleteTransactionAll({
+      transactionAllId: this.#transactionInfo.id,
+      data: {
+        log: transactionAllLogs,
+      },
+    });
   }
 
   get transactionInfo() {
@@ -151,6 +183,7 @@ export class Transaction {
   get statusText() {
     return this.#transactionInfo.statusText;
   }
+
   get cashInfo() {
     return this.#transactionInfo.cashInfo;
   }
@@ -185,12 +218,12 @@ export class Transaction {
     return this.#transactionInfo.statusCode === 3;
   }
 
-  get loading() {
-    return this.#transactionInfo.statusCode === 51;
+  get cancelledBeforeCompleted() {
+    return this.#transactionInfo.statusCode === 4;
   }
 
-  get restoring() {
-    return this.#transactionInfo.statusCode === 52;
+  get cancelledAfterCompleted() {
+    return this.#transactionInfo.statusCode === 7;
   }
 
   get cancelled() {

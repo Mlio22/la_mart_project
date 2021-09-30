@@ -1,9 +1,14 @@
 const { Op } = require("sequelize");
 const db = require("../models/models");
 
-async function craateTransactionAll({ log }) {
-  // output: id
-
+/**
+ * Create new transactionAll
+ * @param {Object} newTransactionAllData
+ * @param {Object} newTransactionAllData.data
+ * @param {Array<Object>} newTransactionAllData.data.log - logs for new transactionAll
+ * @returns {number} id from the new transactionAll
+ */
+async function createTransactionAll({ data: { log } }) {
   const transactionAll = await db.TransaksiKeseluruhan.create({
       log: log,
     }),
@@ -12,19 +17,56 @@ async function craateTransactionAll({ log }) {
   return id;
 }
 
-async function editTransactionAll({ transactionAllId, log }) {
-  // output: undefined
-
+/**
+ * Update existing transactionAll logs
+ * @param {Object} editTransactionAllData
+ * @param {Object} editTransactionAllData.data
+ * @param {number} editTransactionAllData.transactionAllId - existing transactionAll id
+ * @param {Array<Object>} editTransactionAllData.data.log - latest logs from relating transactionAll
+ */
+async function editTransactionAll({ transactionAllId, data: { log } }) {
   const transactionAll = await db.TransaksiKeseluruhan.findOne({ where: { id: transactionAllId } });
 
-  if (!transactionAll) return;
-
-  await db.TransaksiKeseluruhan.update({
+  await transactionAll.update({
     log: log,
   });
 }
 
-async function createTransactionItem({ transactionAllId, itemId, amount, log }) {
+/**
+ * store last latest log and
+ * Delete existing transactionAll
+ * @param {Object} deleteTransactionAllData
+ * @param {number} deleteTransactionAllData.transactionAllId existing transactionAll id
+ * @param {Object} deleteTransactionAllData.data
+ * @param {Array<Object>} deleteTransactionAllData.data.log last latest logs
+ */
+
+async function deleteTransactionAll({ transactionAllId, data: { log } }) {
+  // output: undefined
+  const transactionAll = await db.TransaksiKeseluruhan.findOne({
+    where: { id: transactionAllId },
+  });
+
+  // update log before deleted
+  await transactionAll.update({
+    log: log,
+  });
+
+  await transactionAll.destroy();
+}
+
+/**
+ * create new transactionItem
+ * @param {Object} newTransactionItemData
+ * @param {number} newTransactionItemData.transactionAllId existing transactionAll id
+ * @param {Object} newTransactionItemData.data
+ * @param {number} newTransactionItemData.data.itemId item id, referenced from detail_barang
+ * @param {amount} newTransactionItemData.data.amount item amount
+ * @param {Array<Object>} newTransactionItemData.data.log item logs
+ *
+ * @returns {int} id new transactionItem id
+ */
+async function createTransactionItem({ transactionAllId, data: { itemId, amount, log } }) {
   const transactionItem = await db.TransaksiBarang.create({
       id_transaksi_keseluruhan: transactionAllId,
       id_barang: itemId,
@@ -36,20 +78,51 @@ async function createTransactionItem({ transactionAllId, itemId, amount, log }) 
   return id;
 }
 
-async function editTransactionItem({ transactionItemId, itemId, amount }) {
+/**
+ * update existing transactionItem data
+ * @param {Object} editTransactionItemData
+ * @param {number} editTransactionItemData.transactionItemId existing transactionItem
+ * @param {Object} editTransactionItemData.data
+ * @param {number} editTransactionItemData.data.itemId current new itemId
+ * @param {number} editTransactionItemData.data.amount current new amount
+ * @param {Array<Object>} editTransactionItemData.data.log latest logs
+ *
+ */
+async function editTransactionItem({ transactionItemId, data: { itemId, amount, log } }) {
+  // output: undefined
   const transactionItem = await db.TransaksiBarang.findOne({ where: { id: transactionItemId } });
 
-  if (!transactionItem) return;
-
-  await db.TransaksiBarang.update({
+  await transactionItem.update({
     id_barang: itemId,
     jumlah: amount,
+    log,
   });
 }
 
+/**
+ * add last logs to existing transactionItem
+ * and Delete transactionItem
+ * @param deleteTransactionItemData
+ * @param {number} deleteTransactionItemData.transactionItemId existing transactionItem id
+ * @param {Object} deleteTransactionItemData.data
+ * @param {array<Object>} deleteTransactionItemData.data.log last latest logs
+ */
+async function deleteTransactionItem({ transactionItemId, data: { log } }) {
+  // output: undefined
+  const transactionItem = await db.TransaksiBarang.findOne({ where: { id: transactionItemId } });
+
+  await transactionItem.update({
+    log: log,
+  });
+
+  await transactionItem.destroy();
+}
+
 module.exports = {
-  craateTransactionAll,
+  createTransactionAll,
   editTransactionAll,
+  deleteTransactionAll,
   createTransactionItem,
   editTransactionItem,
+  deleteTransactionItem,
 };
