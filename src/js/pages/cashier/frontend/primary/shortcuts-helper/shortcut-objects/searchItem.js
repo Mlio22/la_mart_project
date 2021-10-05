@@ -591,9 +591,13 @@ class SearchItemResults {
   selectFilteredItem() {
     // index will be the index from click listener @#setResultsElement
     // or be
-    this.#searchItem.selectedItem = {
-      ...this.#matchedItemList[this.#focusedItemIndex],
-    };
+
+    // select only if an item is being focused
+    if (this.#focusedItemIndex) {
+      this.#searchItem.selectedItem = {
+        ...this.#matchedItemList[this.#focusedItemIndex],
+      };
+    }
   }
 
   /**
