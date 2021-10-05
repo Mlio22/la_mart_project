@@ -1,3 +1,11 @@
+/**
+ * @typedef logDetail
+ * @type {Object}
+ * @property {number} code
+ * @property {String} description
+ * @property {Data} date
+ */
+
 class CashierLog {
   /**
    *
@@ -12,16 +20,11 @@ class CashierLog {
 
     // add timestamp
     this._date = Date.now();
-
-    console.log(`new ${logType} appears with code: ${code}, ${codeList[code]}`);
   }
 
   /**
    * return log details
-   * @returns {Object} logDetail
-   * @returns {number} logDetail.code
-   * @returns {string} logDetail.description
-   * @returns {Date} logDetail.date
+   * @type {logDetail}
    */
   get log() {
     return {
@@ -91,4 +94,4 @@ class ItemLog extends CashierLog {
   }
 }
 
-export default { TransactionLog, ItemLog };
+export { TransactionLog, ItemLog };

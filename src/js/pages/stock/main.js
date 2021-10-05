@@ -3,7 +3,7 @@ import { SubmenuWrapper } from "../cashier/primary/submenuWrapper.js";
 import { Notification } from "./stockChilds/notification.js";
 import { SaveStock } from "./stockChilds/saveStock.js";
 
-class StockPage {
+export class StockPage {
   constructor(stockElement) {
     this.stockElement = stockElement;
     this.stockChild = {};

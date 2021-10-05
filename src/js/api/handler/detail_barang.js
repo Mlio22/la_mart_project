@@ -1,6 +1,15 @@
 const { Op } = require("sequelize");
 const db = require("../models/models");
 
+/**
+ *
+ * @async
+ * @param {Object} searchItemParam
+ * @param {string} [searchItemParam.hint=""]
+ * @param {Array<String>} [searchItemParam.searchBy=["barcode_barang", "nama_barang"]] - filter
+ * @param {Boolean} [searchItemParam.exactSearch=false] - must match with hint exactly?
+ * @returns {Promise<Array<Object>>} list of matching results
+ */
 async function searchItemDB({
   hint = "",
   searchBy = ["barcode_barang", "nama_barang"],

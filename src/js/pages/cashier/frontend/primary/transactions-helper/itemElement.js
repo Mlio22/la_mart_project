@@ -1,8 +1,33 @@
+/**
+ * @typedef {import('../transactions-helper/item').Item} Item
+ */
+
 export class ActionElement {
+  /**
+   * wrapping action's element
+   * @type {HTMLElement}
+   * @private
+   */
   #actionWrapper;
+
+  /**
+   * contains action button
+   * @type {HTMLElement}
+   * @private
+   */
   #actionButton;
+
+  /**
+   * is action button clickable
+   * @type {Boolean}
+   * @private
+   */
   #isDeletable;
 
+  /**
+   * create action element for cancelling an item
+   * @param {Item} item
+   */
   constructor(item) {
     this.item = item;
 
@@ -13,18 +38,28 @@ export class ActionElement {
     this.#listenAction();
   }
 
+  /**
+   * creates action element with its childs
+   * @private
+   */
   #createActionElement() {
+    // create action wrapper element
     this.#actionWrapper = document.createElement("td");
     this.#actionWrapper.className = `purchases-content action-content no-input`;
 
+    // create action button element
     this.#actionButton = document.createElement("button");
     this.#actionButton.className = "focusable";
     this.#actionButton.innerHTML = `<i class="fas fa-times "></i>`;
     this.#setButtonAblity();
 
+    // append button to wrapper
     this.#actionWrapper.appendChild(this.#actionButton);
   }
 
+  /**
+   * @private
+   */
   #setButtonAblity() {
     // item can be deleted if it's deletable (valid)
     // set button disablity
@@ -38,59 +73,101 @@ export class ActionElement {
     }
   }
 
+  /**
+   * @private
+   */
   #listenAction() {
     this.#actionWrapper.addEventListener("click", () => {
+      // delete the item if data is valid and button is clicked
       if (this.#isDeletable) {
-        // delete the item if data is valid and button is clicked
         this.#deleteThisItem();
       }
     });
   }
 
-  // to item function
+  /**
+   * @private
+   */
   #deleteThisItem() {
-    // delete item through transaction
     this.item.deleteThisItem();
   }
 
+  /**
+   * @type {HTMLElement}
+   */
   get element() {
     return this.#actionWrapper;
   }
 
+  /**
+   * set to make this item deletable
+   */
   ableToDelete() {
     this.#isDeletable = true;
     this.#setButtonAblity();
   }
 }
 
-// Barcode element
 export class BarcodeElement {
+  /**
+   * contains barcode wrapper element
+   * @type {HTMLElement}
+   * @private
+   */
   #barcodeWrapper;
+
+  /**
+   * contains barcode input element
+   * @type {HTMLElement}
+   * @private
+   */
   #barcodeElement;
 
+  /**
+   * contains current barcode value
+   * @type {String}
+   * @private
+   */
+  #currentBarcodeValue;
+
+  /**
+   * creates barcode element
+   * @constructor
+   * @param {Item} item
+   */
   constructor(item) {
     this.item = item;
 
-    const firstBarcode = item.data.barcode;
+    // set barcode's value with initial barcode from item
+    // e.g. an item added from SearchItem shortcut, so barcode's input value is not null
+    this.#currentBarcodeValue = item.data.barcode;
 
-    // create the barcode ui
-    this.#createBarcodeElement(firstBarcode);
+    this.#createBarcodeElement();
 
+    // lock if item is already valid e.g. from searchItem
     if (this.item.data.valid) this.lock();
   }
 
+  /**
+   * focus to barcode
+   */
   focus() {
     this.#barcodeElement.focus();
   }
 
+  /**
+   * lock the item's barcode
+   * so the barcode cannot be change
+   */
   lock() {
-    // lock the item's barcode
-    // so the barcode cannot be change
     this.#barcodeElement.disabled = true;
   }
 
-  // local related methods
-  #createBarcodeElement(barcode) {
+  /**
+   * create barcode wrapper and input elements
+   * @private
+   */
+  #createBarcodeElement() {
     // the wrapper element
     this.#barcodeWrapper = document.createElement("td");
     this.#barcodeWrapper.className = "purchases-content barcode-content focusable";
@@ -98,7 +175,7 @@ export class BarcodeElement {
     // the input element
     this.#barcodeElement = document.createElement("input");
     this.#barcodeElement.type = "text";
-    this.#barcodeElement.value = barcode;
+    this.#barcodeElement.value = this.#currentBarcodeValue;
 
     // listen to the input
     this.#listenBarcode();
@@ -107,23 +184,31 @@ export class BarcodeElement {
     this.#barcodeWrapper.appendChild(this.#barcodeElement);
   }
 
+  /**
+   * set listener to barcode.
+   */
   #listenBarcode() {
-    // if barcode is changed,
-    // first, look for duplicate item on the list,
-    // if it's not duplicate, then check to DB with search-item
-
-    // if search-item is succeed, search-item will change the item data
-    // else if search-item is closed, change item data and set validity to false
+    /**
+     * if barcode is changed,
+     * first, look for duplicate item on the list,
+     * if it's not duplicate, then check to DB with search-item
+     *
+     * if search-item is succeed, search-item will change the item data
+     * else if search-item is closed, change item data and set validity to false
+     *
+     * @param {Event} e
+     */
     const checkChange = (e) => {
       const barcodeValue = e.target.value;
+
+      // update #barcodeValue
+      this.#currentBarcodeValue = barcodeValue;
 
       if (barcodeValue.length > 0) {
         this.item.setSeveralItemData({ barcode: barcodeValue });
         const isDuplicate = this.item.checkDuplicateFromItem();
 
         if (isDuplicate) {
-          // if duplicate, then clear the barcode and set amount to 1
-          this.item.setSeveralItemData({ barcode: "", amount: 1 });
           this.focus();
         } else {
           // if doesn't duplicate,
@@ -138,12 +223,17 @@ export class BarcodeElement {
 
     // double enter to open searchItem
     let isEnteredBeforeTimeout = false;
+
     const checkDoubleEnter = (key) => {
       if (key === "Enter") {
+        // if enter pressed before timeout, open searchitem
         if (isEnteredBeforeTimeout) {
           isEnteredBeforeTimeout = false;
           this.item.openSearchFromItem();
-        } else {
+        }
+
+        // else, set isEnteredBeforeTimeout to true and wait again
+        else {
           isEnteredBeforeTimeout = true;
 
           setTimeout(() => {
@@ -168,81 +258,168 @@ export class BarcodeElement {
     });
   }
 
-  // function that called from parent
+  /**
+   * @type {HTMLElement}
+   */
   get element() {
     return this.#barcodeWrapper;
   }
 
+  /**
+   * @type {String}
+   */
+  get barcodeValue() {
+    return this.#currentBarcodeValue;
+  }
+
+  /**
+   * @param {String} barcode - new barcode
+   */
   set barcode(barcode) {
+    this.#currentBarcodeValue = barcode;
     this.#barcodeElement.value = barcode;
   }
 }
 
 export class TextElement {
+  /**
+   * contains text ui element with its childs
+   * @type {HTMLElement}
+   * @private
+   */
   #textElement;
+
+  /**
+   * contains classname of textElement
+   * @type {String}
+   * @private
+   */
   #classname;
 
+  /**
+   * contains current text
+   * @type {String}
+   * @private
+   */
+  #currentTextValue;
+
+  /**
+   * creates textelement
+   * @param {String} classname - classname of this textElement
+   * @param {String} value - inital value of textElement
+   */
   constructor(classname, value = "") {
     this.#classname = classname;
+    this.#currentTextValue = value;
 
-    this.#createTextElement(value);
+    this.#createTextElement();
   }
 
-  #createTextElement(firstText) {
+  #createTextElement() {
     this.#textElement = document.createElement("td");
     this.#textElement.className = `purchases-content no-input ${this.#classname}`;
 
-    this.text = firstText;
+    this.text = this.#currentTextValue;
   }
 
+  /**
+   * @param {String} text - new text value
+   */
   set text(text) {
+    this.#currentTextValue = text;
     this.#textElement.innerText = text;
   }
 
+  /**
+   * @type {HTMLElement}
+   */
   get element() {
     return this.#textElement;
   }
 }
 
 export class AmountElement {
+  /**
+   * contains amount wrapper element
+   * @type {HTMLElement}
+   * @private
+   */
   #amountWrapper;
+
+  /**
+   * contains amount input element
+   * @type {HTMLElement}
+   * @private
+   */
   #amountElement;
 
+  /**
+   * max amount value when an item is in completed transaction
+   * @type {Number}
+   * @private
+   */
   #maxAmountValue = 0;
 
+  /**
+   * contains value of is transacton completed
+   * @type {Boolean}
+   * @private
+   */
   #isTransactionCompleted;
 
+  /**
+   * contains current amount input value
+   * @type {Number}
+   * @private
+   */
+  #currentAmountValue;
+
+  /**
+   * creates amount element
+   * @param {Item} item
+   */
   constructor(item) {
     this.item = item;
 
     // set the value
-    const firstAmount = item.data.amount;
+    this.#currentAmountValue = item.data.amount;
 
     // initialize
-    this.#createAmountElement(firstAmount);
+    this.#createAmountElement();
     this.#checkTransactionStatus();
 
     // listener
     this.#listenAmount();
   }
 
+  /**
+   * creates amount wrapper element and amount input element
+   * @private
+   */
   #createAmountElement(firstAmount = 1) {
     this.#amountWrapper = document.createElement("td");
     this.#amountWrapper.className = "purchases-content amount-content focusable";
 
+    // creates input
     this.#amountElement = document.createElement("input");
     this.#amountElement.type = "number";
-    this.#amountElement.value = firstAmount;
+    this.#amountElement.value = this.#currentAmountValue;
     this.#amountElement.min = 1;
 
+    // appends input into wrapper
     this.#amountWrapper.appendChild(this.#amountElement);
   }
 
+  /**
+   * listen to amount input
+   * @private
+   */
   #listenAmount() {
+    // detect amount value change
     this.#amountElement.addEventListener("change", (e) => {
       let amount = e.target.value;
 
-      // set amount to zero if NaN
+      // set amount to 1 if NaN
       if (amount == "") {
         this.#amountElement.value = 1;
         amount = 1;
@@ -256,10 +433,15 @@ export class AmountElement {
         amount = this.#maxAmountValue;
       }
 
+      // set item's amount
       this.item.setSeveralItemData({ amount });
     });
   }
 
+  /**
+   * check transaction's statui to determine max amount set or not
+   * @private
+   */
   #checkTransactionStatus() {
     this.#isTransactionCompleted = this.item.transactionStatus.isCompleted;
     if (this.#isTransactionCompleted) {
@@ -267,17 +449,26 @@ export class AmountElement {
     }
   }
 
+  /**
+   * @type {HTMLElement}
+   */
   get element() {
     // function called from itemUi
     return this.#amountWrapper;
   }
 
+  /**
+   * @param {Number} [amount=1] - new amount value
+   */
   set value(amount = 1) {
     // set amount input value
     // function called from itemUi
     this.#amountElement.value = amount;
   }
 
+  /**
+   * set max amount
+   */
   setMaxAmount() {
     this.#isTransactionCompleted = true;
     // set max amount if transaction is completed

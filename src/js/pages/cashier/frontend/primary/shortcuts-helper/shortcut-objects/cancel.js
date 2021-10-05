@@ -1,9 +1,33 @@
+/**
+ * @typedef {import("../../submenuWrapper.js").SubmenuWrapper} SubmenuWrapper
+ */
+
 import { Submenu } from "./SubmenuPrototype.js";
+
+/**
+ * @extends {Submenu}
+ */
 export class Cancel extends Submenu {
+  /**
+   * contains yes button element
+   * @type {HTMLElement}
+   * @private
+   */
   #yesButton;
+
+  /**
+   * contains no button element
+   * @type {HTMLElement}
+   * @private
+   */
   #noButton;
 
-  constructor(submenuWrapper, submenuProperties) {
+  /**
+   * creates cancel submenu
+   * @param {SubmenuWrapper} submenuWrapper - referenced SubmenuWrapper instance
+   * @param {Object} [submenuProperties={}] - options
+   */
+  constructor(submenuWrapper, submenuProperties = {}) {
     super(submenuWrapper, submenuProperties);
 
     this._initializeSubmenu();

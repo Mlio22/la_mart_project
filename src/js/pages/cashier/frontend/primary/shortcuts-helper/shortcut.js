@@ -1,9 +1,23 @@
+/**
+ * @typedef {import('../shortcutWrapper').ShortcutWrapper} ShortcutWrapper
+ */
+
 export class Shortcut {
   #shortcutWrapper;
   #shortcutKey;
   #shortcutClassname;
   #shortcutAvailablity;
   #shortcutElement;
+
+  /**
+   *
+   * @param {ShortcutWrapper} shortcutWrapper - referenced ShortcutWrapper
+   * @param {string} shortcutKey
+   *
+   * @param {Object} shortcutDetails
+   * @param {string} shortcutDetails.name - shortcut's name
+   * @param {boolean} shortcutDetails.initialAvailabiilty
+   */
 
   constructor(shortcutWrapper, shortcutKey, { name: shortcutClassname, initialAvailabiilty }) {
     this.#shortcutWrapper = shortcutWrapper;
@@ -45,6 +59,9 @@ export class Shortcut {
     this.#setShortcutAvailability();
   }
 
+  /**
+   * @returns {Boolean}
+   */
   get availability() {
     return this.#shortcutAvailablity;
   }

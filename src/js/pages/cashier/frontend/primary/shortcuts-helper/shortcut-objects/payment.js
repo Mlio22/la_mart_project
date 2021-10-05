@@ -1,20 +1,86 @@
+/**
+ * @typedef {import ("../../submenuWrapper").SubmenuWrapper} SubmenuWrapper
+ */
+
 import { set_proper_price } from "../../../../../../etc/others.mjs";
 import { Submenu } from "./SubmenuPrototype.js";
 
+/**
+ * @extends {Submenu}
+ */
 export class Payment extends Submenu {
+  /**
+   * contains total value must be paid by costumer
+   * @type {Number}
+   * @private
+   */
   #total;
-  #customerMoney;
-  #customerMoneyElement;
-  #proceedButton;
-  #cancelButton;
+
+  /**
+   * contains total elements
+   * @type {HTMLElement}
+   * @private
+   */
   #totalElement;
-  #changeElement;
+
+  /**
+   * contains customer's money
+   * @type {Number}
+   * @private
+   */
+  #customerMoney;
+
+  /**
+   * contais customer's money element
+   * @type {HTMLElement}
+   * @private
+   */
+  #customerMoneyElement;
+
+  /**
+   * contains change value
+   * @type {Number}
+   * @private
+   */
   #change;
+
+  /**
+   * contains change element
+   * @type {HTMLElement}
+   * @private
+   */
+  #changeElement;
+
+  /**
+   * contains proceed button element
+   * @type {HTMLElement}
+   * @private
+   */
+  #proceedButton;
+
+  /**
+   * contains cancel button element
+   * @type {HTMLElement}
+   * @private
+   */
+  #cancelButton;
+
+  /**
+   * contains logic is customer money sufficent or not
+   * @type {Boolean}
+   */
   #isSufficient;
+
+  /**
+   * creates payment submenu
+   * @param {SubmenuWrapper} submenuWrapper
+   * @param {Object} submenuProperties - options
+   */
 
   constructor(submenuWrapper, submenuProperties) {
     super(submenuWrapper, submenuProperties);
 
+    // todo: persingkat pemanggilan properti dibawah ini
     this.#total =
       submenuWrapper.window.childs.transactionList.currentTransaction.transactionInfo.cashInfo.totalPrice;
     this.#customerMoney = this.#total;
@@ -26,11 +92,13 @@ export class Payment extends Submenu {
   }
 
   // protected methods
+  /**@override */
   _setSubmenu() {
     this.#gatherElementInputs();
     this.#assignInitialValue();
   }
 
+  /**@override */
   _setListener() {
     // listen to payment div
     this._submenuElement.addEventListener("keydown", ({ key }) => {
@@ -70,7 +138,10 @@ export class Payment extends Submenu {
     });
   }
 
-  // private methods
+  /**
+   * gather all input elements
+   * @private
+   */
   #gatherElementInputs() {
     this.#customerMoneyElement = this._submenuElement.querySelector(".customer-content");
     this.#totalElement = this._submenuElement.querySelector(".price-content");
@@ -81,6 +152,10 @@ export class Payment extends Submenu {
     this.#cancelButton = this._submenuElement.querySelector("button.cancel");
   }
 
+  /**
+   * set elements value
+   * @private
+   */
   #assignInitialValue() {
     // initial value assignment
     this.#customerMoneyElement.value = set_proper_price(this.#customerMoney);
@@ -88,6 +163,10 @@ export class Payment extends Submenu {
     this.#refreshChange();
   }
 
+  /**
+   * refreshes change element value
+   * @private
+   */
   #refreshChange() {
     // refresh the change value everytime the customer money changed
     this.#change = this.#customerMoney - this.#total;
@@ -101,11 +180,19 @@ export class Payment extends Submenu {
     this.#changeElement.value = change;
   }
 
+  /**
+   * refreshes proceed button according to #isSufficent
+   * @private
+   */
   #refreshButton() {
     // set the proceed button disabled or not due to sufficient or not
     this.#proceedButton.disabled = !this.#isSufficient;
   }
 
+  /**
+   * proceeds payment after proceed button clicked
+   * @private
+   */
   #proceedPayment() {
     this._submenu.hideSubmenu();
 
@@ -121,8 +208,11 @@ export class Payment extends Submenu {
     }
   }
 
+  /**
+   * cancel payment and closes submenu if cancel button clicked
+   * @private
+   */
   #cancelPayment() {
     this._submenu.hideSubmenu();
-    console.log("cancelled");
   }
 }

@@ -11,10 +11,11 @@ export class CashierInvoker {
 
   /**
    * Create or update an transactionAll
+   * @async
    * @param {Object} storeTransactionAllData
    * @param {number} [storeTransactionAllData.transactionAllId=null] - existing transactionALl id for updating
    * @param {Array<Object>} storeTransactionAllData.log - list of TransactionLog logs
-   * @returns {(number | void)} - id of new transactionAll or null if for updating existing transactionAll
+   * @returns {Promise<(number | void)>} - id of new transactionAll or null if for updating existing transactionAll
    */
   static async storeTransactionAll({ transactionAllId = null, log }) {
     // create new transactionAll if transactionAllId is null
@@ -28,10 +29,11 @@ export class CashierInvoker {
 
   /**
    * delete a transactionAll with existing id
+   * @async
    * @param {Object} deleteTransactionAllData
    * @param {number} deleteTransactionAllData.transactionAllId - existing transactionALl id
    * @param {Array<Object>} deleteTransactionAllData.log - last latest TransactionLog logs
-   * @returns {void}
+   * @returns {Promise<void>}
    */
 
   static async deleteTransactionAll({ transactionAllId, log }) {
@@ -41,14 +43,15 @@ export class CashierInvoker {
 
   /**
    * Create new transactionItem or update existing transactionItem
+   * @async
    * @param {Object} storeTransactionItemData
-   * @param {number} [storeTransactionItemData.transactionAllId=null] - existing transactionAll id for creating new transactionItem
-   * @param {number} [storeTransactionItemData.transactionItemId=null] - existing transactionItem id for updating
+   * @param {?number} [storeTransactionItemData.transactionAllId] - existing transactionAll id for creating new transactionItem
+   * @param {?number} [storeTransactionItemData.transactionItemId] - existing transactionItem id for updating
    * @param {Object} storeTransactionItemData.data
    * @param {number} storeTransactionItemData.data.itemId - existing item id from DB
    * @param {amount} storeTransactionItemData.data.amount - amount of item
    * @param {Array<Object>} storeTransactionItemData.data.log - list of ItemLog logs
-   * @returns {(number|void)} - id of new transactionItem or undefined if for updating
+   * @returns {Promise<(number|void)>} - id of new transactionItem or undefined if for updating
    */
 
   static async storeTransactionItem({ transactionAllId = null, transactionItemId = null, data }) {
@@ -69,10 +72,11 @@ export class CashierInvoker {
 
   /**
    * delete a transactionItem with existing id
+   * @async
    * @param {Object} deleteTransactionItemData
    * @param {number} deleteTransactionItemData.transactionItemId - existing transactionItem id
    * @param {Array<Object>} deleteTransactionItemData.log - last latest of transactionItem logs
-   * @returns {void}
+   * @returns {Promise<void>}
    */
 
   static async deleteTransactionItem({ transactionItemId, log }) {

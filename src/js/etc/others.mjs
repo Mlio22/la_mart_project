@@ -1,4 +1,8 @@
-// added function to reverse a string
+/**
+ * reverses a string
+ * @param {string} string
+ * @returns {string}
+ */
 function reverseString(string) {
   let stringArray = string.split("");
   stringArray = stringArray.reverse();
@@ -7,18 +11,23 @@ function reverseString(string) {
 }
 
 // set ordinary number strings to proper price string
-export const set_proper_price = function (value = "") {
+/**
+ * set initial value to proper price in IDR
+ * @param {string | number} value
+ * @returns {string}
+ */
+export const set_proper_price = function (value) {
   // if the input was not a string
-  value = value.toString();
+  if (typeof value === "number") value = value.toString();
 
-  String.prototype.insertDot = function (index) {
+  function insertDot(string, index) {
     // add dot between a string
     if (index > 0) {
-      return this.substring(0, index) + "." + this.substr(index);
+      return string.substring(0, index) + "." + string.substr(index);
     }
 
-    return this;
-  };
+    return string;
+  }
 
   // turn number to string
   let stringValue = value.toString();
@@ -29,8 +38,9 @@ export const set_proper_price = function (value = "") {
   // add a dot for every 3 digit
   let addedDot = 0;
   for (let index = 0; index < stringValue.length; index++) {
-    if (index >= 3 + addedDot * 4) {
-      stringValue = stringValue.insertDot(3 + addedDot * 4);
+    const dotIndex = 3 + addedDot * 4;
+    if (index >= dotIndex) {
+      stringValue = insertDot(stringValue, dotIndex);
       addedDot += 1;
     }
   }
@@ -41,6 +51,13 @@ export const set_proper_price = function (value = "") {
   return stringValue;
 };
 
+/**
+ * checks two objects deep equally
+ * via https://stackoverflow.com/a/25456134/12125511
+ * @param {Object} x
+ * @param {Object} y
+ * @returns {boolean}
+ */
 export function deepEqual(x, y) {
   if (x === y) {
     return true;

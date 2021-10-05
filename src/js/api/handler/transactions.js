@@ -6,7 +6,7 @@ const db = require("../models/models");
  * @param {Object} newTransactionAllData
  * @param {Object} newTransactionAllData.data
  * @param {Array<Object>} newTransactionAllData.data.log - logs for new transactionAll
- * @returns {number} id from the new transactionAll
+ * @returns {Promise<number>} id from the new transactionAll
  */
 async function createTransactionAll({ data: { log } }) {
   const transactionAll = await db.TransaksiKeseluruhan.create({
@@ -64,7 +64,7 @@ async function deleteTransactionAll({ transactionAllId, data: { log } }) {
  * @param {amount} newTransactionItemData.data.amount item amount
  * @param {Array<Object>} newTransactionItemData.data.log item logs
  *
- * @returns {int} id new transactionItem id
+ * @returns {Promise<int>} id new transactionItem id
  */
 async function createTransactionItem({ transactionAllId, data: { itemId, amount, log } }) {
   const transactionItem = await db.TransaksiBarang.create({
@@ -80,12 +80,13 @@ async function createTransactionItem({ transactionAllId, data: { itemId, amount,
 
 /**
  * update existing transactionItem data
+ * @async
  * @param {Object} editTransactionItemData
  * @param {number} editTransactionItemData.transactionItemId existing transactionItem
  * @param {Object} editTransactionItemData.data
  * @param {number} editTransactionItemData.data.itemId current new itemId
  * @param {number} editTransactionItemData.data.amount current new amount
- * @param {Array<Object>} editTransactionItemData.data.log latest logs
+ * @param {Promise} editTransactionItemData.data.log latest logs
  *
  */
 async function editTransactionItem({ transactionItemId, data: { itemId, amount, log } }) {
@@ -102,6 +103,7 @@ async function editTransactionItem({ transactionItemId, data: { itemId, amount, 
 /**
  * add last logs to existing transactionItem
  * and Delete transactionItem
+ * @async
  * @param deleteTransactionItemData
  * @param {number} deleteTransactionItemData.transactionItemId existing transactionItem id
  * @param {Object} deleteTransactionItemData.data

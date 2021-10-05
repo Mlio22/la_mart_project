@@ -5,6 +5,36 @@ import { SearchItem } from "../shortcuts-helper/shortcut-objects/searchItem.js";
 import { CashierInvoker } from "../../dbInvoker.js";
 import { deepEqual } from "../../../../../etc/others.mjs";
 
+/**
+ * @typedef {import('../transactions-helper/itemList').ItemList} ItemList
+ *
+ * @typedef ItemData
+ * @type {Object}
+ * @property {?number} id - item id from DB
+ * @property {string} barcode - item barcode from DB
+ * @property {string} name - item name from DB
+ * @property {string} quantity - item quantity
+ * @property {number} price - item price
+ * @property {boolean} valid - is item valid or not?
+ * @property {?number} amount - current item amount
+ * @property {?number} maxAmount - max amount
+ *
+ * @typedef ElementContent
+ * @type {Object}
+ * @property {ActionElement} actionElement
+ * @property {BarcodeElement} barcodeElement
+ * @property {TextElement} nameElement
+ * @property {TextElement} quantityElement
+ * @property {TextElement} priceElement
+ * @property {AmountElement} amountElement
+ * @property {TextElement} totalPriceElement
+ */
+
+/**
+ * @type {ItemData}
+ * @constant
+ * @default
+ */
 const EMPTY_ITEM = {
   id: null,
   barcode: "",
@@ -15,23 +45,63 @@ const EMPTY_ITEM = {
 };
 
 export class Item {
+  /**
+   * contains id generated from DB
+   * @type {number}
+   */
   #dbid = null;
-  #itemLog = [];
-  #savedItemData = null; // saved item data in DB
 
+  /**
+   * contains logs
+   * @type {Array<ItemLog>}
+   * */
+  #itemLog = [];
+
+  /**
+   * saved item data in DB as buffer
+   * and updates Item updated in DB
+   * @type {ItemData}
+   */
+  #savedItemData = null;
+
+  /**
+   * element that contains UIs
+   * @type {HTMLElement}
+   */
   #listElement = null;
 
+  /**
+   * contains data detail of this item
+   * @type {ItemData}
+   */
   #data;
+
+  /**
+   * element itemUI
+   * @type {ItemUI}
+   */
   #ui;
 
+  /**
+   * creating item
+   * @param {ItemList} itemList - referenced itemlist
+   * @param {HTMLElement} listElement - itemlist element
+   * @param {Object} [data]
+   */
   constructor(itemList, listElement, data = { ...EMPTY_ITEM }) {
+    /**
+     * @type {ItemList}
+     */
     this.itemList = itemList;
+
+    /**
+     * @type {HTMLElement}
+     */
     this.#listElement = listElement;
 
-    this.#gatherTransactionInfo();
-
-    // gathering data
+    // gather transaction statusses and data
     this.#gatherData(data);
+    this.#gatherTransactionInfo();
 
     // add ui class property
     this.#createUi();
@@ -39,7 +109,16 @@ export class Item {
     this.#init();
   }
 
+  /**
+   * @private
+   */
   #gatherTransactionInfo() {
+    /**
+     * @property {Object} transactionStatus
+     * @property {boolean} transactionStatus.isWorking
+     * @property {boolean} transactionStatus.isSaved
+     * @property {boolean} transactionStatus.isCompleted
+     */
     this.transactionStatus = {
       isWorking: this.itemList.transaction.working,
       isSaved: this.itemList.transaction.saved,
@@ -47,20 +126,39 @@ export class Item {
     };
   }
 
-  // gather data if available
+  /**
+   * gather data if available
+   * @private
+   * @param {ItemData} data
+   */
   #gatherData(data) {
+    // checks if data has sufficent properties
+    const validProperties = ["barcode", "name", "quantity", "price"],
+      ispropertiesValid = validProperties.every((x) => x in data);
+
+    if (!ispropertiesValid) {
+      // todo: error
+      this.#data = { ...EMPTY_ITEM };
+    }
+
     this.#data = {
       amount: 1,
       ...data,
     };
   }
 
+  /**
+   * create UI for new item or
+   * restore UI for completed item
+   * @private
+   */
   #createUi() {
-    console.log("aakjshd");
-    // create / restore ui
     this.#ui = new ItemUI(this, this.#listElement, { ...this.#data });
   }
 
+  /**
+   * @private
+   */
   #init() {
     // setting timeout to fix item's index in itemList
     setTimeout(() => {
@@ -72,15 +170,20 @@ export class Item {
     }, 50);
   }
 
-  // for loading previous transaction and restoring completed transaction item
-  // called from itemList
+  /**
+   * restore completed item
+   */
   restoreItem() {
     this.#createUi();
     this.#itemLog.push(new ItemLog(11));
   }
 
+  /**
+   * check data validity
+   * and create a new item if last item valid
+   * @private
+   */
   #checkData() {
-    // go create new item if enough info in previous item
     if (this.#data.valid) {
       this.#ui.childElements.barcodeElement.lock();
       this.itemList.createNewItem();
@@ -89,41 +192,52 @@ export class Item {
     }
   }
 
-  #isItemEmpty() {
-    // checking if the #data is the same as EMPTY_ITEM
+  /**
+   * checking if the #data is the same as EMPTY_ITEM
+   * @returns {boolean} is #data empty
+   */
+  isItemEmpty() {
     return JSON.stringify({ ...this.#data, ...EMPTY_ITEM }) === JSON.stringify(this.#data);
   }
 
-  async checkTransactionStatus() {
-    // renew the transaction statusses
+  /**
+   * renew the transaction statusses
+   */
+  checkTransactionStatus() {
     this.#gatherTransactionInfo();
 
+    // if transaction completed, set max amount of item
     if (this.transactionStatus.isCompleted) {
       this.#setMaxAmount();
     }
   }
 
+  /**
+   * @private
+   * set max value of item's amount after item transaction completed
+   */
   #setMaxAmount() {
-    // setting maxAmount
     const { amount } = this.#data;
-    this.#data = {
-      maxAmount: amount,
-      ...this.#data,
-    };
+    this.#data.maxAmount = amount;
 
+    // set max amount in ui input
     this.#ui.childElements.amountElement.setMaxAmount();
   }
 
-  deleteThisItem() {
-    this.#data.amount = 0;
+  /**
+   * delete this item from ui and transaction
+   */
+  async deleteThisItem() {
+    // remove item from list and ui
     this.itemList.removeItemFromList(this);
     this.#ui.removeUi();
 
+    // refresh total price
     this.itemList.refreshTotalPrice();
 
     // logging
     // checking if item is blank or not
-    if (this.#isItemEmpty()) {
+    if (this.isItemEmpty()) {
       this.#itemLog.push(new ItemLog(42));
     } else {
       this.#itemLog.push(new ItemLog(this.transactionStatus.isCompleted ? 41 : 40));
@@ -131,20 +245,29 @@ export class Item {
 
     // delete from db if exist in db
     if (this.#dbid) {
-      this.#deleteItemDB();
+      await this.deleteItemDB();
     }
 
     this.itemList.focusToLatestBarcode();
   }
 
+  /**
+   * increase this item's amount
+   * @param {?number} amount - number of amount
+   */
   increaseAmount(amount = 1) {
     const nextAmount = this.#data.amount + amount;
     this.setSeveralItemData({ amount: nextAmount });
   }
 
+  /**
+   * decrease this item's amount
+   * @param {?number} amount - number of amount
+   */
   decreaseAmount(amount = 1) {
     const nextAmount = this.#data.amount - amount;
 
+    // reset amount if it reaches zero
     if (nextAmount < 1) {
       nextAmount = 1;
     }
@@ -152,48 +275,73 @@ export class Item {
     this.setSeveralItemData({ amount: nextAmount });
   }
 
+  /**
+   * set single or multiple data
+   * @param {ItemData} newData
+   */
   setSeveralItemData(newData) {
-    // set single or multiple data
     const newDataProperty = { ...this.#data, ...newData };
+    this.#data = { ...newDataProperty };
+
+    // affect other elements
+    this.#ui.itemContent = this.#data;
+    this.itemList.refreshTotalPrice();
 
     // logging
     const logCode = this.transactionStatus.isCompleted ? 31 : 30;
-
-    this.#itemLog.push(
-      new ItemLog(logCode, {
-        before: { ...this.#data },
-        after: { ...newDataProperty },
-      })
-    );
-
-    this.#data = { ...newDataProperty };
-    this.#ui.itemContent = this.#data;
-
-    this.itemList.refreshTotalPrice();
+    this.#itemLog.push(new ItemLog(logCode));
   }
 
-  resetItemData() {
+  /**
+   * resets item input element
+   * @private
+   */
+
+  #resetItemUI() {
+    this.setSeveralItemData({ barcode: "", amount: 1 });
+  }
+
+  /**
+   * resets item data
+   * @private
+   */
+  #resetItemData() {
     this.#data = { amount: 1, ...EMPTY_ITEM };
   }
 
+  /**
+   * @readonly
+   * @returns {ItemData}
+   */
   get data() {
     return this.#data;
   }
 
+  /**
+   * @readonly
+   * @returns {ItemUI}
+   */
   get ui() {
     return this.#ui;
   }
 
+  /**
+   * set data absolutely, from e.g. search-item
+   * so the data will be always valid
+   * unless it's duplicate, it'll be resetted
+   * it only needs item id to log
+   * function called from search-item
+   *
+   * @param {object} setDataParam
+   * @param {ItemData} setDataParam.data
+   * @param {?number} setDataParam.code
+   *
+   */
   set data({ data = EMPTY_ITEM, code = null }) {
-    // set data absolutely, from e.g. search-item
-    // so the data will be always valid
-    // unless it's duplicate, it'll be resetted
-    // it only needs item id to log
-    // function called from search-item
-
     // logging
     this.#itemLog.push(new ItemLog(code, data));
 
+    // add previous amount
     const { amount: previousAmount } = this.#data;
     this.#data = Object.assign(data, {
       amount: previousAmount,
@@ -206,66 +354,99 @@ export class Item {
     this.#checkData();
   }
 
+  /**
+   * check is item duplicated to previous items
+   * @returns {boolean}
+   */
   checkDuplicateFromItem() {
-    const isDuplicate = this.itemList.checkDuplicateOnList(this);
+    /**
+     * @type {(Item | Boolean)}
+     */
+    const duplicatedItem = this.itemList.checkDuplicateOnList(this),
+      isDuplicated = duplicatedItem instanceof Item;
 
-    if (isDuplicate) {
-      // reset to empty item
-      this.resetItemData();
+    if (isDuplicated) {
+      // add duplicated item's amount by this item's amount
+      const { amount } = this.#data;
+      duplicatedItem.increaseAmount(amount);
+
+      // reset current item's data
+      this.#resetItemData();
+      this.#resetItemUI();
     } else {
       this.#data.valid = true;
     }
 
-    return isDuplicate;
+    return isDuplicated;
   }
 
+  /**
+   * @async
+   * opens search item with current barcode as hint
+   */
   async openSearchFromItem() {
-    // exact match search attempt
-    const exactMatch = await SearchItem.exactMatch(this.#data.barcode, "cashier");
+    const hint = this.#data.barcode;
+
+    // attemp to exact match before open searchItem submenu
+    const exactMatch = await SearchItem.exactMatch(hint, "cashier");
     if (exactMatch) {
       this.data = { data: exactMatch, code: 21 };
     }
 
-    // search anyways
+    // proceed to open searchItem submenu if doesnt match
     else {
       this.itemList.transaction.transactionList.cashier.childs.submenu.openSubmenu("F2", {
         itemReference: this,
-        hint: this.#data.barcode,
+        hint: hint,
         type: "cashier",
       });
     }
   }
 
+  /**
+   * @async
+   * store to db as new item if #dbid is null
+   * update it if has #dbid
+   */
   async storeItemtoDB() {
-    // store to db as new item if #dbid is null
-    // update it if has #dbid
     let itemDetail = {
       itemId: this.#data.id,
       amount: this.#data.amount,
       log: this.#itemLog.map((log) => log.log),
     };
 
+    // if has id, update DB data
     if (this.#dbid) {
-      if (!deepEqual(itemDetail, this.#savedItemData)) {
-        // update existing transactionItem in database
+      const isDetailChanged = !deepEqual(itemDetail, this.#savedItemData);
+
+      // update existing transactionItem in database if detail has any changes
+      if (isDetailChanged) {
         await CashierInvoker.storeTransactionItem({
           transactionItemId: this.#dbid,
           data: { ...itemDetail },
         });
       }
-    } else {
+    }
+
+    // if doesnt has an id, store it and get the id
+    else {
       // creating new transactionItem in database
       this.#dbid = await CashierInvoker.storeTransactionItem({
-        transactionAllId: this.itemList.transaction.id,
+        transactionAllId: this.itemList.transaction.DBId,
         data: { ...itemDetail },
       });
     }
 
-    // save stored data
+    // save new stored data
     this.#savedItemData = { ...itemDetail };
   }
 
-  async #deleteItemDB() {
+  /**
+   * deletes item from DB.
+   * used when completed transaction item is being deleted
+   * @async
+   */
+  async deleteItemDB() {
     let itemDetail = {
       transactionItemId: this.#dbid,
       log: this.#itemLog.map((log) => log.log),
@@ -276,18 +457,44 @@ export class Item {
 }
 
 class ItemUI {
+  /**
+   * @type {ElementContent}
+   * @private
+   */
   #itemContentElement;
+
+  /**
+   * containing HTML element that contains childs HTMLs
+   * like barcode input element, name input element etc
+   * @type {HTMLElement}
+   */
   #itemElement;
 
+  /**
+   * creates childs UI input elements like barcode, name, amount etc
+   * @param {Item} item - referenced item
+   * @param {HTMLElement} listElement
+   * @param {ItemData} data
+   */
   constructor(item, listElement, data = { ...EMPTY_ITEM }) {
+    /**
+     * @type {Item}
+     */
     this.item = item;
+
+    /**
+     * @type {HTMLElement}
+     */
     this.listElement = listElement;
 
     this.#createElement(data);
   }
 
+  /**
+   * create item wrapper element
+   * @param {ItemData} data
+   */
   #createElement(data) {
-    console.log(this.listElement);
     // create tr element
     this.#itemElement = document.createElement("tr");
     this.#itemElement.className = "purchases-contents";
@@ -306,26 +513,28 @@ class ItemUI {
       totalPriceElement: new TextElement("total-price-content", set_proper_price(price * amount)),
     };
 
+    // append childs to wrapper
     Object.keys(this.#itemContentElement).forEach((key) => {
       this.#itemElement.appendChild(this.#itemContentElement[key].element);
     });
 
+    // append wrapper to list
     this.listElement.appendChild(this.#itemElement);
-    console.log(this.#itemElement);
   }
 
+  /**
+   * remove ui from document
+   */
   removeUi() {
-    // remove ui from document
     this.#itemElement.remove();
   }
 
-  changeAmount(amount) {
-    // above: item
-    // below: barcode
-    this.#itemContentElement.amountElement.value = amount;
-  }
+  /**
+   * @param {ItemData} newItemData
+   */
 
   set itemContent(newItemData) {
+    // get item datas and elements
     const { name, barcode, quantity, price, amount, valid } = newItemData;
     const {
       actionElement,
@@ -340,6 +549,7 @@ class ItemUI {
     // set action to delete if valid
     if (valid) actionElement.ableToDelete();
 
+    // set element with datas
     barcodeElement.barcode = barcode;
     nameElement.text = name;
     quantityElement.text = quantity;
@@ -348,6 +558,9 @@ class ItemUI {
     totalPriceElement.text = set_proper_price(price * amount);
   }
 
+  /**
+   * @type {ElementContent}
+   */
   get childElements() {
     return this.#itemContentElement;
   }

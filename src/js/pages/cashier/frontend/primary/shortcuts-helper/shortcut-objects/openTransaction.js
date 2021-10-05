@@ -1,13 +1,36 @@
+/**
+ * @typedef {import("../../submenuWrapper.js").SubmenuWrapper} SubmenuWrapper - SubmenuWrapper Instance
+ * @typedef {import("../../transactions-helper/transaction").Transaction} Transaction - SubmenuWrapper Instance
+ */
+
 import { Submenu } from "./SubmenuPrototype.js";
 
+/**
+ * @extends {Submenu}
+ */
 export class OpenTransaction extends Submenu {
+  /**
+   * creates open tranaction submenu
+   * @param {SubmenuWrapper} submenuWrapper - referenced SubmenuWrapper instance
+   * @param {Object} [submenuProperties={}] - options
+   */
+
   constructor(submenuWrapper, submenuProperties) {
     super(submenuWrapper, submenuProperties);
     this._initializeSubmenu();
 
     this._submenuElement.tabIndex = "0";
 
+    /**
+     * contains resultTransaction instance
+     * @type {ResultTransactions}
+     */
     this.result = new ResultTransactions(this);
+
+    /**
+     * contains TypeSlider instance
+     * @type {TypeSlider}
+     */
     this.slider = new TypeSlider(this);
 
     this.#listen();
@@ -25,21 +48,60 @@ export class OpenTransaction extends Submenu {
   }
 }
 
+/**
+ * Type Slider for slide between transaction statusses: saved or completed
+ */
 class TypeSlider {
+  /**
+   * contains referenced opentransaction instance
+   * @type {OpenTransaction}
+   * @private
+   */
   #submenu;
 
+  /**
+   * contains current type index
+   * @type {Number}
+   * @private
+   */
   #currentTypeIndex = 0;
+
+  /**
+   * contains type slider's wrapper element
+   * @type {HTMLElement}
+   * @private
+   */
   #typeSliderElement;
+
+  /**
+   * contains slider element
+   * @type {HTMLElement}
+   * @private
+   */
   #sliderElement;
 
-  #typeChilds;
+  /**
+   * contains type childs in slider element
+   * @type {Array<HTMLElement>}
+   * @private
+   */
 
-  // childs outset widths
+  #typeChilds;
+  /**
+   * contains childs outset widths
+   * @type {Array<Number>}
+   * @private
+   */
   #childOffsetWidth = [];
 
+  /**
+   * adding type slider in open transaction
+   * @param {OpenTransaction} submenu - referemce OpenTransaction instance
+   */
   constructor(submenu) {
     this.#submenu = submenu;
 
+    // get submenu elements
     this.#typeSliderElement = submenu.element.querySelector(".type-slider");
     this.#sliderElement = submenu.element.querySelector(".slider");
 
@@ -51,16 +113,22 @@ class TypeSlider {
     this.#listenSlider();
   }
 
+  /**
+   * toggle slider
+   */
   toggleSlider() {
     // toggle slider
-    // called from parent (OpenTransaction)
     const previousIndex = this.#currentTypeIndex;
 
     this.#currentTypeIndex = previousIndex === 0 ? 1 : 0;
     this.#setSlider();
   }
 
+  /**
+   * listen to slider element
+   */
   #listenSlider() {
+    // slider click
     this.#typeChilds.forEach((typeElement) => {
       typeElement.addEventListener("click", (e) => {
         const typeIndex = this.#typeChilds.findIndex((childs) => childs === e.target);
@@ -73,6 +141,9 @@ class TypeSlider {
     });
   }
 
+  /**
+   * set slider according to type width
+   */
   #setSlider() {
     let sliderWidth = this.#childOffsetWidth[this.#currentTypeIndex],
       sliderLeft = this.#childOffsetWidth
@@ -91,6 +162,9 @@ class TypeSlider {
     this.#submenu.result.getTransactionList(this.#currentTypeIndex);
   }
 
+  /**
+   * get types width
+   */
   #gatherChildrenWidth() {
     this.#typeChilds = Array.prototype.slice.call(this.#typeSliderElement.children);
     this.#childOffsetWidth = this.#typeChilds.map((child) => child.offsetWidth);
@@ -98,14 +172,45 @@ class TypeSlider {
 }
 
 class ResultTransactions {
+  /**
+   * contains referenced open transaction submenu
+   * @type {Submenu}
+   * @private
+   */
   #submenu;
+
+  /**
+   * contains current filtered transaction according to its status
+   * @type {Array<Transaction>}
+   * @private
+   */
   #currentFilteredTransactions = [];
+
+  /**
+   * contains opentransaction's content element
+   * @type {HTMLElement}
+   * @private
+   */
   #openTransactionContentElement;
 
+  /**
+   * contains elements with corresponding #currentFilteredTransaction
+   * @type {Array<HTMLElement>}
+   * @private
+   */
   #resultElements = [];
 
+  /**
+   * current #resultElements element that been focused
+   * @type {Number}
+   * @private
+   */
   #focusIndex = 0;
 
+  /**
+   * adding results section in openTransaction
+   * @param {OpenTransaction} submenu - referemce OpenTransaction instance
+   */
   constructor(submenu) {
     this.#submenu = submenu;
     this.#openTransactionContentElement = submenu.element.querySelector(".content");
@@ -113,6 +218,9 @@ class ResultTransactions {
     this.#listenInteraction();
   }
 
+  /**
+   * @param {("ArrowUp"|"ArrowDown"|"ArrowLeft"|"ArrowRight")} arrowKey - arrow direction
+   */
   arrowAction(arrowKey) {
     switch (arrowKey) {
       case "ArrowUp":
@@ -133,14 +241,32 @@ class ResultTransactions {
     }
   }
 
+  /**
+   * get transaction list according to sliderIndex and show it
+   * @param {(0|1)} [sliderIndex=0]
+   * @private
+   */
   getTransactionList(sliderIndex = 0) {
-    // sliderIndex + 2 equal as transaction's status
-    this.#currentFilteredTransactions =
-      this.#submenu.window.childs.transactionList.retrieveTransactionList(sliderIndex + 2);
+    // (sliderIndex + 2) equal as transaction's status
+
+    /**
+     * sliderIndex:
+     * 2 => saved
+     * 3 => completed
+     */
+
+    const transactionStatus = sliderIndex + 2,
+      filteredTransactions =
+        this.#submenu.window.childs.transactionList.retrieveTransactionList(transactionStatus);
+
+    this.#currentFilteredTransactions = filteredTransactions;
 
     this.#showResults();
   }
 
+  /**
+   * creates results element and show it
+   */
   #showResults() {
     // reset the HTML of content
     this.#openTransactionContentElement.innerHTML = `
@@ -166,6 +292,10 @@ class ResultTransactions {
     }, 50);
   }
 
+  /**
+   * create elements of result from #currentFilteredTransactions
+   * @private
+   */
   #createResultElements() {
     // refresh the results element
     this.#resultElements = [];
@@ -176,9 +306,11 @@ class ResultTransactions {
       contentItem.tabIndex = "0";
 
       const items = transactionInfo.itemList.items;
-
       contentItem.innerHTML = `
-      <div class="id">#${transactionInfo.id}</div>
+      <div class="id">
+        <div class="id">Local: #${transactionInfo.localId}</div>
+        <div class="id">Saved: #${transactionInfo.DBId}</div>
+      </div>
       <div class="item-bar">
           <div class="collapse-button-wrapper"><div class="collapse-button"></div></div>
           <div class="item-count">${items.length} Item</div>
@@ -195,6 +327,10 @@ class ResultTransactions {
     });
   }
 
+  /**
+   * set listeners to results elements
+   * @private
+   */
   #listenInteraction() {
     this.#resultElements.forEach(({ itemsElement: resultElement }) => {
       const itemBar = resultElement.querySelector(".item-bar");
@@ -230,7 +366,7 @@ class ResultTransactions {
         }
       });
 
-      //* result selection (keydown - enter)
+      // result selection (keydown - enter)
       resultElement.addEventListener("keydown", ({ key }) => {
         if (key === "Enter") {
           // select item
@@ -240,49 +376,66 @@ class ResultTransactions {
     });
   }
 
+  /**
+   * select transaction to load/restore and close submenu
+   * @private
+   */
   #selectTransactionAndClose() {
     // item selected;
     this.#submenu.window.childs.transactionList.loadTransaction(
-      this.#currentFilteredTransactions[this.#focusIndex].transactionInfo.id
+      this.#currentFilteredTransactions[this.#focusIndex].transactionInfo.localId
     );
 
     this.#submenu.window.childs.submenu.hideSubmenu();
   }
 
+  /**
+   * collapses or un-collapses or toggle a itemElement
+   * @param {("closes" | "open" | "toggle")} collapseStatus
+   * @param {HTMLElement} itemsElement
+   */
   #arrowCollapseOrNot(
-    collapseTarget = "close",
+    collapseStatus = "close",
     itemsElement = this.#resultElements[this.#focusIndex].itemsElement
   ) {
-    //* collapse parameter values:
-    // "close": about to close the collapse
-    // "open": about to open the collapse
-    // "toggle": toggle the collapse
+    /**
+     * collapseStatus parameter values:
+     * "close": about to close the collapse
+     * "open": about to open the collapse
+     * "toggle": toggle the collapse
+     */
 
     const itemBar = itemsElement.querySelector(".item-bar"),
       isCollapsed = itemBar.classList.contains("active");
 
-    if (isCollapsed === true && collapseTarget === "close") {
+    if (isCollapsed === true && collapseStatus === "close") {
       itemBar.classList.remove("active");
     }
 
-    if (isCollapsed === false && collapseTarget === "open") {
+    if (isCollapsed === false && collapseStatus === "open") {
       itemBar.classList.add("active");
     }
 
-    if (collapseTarget === "toggle") {
+    if (collapseStatus === "toggle") {
       itemBar.classList.toggle("active");
     }
   }
 
+  /**
+   * set focus index
+   * @param {Number} focusIndex -
+   */
   set focusIndex(focusIndex) {
     this.#focusIndex = focusIndex;
 
+    // resets #focusIndex if reaches last #resultElements
     if (this.#focusIndex > this.#resultElements.length - 1) {
       this.#focusIndex = 0;
     } else if (this.#focusIndex < 0) {
       this.#focusIndex = this.#resultElements.length - 1;
     }
 
+    // focus to its itemElement
     this.#resultElements[this.#focusIndex].itemsElement.focus();
   }
 }
