@@ -173,9 +173,9 @@ export class ItemList {
    * @async
    */
   async storeItemsToDB() {
-    this.#items.forEach(async (item) => {
+    for await (const item of this.#items) {
       await item.storeItemtoDB();
-    });
+    }
   }
 
   /**

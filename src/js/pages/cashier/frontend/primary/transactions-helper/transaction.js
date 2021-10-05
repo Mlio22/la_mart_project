@@ -158,7 +158,7 @@ export class Transaction {
     // add TransactionLog: completed (3)
     this.#addLog(3);
 
-    this.#storeTransactionToDB();
+    await this.#storeTransactionToDB();
   }
 
   /**

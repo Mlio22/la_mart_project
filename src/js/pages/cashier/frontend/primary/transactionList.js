@@ -155,10 +155,11 @@ export class TransactionList {
 
   /**
    * completes current transaction
+   * @async
    */
-  completeCurrentTransaction() {
+  async completeCurrentTransaction() {
     // complete current transaction
-    this.#currentTransaction.completeTransaction();
+    await this.#currentTransaction.completeTransaction();
 
     // show the payment details
     this.cashier.childs.paymentDetails.showFromCurrentTransaction();

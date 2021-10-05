@@ -95,11 +95,11 @@ export class PaymentDetails {
   #setDataFromCurrentTransaction() {
     const transactionInfo = this.cashier.childs.transactionList.currentTransaction.transactionInfo;
     const {
-      id,
+      DBId,
       cashInfo: { customer, totalPrice },
     } = transactionInfo;
 
-    this.#transactionID = id;
+    this.#transactionID = DBId;
 
     this.#customerMoney = customer;
     this.#totalPrice = totalPrice;
