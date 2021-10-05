@@ -14,6 +14,7 @@
  * @property {number} localId - transaction id in local (current cashier session)
  * @property {number} statusCode - transaction's status code
  * @property {string} statusText - transaction's status text
+ * @property {Date} startTime = transsaction's start time
  * @property {cashInfo} cashInfo - tranasction's cashInfo details
  * @property {ItemList} itemList - transaction's itemList
  */
@@ -67,6 +68,7 @@ export class Transaction {
     localId: null,
     statusCode: 1,
     statusText: "working",
+    startTime: new Date(),
     cashInfo: {
       customer: 0,
       totalPrice: 0,
@@ -284,6 +286,14 @@ export class Transaction {
    */
   get localId() {
     return this.#transactionInfo.localId;
+  }
+
+  /**
+   * returns transaction's start time
+   * @type {Date}
+   */
+  get startTime() {
+    return this.#transactionInfo.startTime;
   }
 
   /**

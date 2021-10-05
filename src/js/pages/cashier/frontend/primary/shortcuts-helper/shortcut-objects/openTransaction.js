@@ -301,15 +301,17 @@ class ResultTransactions {
     this.#resultElements = [];
 
     this.#resultElements = this.#currentFilteredTransactions.map(({ transactionInfo }) => {
+      const { localId, DBId, itemList, startTime } = transactionInfo;
+
       const contentItem = document.createElement("div");
       contentItem.className = "content-item";
       contentItem.tabIndex = "0";
 
-      const items = transactionInfo.itemList.items;
+      const items = itemList.items;
       contentItem.innerHTML = `
       <div class="id">
-        <div class="id">Local: #${transactionInfo.localId}</div>
-        <div class="id">Saved: #${transactionInfo.DBId}</div>
+        <div class="id">Local: #${localId}</div>
+        <div class="id">Saved: #${DBId}</div>
       </div>
       <div class="item-bar">
           <div class="collapse-button-wrapper"><div class="collapse-button"></div></div>
@@ -320,7 +322,7 @@ class ResultTransactions {
             })
             .join("")}</div>
       </div>
-      <div class="time">11:02</div>`;
+      <div class="time">${startTime.getHours()}:${startTime.getMinutes()}</div>`;
       this.#openTransactionContentElement.appendChild(contentItem);
 
       return { itemsElement: contentItem, collapsed: false };
