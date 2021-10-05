@@ -8,6 +8,7 @@
 
 import { CashierInvoker } from "../../../dbInvoker.js";
 import { Submenu } from "./SubmenuPrototype.js";
+import { set_proper_price } from "../../../../../../etc/others.mjs";
 
 // todo: output pada search item adalah Promise
 
@@ -16,7 +17,7 @@ import { Submenu } from "./SubmenuPrototype.js";
  * todo: perbaiki parameter fungsi ini
  * search item based from hint and params
  * @param {Object} itemSearchParam
- * @param {WindowType} [itemSearchParam.type="cashier"]
+ * @param {WindowType} [itemSearchParam.type="cashier"] - window that searchItem in
  * @param {Array<Object>} [itemSearchParam.initialFilteredItems = []] - list of filtered items data before
  *
  * @param {Object} itemSearchParam.detail
@@ -34,6 +35,7 @@ async function item_searcher({
   // return none if hint is none
   if (hint === "") return [];
 
+  console.log(initialFilteredItems);
   // search first from DB if initialFilteredItem is none
   if (initialFilteredItems.length === 0) {
     if (type === "cashier") {
@@ -49,7 +51,7 @@ async function item_searcher({
   hint = hint.toLowerCase();
 
   initialFilteredItems.forEach((item) => {
-    let previousMatch = false;
+    let isMatch = false;
 
     // if anyone of the parameter is match then return the item
     params.forEach((param) => {
@@ -60,10 +62,10 @@ async function item_searcher({
         currentMatch = item[param].toLowerCase().includes(hint);
       }
 
-      previousMatch = previousMatch || currentMatch;
+      isMatch = isMatch || currentMatch;
     });
 
-    if (previousMatch) matchedItems.push(item);
+    if (isMatch) matchedItems.push(item);
   });
 
   return matchedItems;
@@ -270,14 +272,9 @@ export class SearchItem extends Submenu {
     // get the previous hint and compare with the new hint
     // if the new hint is the same previous hint plus one character
     // prevent oversearch the API and let to research with the last filteredItem
-    const previousHint = this.#hint;
     this.#hint = hint;
 
-    if (previousHint !== "") {
-      this.#searchItemMatchBoth(this.#hint.includes(previousHint));
-    } else {
-      this.#searchItemMatchBoth();
-    }
+    this.#searchItemMatchBoth();
   }
 
   /**
@@ -467,7 +464,7 @@ const SEARCH_ITEM_RESULTS = {
       <p class="item-barcode">${barcode}</p>
       <p class="item-name">${name}</p>
       <p class="item-type">${quantity}</p>
-      <p class="item-price">${price}</p>
+      <p class="item-price">${set_proper_price(price)}</p>
     `;
 
       return resultElement;
