@@ -35,7 +35,6 @@ async function item_searcher({
   // return none if hint is none
   if (hint === "") return [];
 
-  console.log(initialFilteredItems);
   // search first from DB if initialFilteredItem is none
   if (initialFilteredItems.length === 0) {
     if (type === "cashier") {
@@ -589,8 +588,8 @@ class SearchItemResults {
     // index will be the index from click listener @#setResultsElement
     // or be
 
-    // select only if an item is being focused
-    if (this.#focusedItemIndex) {
+    // select only if any item in matched
+    if (this.#matchedItemElements.length > 0 && this.#focusedItemIndex !== null) {
       this.#searchItem.selectedItem = {
         ...this.#matchedItemList[this.#focusedItemIndex],
       };
