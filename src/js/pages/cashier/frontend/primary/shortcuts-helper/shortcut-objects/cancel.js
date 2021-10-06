@@ -64,6 +64,7 @@ export class Cancel extends Submenu {
    * @private
    */
   #confirmCancellation() {
+    console.log(this._submenu);
     this._submenu.window.childs.transactionList.cancelCurrentTransaction();
     this._submenu.hideSubmenu();
   }
@@ -88,9 +89,9 @@ export class Cancel extends Submenu {
       }
     });
 
-    this.#yesButton.addEventListener("click", this.#confirmCancellation);
+    this.#yesButton.addEventListener("click", () => this.#confirmCancellation());
 
-    this.#noButton.addEventListener("click", this.#cancelCancellation);
+    this.#noButton.addEventListener("click", () => this.#cancelCancellation());
   }
 
   _setSubmenu() {
