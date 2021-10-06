@@ -5,7 +5,7 @@
  * @typedef {import ("./shortcuts-helper/shortcut-objects/openTransaction").OpenTransaction} OpenTransaction
  * @typedef {import ("./shortcuts-helper/shortcut-objects/payment").Payment} Payment
  * @typedef {import ("./shortcuts-helper/shortcut-objects/searchItem").SearchItem} SearchItem
- * @typedef {(Cancel | CheckBalance | OpenTransaction | Payment | SearchItem)} Submenu
+ * @typedef {Cancel | CheckBalance | OpenTransaction | Payment | SearchItem} Submenu
  * @typedef {("F1" | "F2" | "F3" | "F4" | "F5" | "F6" | "F7" | "F8" | "F9" | "F10" | "F11" | "F12" )} ShortcutKey
  */
 

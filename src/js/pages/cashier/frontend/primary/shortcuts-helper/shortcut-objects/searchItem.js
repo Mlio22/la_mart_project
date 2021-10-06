@@ -8,7 +8,7 @@
 
 import { CashierInvoker } from "../../../dbInvoker.js";
 import { Submenu } from "./SubmenuPrototype.js";
-import { set_proper_price } from "../../../../../../etc/others.mjs";
+import { set_proper_price, isChildOf } from "../../../../../../etc/others.mjs";
 
 // todo: output pada search item adalah Promise
 
@@ -261,6 +261,26 @@ export class SearchItem extends Submenu {
         this.#itemReference.unknownItem();
       }
     }
+  }
+
+  /**
+   * fix focus e.g. keep focusing to hint if SearchItem is still open
+   * @param {HTMLElement} target - new focused element
+   */
+  fixFocus(target) {
+    // check if focused element is child of SearchItem element
+    // force focus to hint if not child of searchitem
+
+    if (!isChildOf(this.element, target)) {
+      this.focusToHint();
+    }
+  }
+
+  /**
+   * focus to hint element
+   */
+  focusToHint() {
+    this.#searchItemHeader.focusToHint();
   }
 
   /**
@@ -569,16 +589,13 @@ class SearchItemResults {
    */
   focusToResultItem(position = "next") {
     // position: next/previous
-    const previousFocusedIndex = this.#focusedItemIndex;
     if (position === "next" && this.#focusedItemIndex < this.#matchedItemElements.length - 1) {
       this.#focusedItemIndex += 1;
     } else if (position === "previous" && this.#focusedItemIndex > 0) {
       this.#focusedItemIndex -= 1;
     }
 
-    if (previousFocusedIndex !== this.#focusedItemIndex) {
-      this.#focusToResultItemWithIndex();
-    }
+    this.#focusToResultItemWithIndex();
   }
 
   /**
@@ -644,7 +661,12 @@ class SearchItemResults {
 
     // focus to first child of result element
     this.#focusedItemIndex = 0;
-    this.#focusToResultItemWithIndex();
+
+    // focus to resultitem if any resultitem element available
+    // else let focus to hint as it be
+    if (this.#matchedItemList.length > 0) {
+      this.#focusToResultItemWithIndex();
+    }
   }
 
   /**

@@ -73,3 +73,20 @@ export function deepEqual(x, y) {
     return true;
   } else return false;
 }
+
+/**
+ * checks if an element is a child of a parent element
+ * via https://stackoverflow.com/a/2234986/12125511
+ * @param {HTMLElement} parent
+ * @param {HTMLElement} child
+ */
+export function isChildOf(parent, child) {
+  let node = child.parentNode;
+  while (node !== null) {
+    if (node === parent) {
+      return true;
+    }
+    node = node.parentNode;
+  }
+  return false;
+}

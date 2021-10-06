@@ -4,6 +4,7 @@ import { TotalPrice } from "./primary/totalPrice.js";
 import { ShortcutWrapper } from "./primary/shortcutWrapper.js";
 import { PaymentDetails } from "./primary/paymentDetails.js";
 import { SubmenuWrapper } from "./primary/submenuWrapper.js";
+import { SearchItem } from "./primary/shortcuts-helper/shortcut-objects/searchItem.js";
 
 /**
  * @typedef CashierChilds
@@ -61,10 +62,20 @@ export class CashierUI {
   #setCashierListener() {
     // auto add to item if detected string input when cashier focused
     this.cashierElement.addEventListener("keydown", ({ target, key }) => {
-      // regex for: letters and numbers only
-      const regex = /^[A-Za-z0-9]*$/;
+      // checking for opened submenus
+      const currentSubmenu = this.#cashierChild.submenu.openedSubmenu;
 
-      if (target === this.cashierElement) {
+      // focus to searchItem's hint if available
+      if (currentSubmenu instanceof SearchItem) {
+        currentSubmenu.fixFocus(target);
+      }
+
+      // focus to item element as soon as a keyinput inserted
+      // or create new transastion if it's completed
+      else if (target === this.cashierElement) {
+        // regex for: letters and numbers only
+        const regex = /^[A-Za-z0-9]*$/;
+
         if (key.length === 1 && regex.test(key)) {
           this.#cashierChild.transactionList.inputFromCashier();
         }

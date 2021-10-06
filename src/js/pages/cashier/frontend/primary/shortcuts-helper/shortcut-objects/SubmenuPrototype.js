@@ -2,6 +2,7 @@
  * @typedef {import ("../../submenuWrapper").SubmenuWrapper} SubmenuWrapper
  * @typedef {import ("../../../main").CashierUI} CashierUI
  * @typedef {import ("../../../../../stock/main").StockPage} StockPage
+ * @typedef {("Cancel" | "CheckBalance" | "OpenTransaction" | "Payment" | "SearchItem")} submenuNames
  */
 
 /**
@@ -84,7 +85,7 @@ export class Submenu {
 
   /**
    * returns window parent
-   * @type {CashierUI | StockPage}
+   * @type {CashierUI}
    */
   get window() {
     return this._submenu.window;
@@ -96,5 +97,13 @@ export class Submenu {
    */
   get element() {
     return this._submenuElement;
+  }
+
+  /**
+   * returns submenu name that is working right now
+   * @type {submenuNames}
+   */
+  get name() {
+    return this._submenuName;
   }
 }
