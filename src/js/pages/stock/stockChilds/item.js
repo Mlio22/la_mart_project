@@ -27,6 +27,9 @@ export class Item {
     // if isItemDataSet, then lock the barcode, name, quantity
     this.isItemDataSet = false;
 
+    // itemData is data's item that gathered from searchItem
+    this.searchItemData = null;
+
     this.#createItemUi();
   }
 
@@ -122,6 +125,8 @@ export class Item {
 
   #setItemValues(itemData) {
     const { barcode, name, quantity, buyPrice, sellPrice, stock } = itemData;
+    this.searchItemData = itemData;
+
     this.childElements.action.able();
     this.childElements.barcode.value = barcode;
     this.childElements.name.value = name;
@@ -215,6 +220,23 @@ export class Item {
     this.childElements.firstStock.lock();
     this.childElements.stockIn.lock();
     this.childElements.stockOut.lock();
+  }
+
+  getItemDatas() {
+    return {
+      isKnownItem: this.isKnownItem,
+      previousItemData: this.searchItemData,
+      itemData: {
+        barcode: this.childElements.barcode.value,
+        name: this.childElements.name.value,
+        quantity: this.childElements.quantity.value,
+        buyPrice: this.childElements.buyPrice.value,
+        sellPrice: this.childElements.sellPrice.value,
+        firstStock: this.childElements.firstStock.value,
+        stockIn: this.childElements.stockIn.value,
+        stockOut: this.childElements.stockOut.value,
+      },
+    };
   }
 
   delete() {

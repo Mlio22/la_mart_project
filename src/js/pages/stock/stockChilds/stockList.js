@@ -76,4 +76,14 @@ export class StockList {
       this.#stockList[index].delete();
     }
   }
+
+  saveToDb() {
+    this.itemDatas = [];
+    for (let index = 0; index < this.#stockList.length - 1; index++) {
+      const itemData = this.#stockList[index].getItemDatas();
+
+      if (itemData.isKnownItem) {
+      }
+    }
+  }
 }
