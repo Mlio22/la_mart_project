@@ -265,7 +265,7 @@ export class Item {
    * @param {?number} amount - number of amount
    */
   decreaseAmount(amount = 1) {
-    const nextAmount = this.#data.amount - amount;
+    let nextAmount = this.#data.amount - amount;
 
     // reset amount if it reaches zero
     if (nextAmount < 1) {
