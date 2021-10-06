@@ -447,12 +447,15 @@ export class Item {
    * @async
    */
   async deleteItemDB() {
-    let itemDetail = {
-      transactionItemId: this.#dbid,
-      log: this.#itemLog.map((log) => log.log),
-    };
+    // only if the data has been saved before
+    if (this.#dbid) {
+      let itemDetail = {
+        transactionItemId: this.#dbid,
+        log: this.#itemLog.map((log) => log.log),
+      };
 
-    await CashierInvoker.deleteTransactionItem(itemDetail);
+      await CashierInvoker.deleteTransactionItem(itemDetail);
+    }
   }
 }
 

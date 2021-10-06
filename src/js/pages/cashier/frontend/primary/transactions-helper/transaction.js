@@ -175,7 +175,8 @@ export class Transaction {
     // log with code 4 (cancelled) or 5 (cancelled after completed)
     this.#addLog(isTransactionCompleted ? 42 : 41);
 
-    this.#cancelTransactionToDB();
+    // delete DB data only if it has an ID
+    if (this.#transactionInfo.DBId !== null) this.#cancelTransactionToDB();
   }
 
   /**
