@@ -124,6 +124,14 @@ export class SearchItem extends Submenu {
   #searchItemResult;
 
   /**
+   * contains list of result that have searched before (since this searchItem opened)
+   * @type {Array<ItemData>}
+   * @private
+   */
+  // todo: set this to static to not oversearch DB even more
+  #filteredListBuffer = [];
+
+  /**
    * @param {SubmenuWrapper} submenuWrapper
    * @param {Object} submenuProperties - options
    * @param {Object} [params={}]
@@ -209,14 +217,25 @@ export class SearchItem extends Submenu {
    * @private
    */
   async #searchItemMatchBoth() {
-    const matchedItemsWithBoth = await item_searcher({
-      type: this.#type,
-      initialFilteredItems: this.#filteredItems,
-      detail: {
-        hint: this.#hint,
-        full_match: false,
-      },
-    });
+    let matchedItemsWithBoth;
+
+    // check from buffer
+    if (this.#filteredListBuffer[this.#hint]) {
+      matchedItemsWithBoth = this.#filteredListBuffer[this.#hint];
+    } else {
+      // else: search it
+      matchedItemsWithBoth = await item_searcher({
+        type: this.#type,
+        initialFilteredItems: this.#filteredItems,
+        detail: {
+          hint: this.#hint,
+          full_match: false,
+        },
+      });
+
+      // add filtereditems into buffer
+      this.#filteredListBuffer[this.#hint] = matchedItemsWithBoth;
+    }
 
     // set the results
     this.#filteredItems = matchedItemsWithBoth;
