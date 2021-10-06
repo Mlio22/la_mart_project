@@ -5,6 +5,7 @@ import { ShortcutWrapper } from "./primary/shortcutWrapper.js";
 import { PaymentDetails } from "./primary/paymentDetails.js";
 import { SubmenuWrapper } from "./primary/submenuWrapper.js";
 import { SearchItem } from "./primary/shortcuts-helper/shortcut-objects/searchItem.js";
+import { Cancel } from "./primary/shortcuts-helper/shortcut-objects/cancel.js";
 
 /**
  * @typedef CashierChilds
@@ -67,6 +68,10 @@ export class CashierUI {
 
       // focus to searchItem's hint if available
       if (currentSubmenu instanceof SearchItem) {
+        currentSubmenu.fixFocus(target);
+      }
+
+      if (currentSubmenu instanceof Cancel) {
         currentSubmenu.fixFocus(target);
       }
 

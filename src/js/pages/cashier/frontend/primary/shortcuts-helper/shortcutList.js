@@ -13,10 +13,10 @@ import { saveTransaction } from "./shortcut-functions/saveTransaction.js";
 // element HTMLs
 const cancelHTML = `<div class="header">Batalkan Transaksi?</div>
 <div class="options">
-    <div class="option-yes">
+    <div class="option-yes" tabindex="0">
         <i class="fas fa-check"></i>Ya
     </div>
-    <div class="option-no">
+    <div class="option-no" tabindex="0">
         <i class="fas fa-times"></i>Tidak
     </div>
 </div>`;

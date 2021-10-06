@@ -83,6 +83,10 @@ export function deepEqual(x, y) {
 export function isChildOf(parent, child) {
   let node = child.parentNode;
   while (node !== null) {
+    if (node === document) {
+      return false;
+    }
+
     if (node === parent) {
       return true;
     }
