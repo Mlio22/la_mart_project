@@ -60,17 +60,17 @@ export class ItemList {
         this.#items[itemIndexOnList].increaseAmount(1);
       } else {
         // add item to latest empty item in list
-        this.#items[this.#items.length - 1].data = { data: itemData, code: 22 };
+        this.#items[this.#items.length - 1].itemInfo = { itemInfo: itemData, code: 22 };
       }
+      this.#checkItemToAffectShortcut();
     }
 
     // add item if not duplicate (including empty item)
     else {
       const newItem = new Item(this, this.itemElement, itemData);
       this.#items.push(newItem);
+      this.#checkItemToAffectShortcut();
     }
-
-    this.#checkItemToAffectShortcut();
   }
 
   // check for duplicate items
@@ -82,7 +82,7 @@ export class ItemList {
   checkDuplicateOnList(itemReference) {
     // called from item, itemElement
     const indexOnList = this.#items.indexOf(itemReference);
-    const duplicatedItemIndex = this.#duplicateItemIndexBarcode(itemReference.data, indexOnList);
+    const duplicatedItemIndex = this.#duplicateItemIndexBarcode(itemReference, indexOnList);
 
     if (duplicatedItemIndex >= 0) {
       // add the same amount of new item to duplicated item
@@ -268,23 +268,25 @@ export class ItemList {
    * @returns {(number | boolean)}
    */
   #duplicateItemIndexBarcode(comparedItemData, indexOnList = null) {
-    const { barcode: comparedBarcode } = comparedItemData;
+    if (comparedItemData.itemInfo) {
+      const { barcode: comparedBarcode } = comparedItemData.itemInfo;
 
-    const transactionLength = this.#items.length;
-    for (let itemIndex = 0; itemIndex < transactionLength; itemIndex++) {
-      // skips if it its (comparedItemData's) index
-      if (indexOnList === itemIndex) {
-        continue;
+      const transactionLength = this.#items.length;
+      for (let itemIndex = 0; itemIndex < transactionLength; itemIndex++) {
+        // skips if it its (comparedItemData's) index
+        if (indexOnList === itemIndex) {
+          continue;
+        }
+
+        // compare with barcode
+        const { barcode: barcodeFromList } = this.#items[itemIndex].itemInfo;
+
+        if (comparedBarcode === barcodeFromList) {
+          return itemIndex;
+        }
       }
-
-      // compare with barcode
-      const { barcode: barcodeFromList } = this.#items[itemIndex].data;
-
-      if (comparedBarcode === barcodeFromList) {
-        return itemIndex;
-      }
+      return -1;
     }
-    return -1;
   }
 
   /**
@@ -309,7 +311,9 @@ export class ItemList {
     let currentTotalPrice = 0;
 
     this.#items.forEach((item) => {
-      const { valid, price, amount } = item.data;
+      const { valid, amount } = item.data;
+      const { price } = item.itemInfo;
+
       if (valid) {
         currentTotalPrice += price * amount;
       }

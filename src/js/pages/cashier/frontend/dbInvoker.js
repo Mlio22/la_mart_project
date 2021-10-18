@@ -1,17 +1,19 @@
 /**
- * class EndpointAPI is for connecting db (node) and frontend (cjs) using IPC listeners
- *
+ * @typedef {import ('../../../etc/ItemData').ItemData} ItemData
  */
+
+import { ItemDataInformation } from "../../../etc/ItemData.js";
+
 const { ipcRenderer } = require("electron");
 
+/**
+ * class EndpointAPI is for connecting db (node) and frontend (cjs) using IPC listeners
+ */
 export class CashierInvoker {
-  static async searchItemDB(param) {
-    return ipcRenderer.invoke("search-item-db", param);
-  }
-
   /**
    * Create or update an transactionAll
    * @async
+   * @static
    * @param {Object} storeTransactionAllData
    * @param {number} [storeTransactionAllData.transactionAllId=null] - existing transactionALl id for updating
    * @param {Array<Object>} storeTransactionAllData.log - list of TransactionLog logs
@@ -30,6 +32,7 @@ export class CashierInvoker {
   /**
    * delete a transactionAll with existing id
    * @async
+   * @static
    * @param {Object} deleteTransactionAllData
    * @param {number} deleteTransactionAllData.transactionAllId - existing transactionALl id
    * @param {Array<Object>} deleteTransactionAllData.log - last latest TransactionLog logs
@@ -44,6 +47,7 @@ export class CashierInvoker {
   /**
    * Create new transactionItem or update existing transactionItem
    * @async
+   * @static
    * @param {Object} storeTransactionItemData
    * @param {?number} [storeTransactionItemData.transactionAllId] - existing transactionAll id for creating new transactionItem
    * @param {?number} [storeTransactionItemData.transactionItemId] - existing transactionItem id for updating
@@ -73,6 +77,7 @@ export class CashierInvoker {
   /**
    * delete a transactionItem with existing id
    * @async
+   * @static
    * @param {Object} deleteTransactionItemData
    * @param {number} deleteTransactionItemData.transactionItemId - existing transactionItem id
    * @param {Array<Object>} deleteTransactionItemData.log - last latest of transactionItem logs
@@ -87,4 +92,51 @@ export class CashierInvoker {
   static async createReportSession() {}
   static async createReportDaily() {}
   static async createPayment() {}
+}
+
+/**
+ * endpoint API to DB Item
+ */
+export class ItemInvoker {
+  /**
+   * contains previously searched item details, for faster searching
+   * @static
+   * @private
+   * @type {Array<ItemData>}
+   */
+  static #searchedItemList = [];
+
+  /**
+   * obtains item details from DB
+   * @async
+   * @static
+   * @param {Object} searchItemDetailsParam
+   * @param {String} searchItemDetailsParam.hint - hint to search in DB
+   * @param {Array<String>} searchItemDetailsParam.param - which item's property will be used for filtering
+   * @param {Boolean} searchItemDetailsParam.full_match - is it must be exactly match or partially
+   * @param {"cashier" | "stock")} searchItemDetailsParam.type - is it must be exactly match or partially
+   * @returns {Promise<Array<ItemData>, void>}
+   */
+  static async searchItemDetails({ hint, params, full_match, type }) {
+    // todo: throw error if params has insufficent values
+    // todo: search from #searchItemList first before using DB
+
+    const details = { hint, params, full_match, type };
+    let searchedItems = await ipcRenderer.invoke("search-item-db", { ...details });
+
+    searchedItems = searchedItems.map((searchedItemData) => {
+      return new ItemDataInformation(searchedItemData);
+    });
+
+    // add to searchItemDetails list
+    this.#searchedItemList[hint] = searchedItems;
+
+    return [...searchedItems];
+  }
+
+  static async addItem() {}
+
+  static async alterItemAmount() {}
+
+  static async updateItemDetail() {}
 }

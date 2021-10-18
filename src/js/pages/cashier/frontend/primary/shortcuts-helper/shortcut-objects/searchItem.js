@@ -6,44 +6,51 @@
  * @typedef {import("../../transactions-helper/item").Item} Item
  */
 
-import { CashierInvoker } from "../../../dbInvoker.js";
+import { ItemInvoker } from "../../../dbInvoker.js";
 import { Submenu } from "./SubmenuPrototype.js";
 import { set_proper_price, isChildOf } from "../../../../../../etc/others.mjs";
-
-// todo: output pada search item adalah Promise
 
 /**
  * @async
  * todo: perbaiki parameter fungsi ini
  * search item based from hint and params
  * @param {Object} itemSearchParam
- * @param {WindowType} [itemSearchParam.type="cashier"] - window that searchItem in
+ * @param {string} [itemSearchParam.hint=""]
  * @param {Array<Object>} [itemSearchParam.initialFilteredItems = []] - list of filtered items data before
+ * @param {WindowType} [itemSearchParam.type="cashier"] - window that searchItem in
  *
  * @param {Object} itemSearchParam.detail
- * @param {string} [itemSearchParam.detail.hint=""]
- * @param {} [itemSearchParam.detail.params=['name', 'barcode']] - filtering parameters
- * @param {Boolean} [itemSearchParam.detail.full_match = false] - must exactly match with hint?
+ * @param {?FilterParams} [itemSearchParam.detail.params=['name', 'barcode']] - filtering parameters
+ * @param {?Boolean} [itemSearchParam.detail.full_match = false] - must exactly match with hint?
  *
- * @returns {Promise<Array<Object>>} list of new filtered items
+ * @returns {Promise<Array<ItemData>>} list of new filtered items
  */
-async function item_searcher({
-  type = "cashier",
-  initialFilteredItems = [],
-  detail: { hint = "", params = ["name", "barcode"], full_match = false },
-}) {
+async function item_searcher({ hint = "", initialFilteredItems = [], type = "cashier", detail }) {
+  // set details default value
+  const { params, full_match } = detail;
+  detail.params = params ?? ["name", "barcode"];
+  detail.full_match = full_match ?? false;
+
   // return none if hint is none
   if (hint === "") return [];
 
-  // search first from DB if initialFilteredItem is none
+  // search item from DB if initialFilteredItem is none
   if (initialFilteredItems.length === 0) {
-    if (type === "cashier") {
-      initialFilteredItems = await CashierInvoker.searchItemDB({ hint, params, full_match });
-    } else {
-      initialFilteredItems = await CashierInvoker.searchItemDB({ hint, params, full_match });
-    }
+    return await ItemInvoker.searchItemDetails({ hint, type, ...detail });
   }
 
+  // filter it if initialFilteredItem has any item
+  else {
+    return filterInitialItems({ hint, initialFilteredItems, ...detail });
+  }
+}
+
+function filterInitialItems({
+  hint,
+  initialFilteredItems = [],
+  params = ["name", "barcode"],
+  full_match = false,
+}) {
   const matchedItems = [];
 
   // set the hint to lowercase
@@ -70,6 +77,7 @@ async function item_searcher({
   return matchedItems;
 }
 
+// todo: output pada search item adalah Promise
 /**
  * @extends {Submenu}
  */
@@ -225,10 +233,10 @@ export class SearchItem extends Submenu {
     } else {
       // else: search it
       matchedItemsWithBoth = await item_searcher({
-        type: this.#type,
+        hint: this.#hint,
         initialFilteredItems: this.#filteredItems,
+        type: this.#type,
         detail: {
-          hint: this.#hint,
           full_match: false,
         },
       });
@@ -247,12 +255,11 @@ export class SearchItem extends Submenu {
    * @private
    */
   #addToSelectedItemToItemList() {
-    this.#selectedItem.valid = true;
     if (this.#itemReference !== null) {
       // if itemReference params exists,
       // change that reference's item using item's method
-      this.#itemReference.data = {
-        data: this.#selectedItem,
+      this.#itemReference.itemInfo = {
+        itemInfo: this.#selectedItem,
         code: 20,
       };
     } else {
@@ -346,8 +353,9 @@ export class SearchItem extends Submenu {
     // return false if not match exact
 
     const matchExactBarcode = await item_searcher({
+      hint: hint,
       type: windowType,
-      detail: { hint: hint, params: ["barcode"], full_match: true },
+      detail: { params: ["barcode"], full_match: true },
     });
 
     const isMatchExact = matchExactBarcode.length === 1;
@@ -371,8 +379,8 @@ export class SearchItem extends Submenu {
     // return false if hint doesn't match any barcode or name
 
     const matchAny = await item_searcher({
+        hint: hint,
         type: type,
-        detail: { hint: hint, full_match: false },
       }),
       isMatchAny = matchAny.length > 0;
 
@@ -626,9 +634,7 @@ class SearchItemResults {
 
     // select only if any item in matched
     if (this.#matchedItemElements.length > 0 && this.#focusedItemIndex !== null) {
-      this.#searchItem.selectedItem = {
-        ...this.#matchedItemList[this.#focusedItemIndex],
-      };
+      this.#searchItem.selectedItem = this.#matchedItemList[this.#focusedItemIndex];
     }
   }
 

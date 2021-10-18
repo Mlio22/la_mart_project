@@ -318,7 +318,7 @@ class ResultTransactions {
           <div class="item-count">${items.length} Item</div>
           <div class="item-list">${items
             .map((item) => {
-              return `<div class="item-list-child">- ${item.data.name} (${item.data.amount})</div>`;
+              return `<div class="item-list-child">- ${item.itemInfo.name} (${item.data.amount})</div>`;
             })
             .join("")}</div>
       </div>

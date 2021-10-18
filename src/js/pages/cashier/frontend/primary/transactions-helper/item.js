@@ -4,20 +4,20 @@ import { ItemLog } from "../../../../../etc/Log.js";
 import { SearchItem } from "../shortcuts-helper/shortcut-objects/searchItem.js";
 import { CashierInvoker } from "../../dbInvoker.js";
 import { deepEqual } from "../../../../../etc/others.mjs";
+import { ItemDataInformation, EmptyItemInformation } from "../../../../../etc/ItemData.js";
 
 /**
- * @typedef {import('../transactions-helper/itemList').ItemList} ItemList
+ * @typedef {import ('../transactions-helper/itemList').ItemList} ItemList
+ * @typedef {import ('../../../../../etc/ItemData.js').ItemDataInformation} ItemDataInformation
  *
  * @typedef ItemData
  * @type {Object}
- * @property {?number} id - item id from DB
- * @property {string} barcode - item barcode from DB
- * @property {string} name - item name from DB
- * @property {string} quantity - item quantity
- * @property {number} price - item price
- * @property {boolean} valid - is item valid or not?
- * @property {?number} amount - current item amount
- * @property {?number} maxAmount - max amount
+ * @property {ItemDataInformation} itemInfo - contains item information details
+ * @property {Number} amount - amount of this item
+ * @property {Boolean} valid - is item valid (e.g. from DB)
+ * @property {String} hint - barcode hint
+ * @property {Number} maxAmount - maxAmount
+ *
  *
  * @typedef ElementContent
  * @type {Object}
@@ -29,20 +29,6 @@ import { deepEqual } from "../../../../../etc/others.mjs";
  * @property {AmountElement} amountElement
  * @property {TextElement} totalPriceElement
  */
-
-/**
- * @type {ItemData}
- * @constant
- * @default
- */
-const EMPTY_ITEM = {
-  id: null,
-  barcode: "",
-  name: "",
-  quantity: "",
-  price: 0,
-  valid: false,
-};
 
 export class Item {
   /**
@@ -60,7 +46,7 @@ export class Item {
   /**
    * saved item data in DB as buffer
    * and updates Item updated in DB
-   * @type {ItemData}
+   * @type {ItemDataInformation}
    */
   #savedItemData = null;
 
@@ -74,7 +60,12 @@ export class Item {
    * contains data detail of this item
    * @type {ItemData}
    */
-  #data;
+  #data = {
+    itemInfo: null,
+    amount: 1,
+    valid: false,
+    hint: "",
+  };
 
   /**
    * element itemUI
@@ -86,9 +77,9 @@ export class Item {
    * creating item
    * @param {ItemList} itemList - referenced itemlist
    * @param {HTMLElement} listElement - itemlist element
-   * @param {Object} [data]
+   * @param {ItemDataInformation?} [data = EmptyItemInformation]
    */
-  constructor(itemList, listElement, data = { ...EMPTY_ITEM }) {
+  constructor(itemList, listElement, data = new EmptyItemInformation()) {
     /**
      * @type {ItemList}
      */
@@ -132,19 +123,12 @@ export class Item {
    * @param {ItemData} data
    */
   #gatherData(data) {
-    // checks if data has sufficent properties
-    const validProperties = ["barcode", "name", "quantity", "price"],
-      ispropertiesValid = validProperties.every((x) => x in data);
+    this.#data.itemInfo = data;
 
-    if (!ispropertiesValid) {
-      // todo: error
-      this.#data = { ...EMPTY_ITEM };
+    // checks item if it's empty or not
+    if (!(data instanceof EmptyItemInformation)) {
+      this.#data.valid = true;
     }
-
-    this.#data = {
-      amount: 1,
-      ...data,
-    };
   }
 
   /**
@@ -153,7 +137,7 @@ export class Item {
    * @private
    */
   #createUi() {
-    this.#ui = new ItemUI(this, this.#listElement, { ...this.#data });
+    this.#ui = new ItemUI(this, this.#listElement, this.#data.itemInfo, this.#data.amount);
   }
 
   /**
@@ -184,6 +168,7 @@ export class Item {
    * @private
    */
   #checkData() {
+    console.log(this.#data);
     if (this.#data.valid) {
       this.#ui.childElements.barcodeElement.lock();
       this.itemList.createNewItem();
@@ -193,11 +178,11 @@ export class Item {
   }
 
   /**
-   * checking if the #data is the same as EMPTY_ITEM
+   * checking if the #data's information is the same as EmptyItemInformation
    * @returns {boolean} is #data empty
    */
   isItemEmpty() {
-    return JSON.stringify({ ...this.#data, ...EMPTY_ITEM }) === JSON.stringify(this.#data);
+    return this.#data.itemInfo instanceof EmptyItemInformation;
   }
 
   /**
@@ -297,16 +282,13 @@ export class Item {
    * @private
    */
 
-  #resetItemUI() {
-    this.setSeveralItemData({ barcode: "", amount: 1 });
-  }
-
-  /**
-   * resets item data
-   * @private
-   */
   #resetItemData() {
-    this.#data = { amount: 1, ...EMPTY_ITEM };
+    this.setSeveralItemData({
+      hint: "",
+      amount: 1,
+      itemInfo: new EmptyItemInformation(),
+      valid: false,
+    });
   }
 
   /**
@@ -319,6 +301,14 @@ export class Item {
 
   /**
    * @readonly
+   * @returns {ItemDataInformation}
+   */
+  get itemInfo() {
+    return this.#data.itemInfo;
+  }
+
+  /**
+   * @readonly
    * @returns {ItemUI}
    */
   get ui() {
@@ -326,28 +316,17 @@ export class Item {
   }
 
   /**
-   * set data absolutely, from e.g. search-item
-   * so the data will be always valid
-   * unless it's duplicate, it'll be resetted
-   * it only needs item id to log
-   * function called from search-item
-   *
-   * @param {object} setDataParam
-   * @param {ItemData} setDataParam.data
-   * @param {?number} setDataParam.code
-   *
+   * sets itemInfo details (e.g. from search item)
+   * @param {Object} setItemInfoParam
+   * @param {ItemDataInformation} itemInfo - new itemInfo
+   * @param {Number} code - log code
    */
-  set data({ data = EMPTY_ITEM, code = null }) {
-    // logging
-    this.#itemLog.push(new ItemLog(code, data));
 
-    // add previous amount
-    const { amount: previousAmount } = this.#data;
-    this.#data = Object.assign(data, {
-      amount: previousAmount,
-    });
+  set itemInfo({ itemInfo, code }) {
+    this.#itemLog.push(new ItemLog(code, itemInfo));
 
-    // check duplicate
+    this.#data.itemInfo = itemInfo;
+
     this.checkDuplicateFromItem();
 
     this.#ui.itemContent = this.#data;
@@ -372,7 +351,6 @@ export class Item {
 
       // reset current item's data
       this.#resetItemData();
-      this.#resetItemUI();
     } else {
       this.#data.valid = true;
     }
@@ -385,12 +363,12 @@ export class Item {
    * opens search item with current barcode as hint
    */
   async openSearchFromItem() {
-    const hint = this.#data.barcode;
+    const hint = this.#data.hint;
 
     // attemp to exact match before open searchItem submenu
     const exactMatch = await SearchItem.exactMatch(hint, "cashier");
     if (exactMatch) {
-      this.data = { data: exactMatch, code: 21 };
+      this.itemInfo = { itemInfo: exactMatch, code: 21 };
     }
 
     // proceed to open searchItem submenu if doesnt match
@@ -410,7 +388,7 @@ export class Item {
    */
   async storeItemtoDB() {
     let itemDetail = {
-      itemId: this.#data.id,
+      itemId: this.#data.itemInfo.id,
       amount: this.#data.amount,
       log: this.#itemLog.map((log) => log.log),
     };
@@ -477,9 +455,10 @@ class ItemUI {
    * creates childs UI input elements like barcode, name, amount etc
    * @param {Item} item - referenced item
    * @param {HTMLElement} listElement
-   * @param {ItemData} data
+   * @param {ItemDataInformation?} [data = EmptyItemInformation]
+   * @param {Number?} [initialAmount = 1] - initial item amount
    */
-  constructor(item, listElement, data = { ...EMPTY_ITEM }) {
+  constructor(item, listElement, itemInfo = new EmptyItemInformation(), initialAmount = 1) {
     /**
      * @type {Item}
      */
@@ -490,30 +469,33 @@ class ItemUI {
      */
     this.listElement = listElement;
 
-    this.#createElement(data);
+    this.#createElement(itemInfo, initialAmount);
   }
 
   /**
    * create item wrapper element
    * @param {ItemData} data
    */
-  #createElement(data) {
+  #createElement(itemInfo, initialAmount) {
     // create tr element
     this.#itemElement = document.createElement("tr");
     this.#itemElement.className = "purchases-contents";
 
     // get the required data
-    const { name, quantity, price, amount } = data;
+    const { barcode, name, quantity, price } = itemInfo;
 
     // create child elements
     this.#itemContentElement = {
       actionElement: new ActionElement(this.item),
-      barcodeElement: new BarcodeElement(this.item),
+      barcodeElement: new BarcodeElement(this.item, barcode),
       nameElement: new TextElement("name-content", name),
       quantityElement: new TextElement("type-content", quantity),
       priceElement: new TextElement("price-content", set_proper_price(price)),
-      amountElement: new AmountElement(this.item),
-      totalPriceElement: new TextElement("total-price-content", set_proper_price(price * amount)),
+      amountElement: new AmountElement(this.item, initialAmount),
+      totalPriceElement: new TextElement(
+        "total-price-content",
+        set_proper_price(price * initialAmount)
+      ),
     };
 
     // append childs to wrapper
@@ -538,7 +520,8 @@ class ItemUI {
 
   set itemContent(newItemData) {
     // get item datas and elements
-    const { name, barcode, quantity, price, amount, valid } = newItemData;
+    const { name, barcode, quantity, price } = newItemData.itemInfo;
+    const { hint, amount, valid } = newItemData;
     const {
       actionElement,
       barcodeElement,
@@ -553,7 +536,7 @@ class ItemUI {
     if (valid) actionElement.ableToDelete();
 
     // set element with datas
-    barcodeElement.barcode = barcode;
+    barcodeElement.barcode = barcode || hint;
     nameElement.text = name;
     quantityElement.text = quantity;
     priceElement.text = set_proper_price(price);

@@ -134,13 +134,14 @@ export class BarcodeElement {
    * creates barcode element
    * @constructor
    * @param {Item} item
+   * @param {String} initialBarcode
    */
-  constructor(item) {
+  constructor(item, initialBarcode) {
     this.item = item;
 
     // set barcode's value with initial barcode from item
     // e.g. an item added from SearchItem shortcut, so barcode's input value is not null
-    this.#currentBarcodeValue = item.data.barcode;
+    this.#currentBarcodeValue = initialBarcode;
 
     this.#createBarcodeElement();
 
@@ -199,13 +200,14 @@ export class BarcodeElement {
      * @param {Event} e
      */
     const checkChange = (e) => {
+      // todo: change function name
       const barcodeValue = e.target.value;
 
       // update #barcodeValue
       this.#currentBarcodeValue = barcodeValue;
 
       if (barcodeValue.length > 0) {
-        this.item.setSeveralItemData({ barcode: barcodeValue });
+        this.item.setSeveralItemData({ hint: barcodeValue });
         const isDuplicate = this.item.checkDuplicateFromItem();
 
         if (isDuplicate) {
@@ -377,12 +379,13 @@ export class AmountElement {
   /**
    * creates amount element
    * @param {Item} item
+   * @param {Number} [initialAmount = 1]
    */
-  constructor(item) {
+  constructor(item, initialAmount) {
     this.item = item;
 
     // set the value
-    this.#currentAmountValue = item.data.amount;
+    this.#currentAmountValue = initialAmount;
 
     // initialize
     this.#createAmountElement();
@@ -474,7 +477,5 @@ export class AmountElement {
     // set max amount if transaction is completed
     this.#maxAmountValue = this.item.data.maxAmount;
     this.#amountElement.max = this.#maxAmountValue;
-
-    console.log(this.#maxAmountValue);
   }
 }
