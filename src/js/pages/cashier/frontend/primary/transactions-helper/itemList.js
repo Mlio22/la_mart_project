@@ -82,7 +82,10 @@ export class ItemList {
   checkDuplicateOnList(itemReference) {
     // called from item, itemElement
     const indexOnList = this.#items.indexOf(itemReference);
-    const duplicatedItemIndex = this.#duplicateItemIndexBarcode(itemReference, indexOnList);
+    const duplicatedItemIndex = this.#duplicateItemIndexBarcode(
+      itemReference.itemInfo,
+      indexOnList
+    );
 
     if (duplicatedItemIndex >= 0) {
       // add the same amount of new item to duplicated item
@@ -267,26 +270,24 @@ export class ItemList {
    * @param {?number} indexOnList - item's index in list (if any)
    * @returns {(number | boolean)}
    */
-  #duplicateItemIndexBarcode(comparedItemData, indexOnList = null) {
-    if (comparedItemData.itemInfo) {
-      const { barcode: comparedBarcode } = comparedItemData.itemInfo;
+  #duplicateItemIndexBarcode(comparedItemDataInfo, indexOnList = null) {
+    const { barcode: comparedBarcode } = comparedItemDataInfo;
 
-      const transactionLength = this.#items.length;
-      for (let itemIndex = 0; itemIndex < transactionLength; itemIndex++) {
-        // skips if it its (comparedItemData's) index
-        if (indexOnList === itemIndex) {
-          continue;
-        }
-
-        // compare with barcode
-        const { barcode: barcodeFromList } = this.#items[itemIndex].itemInfo;
-
-        if (comparedBarcode === barcodeFromList) {
-          return itemIndex;
-        }
+    const transactionLength = this.#items.length;
+    for (let itemIndex = 0; itemIndex < transactionLength; itemIndex++) {
+      // skips if it its (comparedItemData's) index
+      if (indexOnList === itemIndex) {
+        continue;
       }
-      return -1;
+
+      // compare with barcode
+      const { barcode: barcodeFromList } = this.#items[itemIndex].itemInfo;
+
+      if (comparedBarcode === barcodeFromList) {
+        return itemIndex;
+      }
     }
+    return -1;
   }
 
   /**
