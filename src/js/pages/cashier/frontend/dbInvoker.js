@@ -121,15 +121,24 @@ export class ItemInvoker {
     // todo: throw error if params has insufficent values
     // todo: search from #searchItemList first before using DB
 
-    const details = { hint, params, full_match, type };
-    let searchedItems = await ipcRenderer.invoke("search-item-db", { ...details });
+    let searchedItems;
 
+    if (this.#searchedItemList[hint]) {
+      searchedItems = this.#searchedItemList[hint];
+    } else {
+      const details = { hint, params, full_match, type };
+      searchedItems = await ipcRenderer.invoke("search-item-db", { ...details });
+
+      // add to searchItemDetails list
+      this.#searchedItemList[hint] = searchedItems;
+    }
+
+    // set to cashier dataInformation
     searchedItems = searchedItems.map((searchedItemData) => {
-      return new ItemDataInformation(searchedItemData);
+      return new ItemDataInformation(type, searchedItemData);
     });
 
-    // add to searchItemDetails list
-    this.#searchedItemList[hint] = searchedItems;
+    console.log(this.#searchedItemList);
 
     return [...searchedItems];
   }

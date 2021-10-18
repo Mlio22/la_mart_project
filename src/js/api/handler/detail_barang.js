@@ -22,7 +22,7 @@ const db = require("../models/models");
  * @param {String} searchItemParam.type - cashier or stock?
  * @returns {Promise<Array<ItemData>>} list of matching results
  */
-async function searchItemDB({ hint, params: searchBy, full_match: exactSearch, type }) {
+async function searchItemDB({ hint, params: searchBy, full_match: exactSearch }) {
   if (hint === "") return [];
 
   const queries = [];
@@ -55,11 +55,8 @@ async function searchItemDB({ hint, params: searchBy, full_match: exactSearch, t
     ["nama_barang", "name"],
     ["satuan_barang", "quantity"],
     ["harga_jual", "priceSell"],
+    ["harga_beli", "priceBuy"],
   ];
-
-  if (type === "stock") {
-    attributes.push(["harga_beli", "priceBuy"]);
-  }
 
   const query = {
     [Op.or]: queries,

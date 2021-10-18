@@ -24,8 +24,12 @@ class ItemDataInformation {
     priceSell: null,
   };
 
-  constructor({ id, name, barcode, quantity, priceBuy = null, priceSell }) {
-    this.#dataDetails = { id, name, barcode, quantity, priceBuy, priceSell };
+  constructor(type, { id, name, barcode, quantity, priceBuy = null, priceSell }) {
+    this.#dataDetails = { id, name, barcode, quantity, priceSell };
+
+    if (type == "stock") {
+      this.#dataDetails.priceBuy = priceBuy;
+    }
   }
 
   get id() {
@@ -60,7 +64,7 @@ class ItemDataInformation {
 
 class EmptyItemInformation extends ItemDataInformation {
   constructor() {
-    super({
+    super("cashier", {
       id: null,
       barcode: "",
       name: "",

@@ -137,7 +137,7 @@ export class SearchItem extends Submenu {
    * @private
    */
   // todo: set this to static to not oversearch DB even more
-  #filteredListBuffer = [];
+  #filteredListBuffer = { "": [] };
 
   /**
    * @param {SubmenuWrapper} submenuWrapper
@@ -244,6 +244,8 @@ export class SearchItem extends Submenu {
       // add filtereditems into buffer
       this.#filteredListBuffer[this.#hint] = matchedItemsWithBoth;
     }
+
+    console.log(this.#filteredListBuffer);
 
     // set the results
     this.#filteredItems = matchedItemsWithBoth;
