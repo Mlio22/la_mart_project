@@ -24,27 +24,34 @@ const cancelHTML = `<div class="header">Batalkan Transaksi?</div>
 const paymentHTML = `
 <div class="payment-header">Pembayaran</div>
 <div class="payment-content">
-    <div class="customer">
-        <div class="customer-header">Uang:</div>
-        Rp.<input class="customer-content">
+  <div class="customer">
+    <div class="customer-header header">Uang:</div>
+    Rp.<div class="customer-content-wrapper content-wrapper">
+      <input class="customer-content input">
+      <input class=" customer-content auto" readonly>
     </div>
-    <div class="price">
-        <div class="price-header">Total Belanja:</div>
-        Rp.<input class="price-content" readonly>
+  </div>
+  <div class=" price">
+    <div class="price-header header">Total Belanja:</div>
+    Rp.<div class="price-content-wrapper content-wrapper">
+      <input class="price-content" readonly>
     </div>
-    <div class="divider"></div>
-    <div class="change">
-        <div class="change-header">Kembalian:</div>
-        Rp.<input class="change-content" readonly>
+  </div>
+  <div class="divider"></div>
+  <div class="change">
+    <div class="change-header header">Kembalian:</div>
+    Rp.<div class="change-content-wrapper content-wrapper">
+      <input class="change-content" readonly>
     </div>
+  </div>
 </div>
 <div class="payment-actions">
-    <button class="cancel">
-        <i class="fas fa-times"></i>Batalkan
-    </button>
-    <button class="proceed">
-        <i class="fas fa-check"></i>Selesai
-    </button>
+  <button class="cancel">
+    <i class="fas fa-times"></i>Batalkan
+  </button>
+  <button class="proceed">
+    <i class="fas fa-check"></i>Selesai
+  </button>
 </div>`;
 
 const openTransactionHTML = `

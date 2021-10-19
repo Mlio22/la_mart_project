@@ -31,11 +31,25 @@ export class Payment extends Submenu {
   #customerMoney;
 
   /**
-   * contais customer's money element
+   * contains customer's money element
    * @type {HTMLElement}
    * @private
    */
   #customerMoneyElement;
+
+  /**
+   * contains customer's money autocomplete element(readonly)
+   * @type {HTMLElement}
+   * @private
+   */
+  #customerMoneyAutoElement;
+
+  /**
+   * contains state if autocomplete customer's money is available
+   * @type {Boolean}
+   * @private
+   */
+  #isAutoCompleteAvailable = false;
 
   /**
    * contains change value
@@ -100,23 +114,10 @@ export class Payment extends Submenu {
 
   /**@override */
   _setListener() {
-    // listen to payment div
-    this._submenuElement.addEventListener("keydown", ({ key }) => {
-      if (key === "Enter") {
-        // on enter to proceed payment and end the payment
-        // this only works if the #sufficient is true
-        this.#proceedPayment();
-      } else if (key === "Tab") {
-        // close submenu
-        this.#cancelPayment();
-      }
-    });
-
-    // listen to customer-content
-    // every time it changed, change the change too
-    this.#customerMoneyElement.addEventListener("input", (e) => {
-      const input = e.target.value,
-        inputNumber = Number(input.replace(/\./g, ""));
+    // refreshes customeer input money, and refreshes auto and change too
+    const refreshCostumerInput = () => {
+      const inputValue = this.#customerMoneyElement.value,
+        inputNumber = Number(inputValue.replace(/\./g, ""));
 
       //   checks input is number
       if (isFinite(inputNumber)) {
@@ -126,6 +127,38 @@ export class Payment extends Submenu {
       // resets customer money to proper string
       this.#customerMoneyElement.value = set_proper_price(this.#customerMoney);
       this.#refreshChange();
+      this.#refreshAuto();
+    };
+
+    // listen to payment div
+    this._submenuElement.addEventListener("keydown", ({ key }) => {
+      if (key === "Enter") {
+        // set costumer's money value to auto value if user presses enter if autocomplete is available
+        if (this.#isAutoCompleteAvailable) {
+          this.#customerMoneyElement.value = this.#customerMoneyAutoElement.value;
+          this.#isAutoCompleteAvailable = false;
+
+          refreshCostumerInput();
+        } else {
+          // on enter to proceed payment and end the payment
+          // this only works if the #sufficient is true
+          this.#proceedPayment();
+        }
+      } else if (key === "Tab") {
+        // close submenu
+        this.#cancelPayment();
+      }
+    });
+
+    // listen to customer-content
+    // every time it changed, change the change too
+    this.#customerMoneyElement.addEventListener("input", () => {
+      refreshCostumerInput();
+    });
+
+    // focus to customer input (not auto) when the auto is clicked
+    this.#customerMoneyAutoElement.addEventListener("click", () => {
+      this.#customerMoneyElement.focus();
     });
 
     // listen to both buttons
@@ -143,7 +176,9 @@ export class Payment extends Submenu {
    * @private
    */
   #gatherElementInputs() {
-    this.#customerMoneyElement = this._submenuElement.querySelector(".customer-content");
+    this.#customerMoneyElement = this._submenuElement.querySelector(".customer-content.input");
+    this.#customerMoneyAutoElement = this._submenuElement.querySelector(".customer-content.auto");
+
     this.#totalElement = this._submenuElement.querySelector(".price-content");
     this.#changeElement = this._submenuElement.querySelector(".change-content");
 
@@ -178,6 +213,33 @@ export class Payment extends Submenu {
     const change = `${this.#isSufficient ? "" : "-"} ${set_proper_price(Math.abs(this.#change))}`;
 
     this.#changeElement.value = change;
+  }
+
+  /**
+   * refreshes customer money auto element's autocomplete
+   * @private
+   */
+  #refreshAuto() {
+    // just for now, add sufficent zeros to autocomplete
+    let autoValue = this.#customerMoney;
+    let autoText = this.#customerMoneyElement.value;
+
+    if (this.#customerMoney < this.#total) {
+      if (autoValue === 0) {
+        autoValue = 0;
+      } else {
+        while (autoValue < this.#total) {
+          autoValue *= 10;
+          autoText += "0";
+        }
+      }
+
+      this.#customerMoneyAutoElement.value = autoText;
+      this.#isAutoCompleteAvailable = true;
+    } else {
+      this.#customerMoneyAutoElement.value = "";
+      this.#isAutoCompleteAvailable = false;
+    }
   }
 
   /**

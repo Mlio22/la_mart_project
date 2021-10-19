@@ -19,14 +19,23 @@
 }
 .submenu .payment .payment-content > div:not(.divider) > div {
   width: calc(50% - 20px);
+  position: relative;
 }
-.submenu .payment .payment-content > div:not(.divider) > input {
-  width: 50%;
+.submenu .payment .payment-content > div:not(.divider) > div > input {
+  width: 75%;
   background-color: transparent;
   border: none;
   font-size: 24px;
   outline: none;
   padding: 0 10px;
+  z-index: 2;
+  position: relative;
+}
+.submenu .payment .payment-content > div:not(.divider) > div > input.auto {
+  position: absolute;
+  left: 0;
+  z-index: 1;
+  color: #888585;
 }
 .submenu .payment .payment-content > div:not(.divider) input:not(.customer-content) {
   cursor: default;
@@ -45,7 +54,7 @@
   margin: auto;
   text-align: center;
   padding: 25px 30px;
-  background-color: #DCDCDC;
+  background-color: #dcdcdc;
   font-size: 20px;
   border-radius: 10px;
   transition: 0.1s all;
