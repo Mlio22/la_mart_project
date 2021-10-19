@@ -123,6 +123,10 @@ export class ItemList {
     // set total price to be check for payment
     this.transaction.cashInfo = { totalPrice: currentTotalPrice };
     this.transaction.transactionList.cashier.childs.totalPrice.totalPrice = currentTotalPrice;
+
+    if (this.transaction.completed) {
+      this.transaction.transactionList.cashier.childs.paymentDetails.showFromCurrentTransaction();
+    }
   }
 
   /**
