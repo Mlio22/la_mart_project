@@ -247,10 +247,21 @@ export class BarcodeElement {
 
     // arrow up / down to change its amount
     const changeAmountByArrow = (key) => {
+      const lastCaret = this.#barcodeElement.selectionStart;
+      const setToLastCaret = () => {
+        setTimeout(() => {
+          this.#barcodeElement.setSelectionRange(lastCaret, lastCaret);
+        }, 10);
+      };
+
       if (key === "ArrowUp") {
         this.item.increaseAmount();
       } else if (key === "ArrowDown") {
         this.item.decreaseAmount();
+      }
+
+      if (key === "ArrowUp" || key === "ArrowDown") {
+        setToLastCaret();
       }
     };
 
@@ -278,8 +289,12 @@ export class BarcodeElement {
    * @param {String} barcode - new barcode
    */
   set barcode(barcode) {
-    this.#currentBarcodeValue = barcode;
-    this.#barcodeElement.value = barcode;
+    const barcodeBefore = this.#currentBarcodeValue;
+
+    if (barcode !== barcodeBefore) {
+      this.#currentBarcodeValue = barcode;
+      this.#barcodeElement.value = barcode;
+    }
   }
 }
 
