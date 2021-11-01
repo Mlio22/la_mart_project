@@ -102,7 +102,7 @@ export class ItemInvoker {
    * contains previously searched item details, for faster searching
    * @static
    * @private
-   * @type {Array<ItemData>}
+   * @type {Object<Array<ItemData>>}
    */
   static #searchedItemList = [];
 
@@ -123,7 +123,7 @@ export class ItemInvoker {
 
     let searchedItems;
 
-    if (this.#searchedItemList[hint]) {
+    if (this.#searchedItemList[hint]?.length > 0) {
       searchedItems = this.#searchedItemList[hint];
     } else {
       const details = { hint, params, full_match, type };
@@ -137,8 +137,6 @@ export class ItemInvoker {
     searchedItems = searchedItems.map((searchedItemData) => {
       return new ItemDataInformation(type, searchedItemData);
     });
-
-    console.log(this.#searchedItemList);
 
     return [...searchedItems];
   }
