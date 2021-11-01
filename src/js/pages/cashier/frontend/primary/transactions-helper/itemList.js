@@ -190,9 +190,13 @@ export class ItemList {
    * @async
    */
   async deleteItemsFromDB() {
+    const deleteQuery = [];
+
     this.#items.forEach(async (item) => {
-      await item.deleteItemDB();
+      deleteQuery.push(item.deleteItemDB());
     });
+
+    await Promise.all(deleteQuery);
   }
 
   /**
