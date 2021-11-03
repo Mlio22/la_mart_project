@@ -18,7 +18,7 @@ div.submenuCover {
   justify-content: center;
 }
 div.submenuCover div.submenu {
-  background-color: #D0D0D0;
+  background-color: #d0d0d0;
   padding: 10px;
   border-radius: 10px;
   color: #272626;
@@ -37,7 +37,7 @@ div.cashier {
 div.cashier div.left-bar {
   width: 70%;
   height: 100vh;
-  background-color: #F6F6F6;
+  background-color: #f6f6f6;
 }
 div.cashier div.left-bar div.purchases-wrapper {
   height: calc(100vh - 70px);
@@ -48,14 +48,14 @@ div.cashier div.left-bar div.purchases-wrapper table.purchases {
 }
 div.cashier div.left-bar div.purchases-wrapper table.purchases td,
 div.cashier div.left-bar div.purchases-wrapper table.purchases th {
-  border-right: 1px solid #E6E6E6;
-  border-bottom: 1px solid #E6E6E6;
+  border-right: 1px solid #e6e6e6;
+  border-bottom: 1px solid #e6e6e6;
 }
 div.cashier div.left-bar div.purchases-wrapper table.purchases th {
   font-size: 20px;
   position: sticky;
   top: 0;
-  background-color: #E6E6E6;
+  background-color: #e6e6e6;
 }
 div.cashier div.left-bar div.purchases-wrapper table.purchases td {
   background-color: #eeeeee;
@@ -133,7 +133,7 @@ div.cashier div.left-bar div.purchases-wrapper table.purchases tr.purchases-cont
   text-align: center;
 }
 div.cashier div.left-bar div.left-bottom-bar {
-  border-top: 1px solid #E6E6E6;
+  border-top: 1px solid #e6e6e6;
   height: 69px;
   display: flex;
 }
@@ -147,6 +147,7 @@ div.cashier div.left-bar div.left-bottom-bar div.notification {
   padding: 10px;
   border-radius: 10px;
   box-shadow: #00000012 0px 3px 6px;
+  cursor: pointer;
 }
 div.cashier div.left-bar div.left-bottom-bar div.notification i.notification-icon {
   margin-right: 20px;
@@ -159,6 +160,11 @@ div.cashier div.left-bar div.left-bottom-bar div.notification.warning {
 }
 div.cashier div.left-bar div.left-bottom-bar div.notification.error {
   background-color: #f89e9e;
+}
+div.cashier div.left-bar div.left-bottom-bar div.notification.dissapearing {
+  cursor: default;
+  animation-name: dissapearing-notification;
+  animation-duration: 1s;
 }
 div.cashier div.left-bar div.left-bottom-bar div.total-price {
   display: flex;
@@ -177,7 +183,7 @@ div.cashier div.left-bar div.left-bottom-bar div.total-price div.total-price-con
 div.cashier div.right-bar {
   width: calc(30% - 1px);
   height: 100vh;
-  background-color: #E6E6E6;
+  background-color: #e6e6e6;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -187,7 +193,7 @@ div.cashier div.right-bar div.payment {
   transition: none;
   opacity: 0;
   visibility: hidden;
-  border-bottom: 1px solid #DBDBDB;
+  border-bottom: 1px solid #dbdbdb;
   margin: auto;
   height: 400px;
   width: 400px;
@@ -297,5 +303,13 @@ div.cashier div.right-bar div.shortcuts div.shortcut:not(.disabled):hover, div.c
 
   i.shortcut-icon {
     font-size: 30px !important;
+  }
+}
+@keyframes dissapearing-notification {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }

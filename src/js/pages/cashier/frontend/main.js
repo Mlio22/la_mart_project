@@ -1,6 +1,6 @@
 import { TransactionList } from "./primary/transactionList.js";
 import { TotalPrice } from "./primary/totalPrice.js";
-// import { Notification } from './ui/notification.js'
+import { Notification } from "./primary/notification.js";
 import { ShortcutWrapper } from "./primary/shortcutWrapper.js";
 import { PaymentDetails } from "./primary/paymentDetails.js";
 import { SubmenuWrapper } from "./primary/submenuWrapper.js";
@@ -13,6 +13,7 @@ import { Cancel } from "./primary/shortcuts-helper/shortcut-objects/cancel.js";
  * @property {PaymentDetails} paymentDetails
  * @property {TransactionList} transactionList
  * @property {TotalPrice} totalPrice
+ * @property {Notification} notification
  * @property {SubmenuWrapper} submenu
  */
 
@@ -27,6 +28,7 @@ export class CashierUI {
     paymentDetails: new PaymentDetails(this),
     transactionList: new TransactionList(this),
     totalPrice: new TotalPrice(this),
+    notification: new Notification(this),
 
     // submenu
     submenu: new SubmenuWrapper(this),
@@ -53,6 +55,7 @@ export class CashierUI {
     this.#cashierChild.paymentDetails.init();
     this.#cashierChild.transactionList.init();
     this.#cashierChild.totalPrice.init();
+    this.#cashierChild.notification.init();
     this.#cashierChild.submenu.init();
   }
 
