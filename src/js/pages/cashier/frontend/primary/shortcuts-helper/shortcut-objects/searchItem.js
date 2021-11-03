@@ -250,6 +250,10 @@ export class SearchItem extends Submenu {
     // set the results
     this.#filteredItems = matchedItemsWithBoth;
     this.#searchItemResult.setMatches(matchedItemsWithBoth);
+
+    if (matchedItemsWithBoth.length === 0) {
+      this.focusToHint();
+    }
   }
 
   /**
